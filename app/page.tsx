@@ -1,101 +1,147 @@
-import Image from "next/image";
+// app/page.tsx
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
+interface Annonce {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  measure_type: "poids" | "quantité";
+  measure_value: number;
+  expiration_date: string;
+  meeting_points: string;
+  photo: string;
+  publication_date: string;
+}
+
+export default function HomePage() {
+  const searchParams = useSearchParams();
+  const [showPopup, setShowPopup] = useState(false);
+  const [annonces, setAnnonces] = useState<Annonce[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Affichage du pop-up si la connexion a réussi (paramètre success=login dans l'URL)
+  useEffect(() => {
+    if (searchParams.get("success") === "login") {
+      setShowPopup(true);
+      const timer = setTimeout(() => {
+        setShowPopup(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  // Récupération des annonces via l'API
+  useEffect(() => {
+    async function fetchAnnonces() {
+      try {
+        const res = await fetch("/api/annonces");
+        const data = await res.json();
+        if (data.success) {
+          setAnnonces(data.annonces);
+        } else {
+          setError(data.error || "Erreur lors du chargement des annonces.");
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des annonces:", error);
+        setError("Erreur lors du chargement des annonces.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnnonces();
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div style={{ padding: "2rem" }}>
+      {showPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            backgroundColor: "#4caf50",
+            color: "white",
+            padding: "1rem",
+            borderRadius: "5px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
+          }}
+        >
+          Connecté avec succès !
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      )}
+      <h1
+        style={{
+          fontSize: "2.5rem",
+          marginBottom: "1rem",
+          textAlign: "center",
+        }}
+      >
+        Bienvenue sur notre plateforme alimentaire
+      </h1>
+      <p style={{ fontSize: "1.2rem", color: "#555", textAlign: "center" }}>
+        Découvrez nos dons alimentaires.
+      </p>
+      <hr style={{ margin: "2rem 0" }} />
+      {loading ? (
+        <p>Chargement des annonces...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: "1rem",
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {annonces.map((annonce) => (
+            <div
+              key={annonce.id}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "1rem",
+              }}
+            >
+              <h2>{annonce.title}</h2>
+              <img
+                src={annonce.photo}
+                alt={annonce.title}
+                style={{ width: "100%", height: "auto", borderRadius: "5px" }}
+              />
+              <p>
+                <strong>Description:</strong> {annonce.description}
+              </p>
+              <p>
+                <strong>Catégorie:</strong> {annonce.category}
+              </p>
+              <p>
+                <strong>
+                  {annonce.measure_type === "poids" ? "Poids" : "Quantité"}:
+                </strong>{" "}
+                {annonce.measure_value}{" "}
+                {annonce.measure_type === "poids" ? "kg" : ""}
+              </p>
+              <p>
+                <strong>Date limite:</strong>{" "}
+                {new Date(annonce.expiration_date).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Points de rendez-vous:</strong> {annonce.meeting_points}
+              </p>
+              <p>
+                <strong>Publié le:</strong>{" "}
+                {new Date(annonce.publication_date).toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
