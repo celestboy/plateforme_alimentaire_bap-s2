@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+ Particulier
+ Commerçant
+}
+
+model Users {
+  user_id  Int @id @default(autoincrement())
+  user_type UserStatus @default(Particulier)
+  username  String? @unique
+  commerce_name String? @unique
+  adresse_commerce String? @unique
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  sentMessages  Messages[] @relation("SentMessages")
+  receivedMessages  Messages[] @relation("ReceivedMessages")
+  dons Dons[]
+}
+
+model Dons {
+  don_id Int @id @default(autoincrement())
+  title String
+  description String
+  category String
+  quantity Float
+  limit_date DateTime
+  rdv_pts Json
+  img_url String?
+  publishedAt DateTime @default(now())
+  status Boolean @default(false)
+  lieu String?
+  Heure DateTime?
+  donneur_id Int
+  donneur Users @relation(fields: [donneur_id], references: [user_id])
+}
+
+model Messages {
+  message_id  Int @id @default(autoincrement())
+  content String
+  sentAt  DateTime @default(now())
+  author_id Int
+  author  Users @relation("SentMessages", fields: [author_id], references: [user_id])
+  receiver_id Int
+  receiver  Users @relation("ReceivedMessages", fields: [receiver_id], references: [user_id])
+}

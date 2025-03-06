@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `dons` ADD COLUMN `Heure` DATETIME(3) NULL,
+    ADD COLUMN `lieu` VARCHAR(191) NULL,
+    ADD COLUMN `status` BOOLEAN NOT NULL DEFAULT false;
