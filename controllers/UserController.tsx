@@ -17,7 +17,11 @@ class UserController {
   }
 
   async store(data: RegisterSchemaType) {
-    const user_type = data.user_type as UserStatus;
+    const user_type = ["commerçant", "commercant"].includes(
+      data.user_type.toLowerCase()
+    )
+      ? UserStatus.Commerçant
+      : UserStatus.Particulier;
     const username = data.username;
     const commerce_name = data.commerce_name;
     const adresse_commerce = data.adresse_commerce;

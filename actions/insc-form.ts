@@ -25,8 +25,9 @@ const submitInscForm = async (
     }
 
     return { success: true, message: "Compte créé avec succès" };
-  } catch (err) {
-    console.log("Error while creating user:", err);
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error(error.stack);
     return {
       success: false,
       message: "Erreur lors de la création du compte",
