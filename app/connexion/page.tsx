@@ -7,7 +7,7 @@ export default function Login() {
       <h3>Page de login</h3>
       <div>
         <Link href="/register">
-          <button type="button">Je m'inscris</button>
+          <button type="button">Je m&apos;inscris</button>
         </Link>
       </div>
       <div>

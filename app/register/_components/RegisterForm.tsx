@@ -79,7 +79,7 @@ export default function RegisterForm() {
           <div className="relative w-[600px]">
             <span className="font-semibold font-Montserrat text-gray-600 flex items-center">
               <User className="mr-4" />
-              Nom d'utilisateur :
+              Nom d&apos;utilisateur :
             </span>
             <input
               type="text"

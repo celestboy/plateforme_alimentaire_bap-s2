@@ -28,15 +28,6 @@ class UserController {
     const email = data.email;
     const hashedPassword = await hashPassword(data.password);
 
-    // console.log(
-    //   user_type,
-    //   username,
-    //   commerce_name,
-    //   adresse_commerce,
-    //   email,
-    //   hashedPassword
-    // );
-
     const user = await prisma.users.create({
       data: {
         user_type,
@@ -67,7 +58,7 @@ class UserController {
     email: string,
     password: string
   ) {
-    let user = await prisma.users.update({
+    const user = await prisma.users.update({
       where: { user_id: id_user },
       data: { username, commerce_name, adresse_commerce, email, password },
     });

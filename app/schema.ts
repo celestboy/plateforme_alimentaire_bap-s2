@@ -30,7 +30,14 @@ export const LoginSchema = z.object({
 export const DonSchema = z.object({
   title: z.string().nonempty(),
   description: z.string().max(200).nonempty(),
-  category: z.string().nonempty(),
+  category: z.enum([
+    "produits-laitiers",
+    "feculents",
+    "viande",
+    "boisson",
+    "desserts",
+    "autres",
+  ]),
   quantity: z.number().min(0.1).max(1000),
   limit_date: z
     .string()
@@ -44,7 +51,7 @@ export const DonSchema = z.object({
         message: "L'heure doit être valide et dans le futur.",
       }
     ),
-  rdv_pts: z.string().nonempty(),
+  rdv_pts: z.array(z.string().nonempty()),
 });
 
 export const ValidateSchema = z.object({

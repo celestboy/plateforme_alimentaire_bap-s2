@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "lieu": "Place de l'église",
+    "value": "place-de-leglise"
+  },
+  {
+    "id": 2,
+    "lieu": "Rue de la Barque",
+    "value": "rue-de-la-barque"
+  },
+  {
+    "id": 3,
+    "lieu": "Rue du Gard",
+    "value": "rue-du-gard"
+  },
+  {
+    "id": 4,
+    "lieu": "Avenue du Temple",
+    "value": "avenue-du-temple"
+  },
+  {
+    "id": 5,
+    "lieu": "Allée de Toulouse",
+    "value": "allee-de-toulouse"
+  }
+]

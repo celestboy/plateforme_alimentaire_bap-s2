@@ -37,10 +37,10 @@ model Dons {
   title String
   description String
   category String
-  quantity Float
+  quantity Int
   limit_date DateTime
   rdv_pts Json
-  img_url String?
+  img_url String
   publishedAt DateTime @default(now())
   status Boolean @default(false)
   lieu String?

@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        futuraPt: "var(--font-futura-pt)",
+      },
       colors: {
         cream: "#FDEAD8",
         "dark-blue": "#084784",
