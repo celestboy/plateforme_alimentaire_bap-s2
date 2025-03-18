@@ -1,5 +1,6 @@
+import ParticulierBox from "./_components/ParticulierBox";
+import CommercantBox from "./_components/CommercantBox";
 import Link from "next/link";
-import RegisterForm from "./_components/RegisterForm";
 
 export default function RegisterSchema() {
   return (
@@ -10,8 +11,9 @@ export default function RegisterSchema() {
           <button type="button">Je me connecte</button>
         </Link>
       </div>
-      <div>
-        <RegisterForm />
+      <div className="flex justify-center items-center gap-10">
+        <ParticulierBox />
+        <CommercantBox />
       </div>
     </div>
   );

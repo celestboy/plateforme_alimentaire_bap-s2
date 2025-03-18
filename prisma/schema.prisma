@@ -13,14 +13,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserStatus {
- Particulier
- Commerçant
-}
-
 model Users {
   user_id  Int @id @default(autoincrement())
-  user_type UserStatus @default(Particulier)
+  user_type String
   username  String? @unique
   commerce_name String? @unique
   adresse_commerce String? @unique
@@ -46,7 +41,7 @@ model Dons {
   lieu String?
   Heure DateTime?
   donneur_id Int
-  donneur Users @relation(fields: [donneur_id], references: [user_id])
+  donneur Users @relation(fields: [donneur_id], references: [user_id], onDelete: Cascade)
 }
 
 model Messages {

@@ -1,6 +1,6 @@
-import { RegisterSchemaType } from "@/types/forms";
+import { RegisterCommercantSchemaType } from "@/types/forms";
+import { RegisterParticulierSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
-import { UserStatus } from "@prisma/client";
 import { hashPassword } from "@/utils/bcrypt";
 
 class UserController {
@@ -16,26 +16,36 @@ class UserController {
     return users;
   }
 
-  async store(data: RegisterSchemaType) {
-    const user_type = ["commerçant", "commercant"].includes(
-      data.user_type.toLowerCase()
-    )
-      ? UserStatus.Commerçant
-      : UserStatus.Particulier;
+  async storeParticulier(data: RegisterParticulierSchemaType) {
     const username = data.username;
+    const email = data.email;
+    const hashedPassword = await hashPassword(data.password);
+    const user_type = data.user_type;
+
+    const user = await prisma.users.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        user_type,
+      },
+    });
+    return user;
+  }
+  async storeCommercant(data: RegisterCommercantSchemaType) {
     const commerce_name = data.commerce_name;
     const adresse_commerce = data.adresse_commerce;
     const email = data.email;
     const hashedPassword = await hashPassword(data.password);
+    const user_type = data.user_type;
 
     const user = await prisma.users.create({
       data: {
-        user_type,
-        username,
         commerce_name,
         adresse_commerce,
         email,
         password: hashedPassword,
+        user_type,
       },
     });
     return user;
