@@ -25,6 +25,8 @@ model Users {
   sentMessages  Messages[] @relation("SentMessages")
   receivedMessages  Messages[] @relation("ReceivedMessages")
   dons Dons[]
+    donorChats Chats[] @relation("DonorChats")
+  receiverChats Chats[] @relation("ReceiverChats")
 }
 
 model Dons {
@@ -42,6 +44,19 @@ model Dons {
   Heure DateTime?
   donneur_id Int
   donneur Users @relation(fields: [donneur_id], references: [user_id], onDelete: Cascade)
+  chats Chats[]
+}
+
+model Chats {
+  chat_id Int @id @default(autoincrement())
+  donneur_id Int
+  donneur Users @relation("DonorChats", fields: [donneur_id], references: [user_id])
+  receveur_id Int
+  receveur Users @relation("ReceiverChats", fields: [receveur_id], references: [user_id])
+  don_id Int
+  don Dons @relation(fields: [don_id], references: [don_id], onDelete: Cascade)
+  messages Messages[]
+  createdAt DateTime @default(now())
 }
 
 model Messages {
@@ -52,4 +67,6 @@ model Messages {
   author  Users @relation("SentMessages", fields: [author_id], references: [user_id])
   receiver_id Int
   receiver  Users @relation("ReceivedMessages", fields: [receiver_id], references: [user_id])
+  chat_id Int
+  chat Chats @relation(fields: [chat_id], references: [chat_id], onDelete: Cascade)
 }
