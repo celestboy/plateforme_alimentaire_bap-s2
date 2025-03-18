@@ -9,11 +9,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: "#FDEAD8",
-        "dark-blue": "#084784",
-        "vivid-red": "#F87060",
-        "dark-gray": "#2D3142",
-        "fluo-green": "#47E5BC",
+        background: "var(--background)",
+        foreground: "var(--foreground)",
       },
     },
   },

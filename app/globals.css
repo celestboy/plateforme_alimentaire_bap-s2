@@ -2,20 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.cdnfonts.com/css/futura-pt");
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Futura pt", sans-serif;
+}
+
+.hero {
+  background-image: url("/images/Vector.png");
 }
