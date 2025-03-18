@@ -1,26 +1,52 @@
 import { z } from "zod";
 
-export const RegisterSchema = z
-  .object({
-    user_type: z.enum(["particulier", "commercant"]),
-    username: z.string().min(3).max(20).optional(),
-    commerce_name: z.string().min(3).max(50).optional(),
-    adresse_commerce: z.string().min(5).max(50).optional(),
-    email: z.string().email().nonempty(),
-    password: z.string().min(6).max(25).nonempty(),
-  })
-  .refine(
-    (data) =>
-      (data.user_type === "particulier" && data.username) ||
-      (data.user_type === "commercant" &&
-        data.commerce_name &&
-        data.adresse_commerce),
-    {
-      message:
-        "Si vous êtes un particulier, le nom d'utilisateur est requis. Si vous êtes commerçant, le nom et l'adresse du commerce sont requis.",
-      path: ["user_type"],
-    }
-  );
+export const RegisterParticulierSchema = z.object({
+  user_type: z.string().nonempty(),
+  username: z
+    .string()
+    .min(3, { message: "Le pseudo doit contenir au moins 3 caractères." })
+    .max(20, { message: "Le pseudo doit contenir au maximum 20 caractères." })
+    .nonempty(),
+  email: z.string().email().nonempty(),
+  password: z
+    .string()
+    .min(6, {
+      message: "Le mot de passe doit contenir au minimum 6 caractères.",
+    })
+    .max(25, {
+      message: "Le mot de passe doit contenir au maximum 25 caractères.",
+    })
+    .nonempty(),
+});
+export const RegisterCommercantSchema = z.object({
+  user_type: z.string().nonempty(),
+  commerce_name: z
+    .string()
+    .min(5, {
+      message: "Le nom du commerce doit contenir au moins 5 caractères.",
+    })
+    .max(100, { message: "Le pseudo doit contenir au maximum 100 caractères." })
+    .nonempty(),
+  adresse_commerce: z
+    .string()
+    .min(5, {
+      message: "L'adresse du commerce doit contenir au moins 5 caractères.",
+    })
+    .max(100, {
+      message: "L'adresse du commerce doit contenir au maximum 100 caractères.",
+    })
+    .nonempty(),
+  email: z.string().email({ message: "Le mail doit être valide." }).nonempty(),
+  password: z
+    .string()
+    .min(6, {
+      message: "Le mot de passe doit contenir au minimum 6 caractères.",
+    })
+    .max(25, {
+      message: "Le mot de passe doit contenir au maximum 25 caractères.",
+    })
+    .nonempty(),
+});
 
 export const LoginSchema = z.object({
   email: z.string().email().nonempty(),
@@ -29,7 +55,7 @@ export const LoginSchema = z.object({
 
 export const DonSchema = z.object({
   title: z.string().nonempty(),
-  description: z.string().max(200).nonempty(),
+  description: z.string().max(500).nonempty(),
   category: z.enum([
     "produits-laitiers",
     "feculents",
@@ -38,7 +64,10 @@ export const DonSchema = z.object({
     "desserts",
     "autres",
   ]),
-  quantity: z.number().min(0.1).max(1000),
+  quantity: z
+    .number()
+    .min(1, { message: "La quantité doit être égale à 1 au minimum." })
+    .max(1000, { message: "La quantité ne doit pas excéder 1000." }),
   limit_date: z
     .string()
     .nonempty({ message: "La date limite est requise !" })
