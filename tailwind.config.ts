@@ -9,7 +9,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        futuraPt: "var(--font-futura-pt)",
+        futuraPTBold: "var(--font-futura-pt-bold)",
+        futuraPTLight: "var(--font-futura-pt-light)",
+        futuraPTMedium: "var(--font-futura-pt-medium)",
+        futuraPTBook: "var(--font-futura-pt-book)",
+        futuraPTHeavy: "var(--font-futura-pt-heavy)",
       },
       colors: {
         cream: "#FDEAD8",
