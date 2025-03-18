@@ -49,8 +49,6 @@ class DonsController {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      console.log("zeubbbb");
-
       // Générer un nom de fichier unique pour éviter les conflits
       const fileExtension = path.extname(file.name);
       const fileName = `${uuidv4()}${fileExtension}`;
@@ -59,8 +57,6 @@ class DonsController {
       // Écrire le fichier sur le serveur
       const buffer = await file.arrayBuffer();
       fs.writeFileSync(filePath, Buffer.from(buffer));
-
-      console.log("zeubbb");
 
       // URL du fichier téléchargé
       img_url = `/uploads/${fileName}`;
@@ -77,8 +73,6 @@ class DonsController {
       const parsedPts =
         typeof rdv_pts === "string" ? JSON.parse(rdv_pts) : rdv_pts;
 
-      console.log("zeubb");
-
       try {
         const don = await prisma.dons.create({
           data: {
@@ -92,7 +86,6 @@ class DonsController {
             img_url,
           },
         });
-        console.log("zeub");
         return don;
       } catch (err: unknown) {
         const error = err as Error;

@@ -18,7 +18,6 @@ import { useForm } from "react-hook-form";
 import submitDonForm from "@/actions/publish-don-form";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
-import { cn } from "@/utils/cn";
 import { useState, useEffect } from "react";
 import displayDonInfo from "@/actions/displayDonInfo";
 
@@ -31,18 +30,16 @@ interface JwtPayload {
 interface RdvPts {
   id: number;
   lieu: string;
+  value: string;
 }
 
 export default function PublishDonForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [rdvpts, setRdvpts] = useState([]);
-  const { register, handleSubmit, formState, setValue, getValues } =
-    useForm<DonSchemaType>({
-      resolver: zodResolver(DonSchema),
-      defaultValues: {
-        rdv_pts: [], // ✅ Initialisation à un tableau vide
-      },
-    });
+
+  const { register, handleSubmit, formState } = useForm<DonSchemaType>({
+    resolver: zodResolver(DonSchema),
+  });
 
   useEffect(() => {
     fetch("/data/rdv-pts.json")
@@ -54,7 +51,6 @@ export default function PublishDonForm() {
           error
         )
       );
-    console.log("Erreurs du formulaire :", formState.errors);
   }, [formState.errors]);
 
   const isTokenExpired = (token: string): boolean => {
@@ -125,6 +121,18 @@ export default function PublishDonForm() {
     }
   };
 
+  useEffect(() => {
+    Object.values(formState.errors).forEach((error) => {
+      if (error && "message" in error) {
+        toast.error(error.message as string, {
+          icon: <X className="text-white" />,
+          className:
+            "bg-red-500 !important border border-red-200 text-white text-base",
+        });
+      }
+    });
+  }, [formState.errors]);
+
   return (
     <div className="w-[600px] mx-auto">
       <form
@@ -143,6 +151,7 @@ export default function PublishDonForm() {
             {...register("title")}
             className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
             placeholder="Nom du produit"
+            required
           />
         </div>
 
@@ -156,6 +165,7 @@ export default function PublishDonForm() {
             {...register("description")}
             className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
             placeholder="Description du produit"
+            required
           />
         </div>
 
@@ -167,6 +177,7 @@ export default function PublishDonForm() {
           <select
             {...register("category")}
             className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+            required
           >
             <option value="">
               Veuillez séléctionner la catégorie du produit
@@ -190,13 +201,14 @@ export default function PublishDonForm() {
             {...register("quantity", { valueAsNumber: true })}
             className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
             placeholder="Quantité"
+            required
           />
         </div>
 
         <div className="relative w-[600px]">
           <span className="font-semibold font-Montserrat text-gray-600 flex items-center">
             <Calendar1 className="mr-4" />
-            Date Limite de Consommation du Zeub<span>*</span>
+            Date Limite de Consommation<span>*</span>
           </span>
           <input
             type="date"
@@ -210,6 +222,7 @@ export default function PublishDonForm() {
             })}
             className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
             placeholder="Date Limite de consommation"
+            required
           />
         </div>
 
@@ -231,21 +244,8 @@ export default function PublishDonForm() {
                 <input
                   type="checkbox"
                   {...register("rdv_pts")}
-                  value={point.lieu}
+                  value={point.value}
                   className="my-4 mx-2"
-                  onChange={(e) => {
-                    const currentValues = getValues("rdv_pts") || []; // ✅ Toujours un tableau
-                    if (e.target.checked) {
-                      setValue("rdv_pts", [...currentValues, e.target.value]); // ✅ Ajouter
-                    } else {
-                      setValue(
-                        "rdv_pts",
-                        currentValues.filter(
-                          (val: string) => val !== e.target.value
-                        ) // ✅ Retirer
-                      );
-                    }
-                  }}
                 />
 
                 <label htmlFor={`checkbox`} className="cursor-pointer">
@@ -266,21 +266,13 @@ export default function PublishDonForm() {
             onChange={handleFileChange}
             className="w-w-600 my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
             accept="image/*"
+            required
           />
         </div>
 
         {/* Bouton de soumission */}
         <div className="flex justify-center items-center">
-          <button
-            type="submit"
-            className={cn(
-              (formState.isSubmitting || !formState.isValid) &&
-                "!cursor-not-allowed opacity-40"
-            )}
-            disabled={formState.isSubmitting || !formState.isValid}
-          >
-            Je publie mon don
-          </button>
+          <button type="submit">Je publie mon don</button>
         </div>
       </form>
     </div>
