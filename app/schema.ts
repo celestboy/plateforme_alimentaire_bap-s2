@@ -7,7 +7,7 @@ export const RegisterParticulierSchema = z.object({
     .min(3, { message: "Le pseudo doit contenir au moins 3 caractères." })
     .max(20, { message: "Le pseudo doit contenir au maximum 20 caractères." })
     .nonempty(),
-  email: z.string().email().nonempty(),
+  email: z.string().email({ message: "Le mail doit être valide." }).nonempty(),
   password: z
     .string()
     .min(6, {
@@ -49,25 +49,41 @@ export const RegisterCommercantSchema = z.object({
 });
 
 export const LoginSchema = z.object({
-  email: z.string().email().nonempty(),
-  password: z.string().min(6).max(25).nonempty(),
+  email: z.string().email({ message: "Le mail doit être valide." }).nonempty(),
+  password: z
+    .string()
+    .min(6, { message: "Le mot de passe fait au minimum 6 caractères." })
+    .max(25, { message: "Le mot de passe ne peut pas excéder 25 caratères." })
+    .nonempty(),
 });
 
 export const DonSchema = z.object({
   title: z.string().nonempty(),
-  description: z.string().max(500).nonempty(),
-  category: z.enum([
-    "produits-laitiers",
-    "feculents",
-    "viande",
-    "boisson",
-    "desserts",
-    "autres",
-  ]),
+  description: z
+    .string()
+    .max(500, {
+      message: "La description du produit ne doit pas excéder 500 caratères.",
+    })
+    .nonempty(),
+  category: z.enum(
+    [
+      "produits-laitiers",
+      "feculents",
+      "viande",
+      "boisson",
+      "desserts",
+      "autres",
+    ],
+    {
+      message:
+        "Veuillez choisir une des catégories de produits. Si vous ne savez pas quoi mettre, choissisez Autres.",
+    }
+  ),
   quantity: z
     .number()
     .min(1, { message: "La quantité doit être égale à 1 au minimum." })
-    .max(1000, { message: "La quantité ne doit pas excéder 1000." }),
+    .max(1000, { message: "La quantité ne doit pas excéder 1000." })
+    .nonnegative({ message: "La quantité ne peut pas être négative." }),
   limit_date: z
     .string()
     .nonempty({ message: "La date limite est requise !" })
@@ -97,4 +113,10 @@ export const ValidateSchema = z.object({
         message: "L'heure doit être valide et dans le futur.",
       }
     ),
+});
+
+export const CreateChatSchema = z.object({
+  donneur_id: z.number(),
+  receveur_id: z.number(),
+  don_id: z.number(),
 });
