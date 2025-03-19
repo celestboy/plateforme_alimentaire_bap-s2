@@ -56,7 +56,6 @@ export default function SingleDonPage() {
     }
   }, []);
 
-  // 🔹 Fonction pour gérer la création du chat et la redirection
   const handleCreateChat = async () => {
     if (!don || receveurId === null) {
       console.error("Données insuffisantes pour créer le chat");
@@ -70,9 +69,9 @@ export default function SingleDonPage() {
         don_id: don.don_id,
       };
 
-      await CreateChat(data); // ✅ Appel de l'API avec les bons paramètres
+      await CreateChat(data); 
 
-      router.push("/messagerie"); // ✅ Redirection après création
+      router.push("/messagerie"); 
     } catch (error) {
       console.error("Erreur lors de la création du chat:", error);
     }
