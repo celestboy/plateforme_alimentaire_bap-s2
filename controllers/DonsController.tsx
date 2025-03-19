@@ -137,4 +137,5 @@ class DonsController {
   }
 }
 
-export default new DonsController();
+const DonsControllerInstance = new DonsController();
+export default DonsControllerInstance;

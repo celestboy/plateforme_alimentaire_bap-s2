@@ -83,4 +83,5 @@ class UserController {
   }
 }
 
-export default new UserController();
+const UserControllerInstance = new UserController();
+export default UserControllerInstance;

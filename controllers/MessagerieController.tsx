@@ -65,5 +65,5 @@ class ChatController {
     return chats;
   }
 }
-
-export default new ChatController();
+const ChatControllerInstance = new ChatController();
+export default ChatControllerInstance;

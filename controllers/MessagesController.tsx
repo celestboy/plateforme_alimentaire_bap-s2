@@ -62,4 +62,5 @@ class MessagesController {
   }
 }
 
-export default new MessagesController();
+const MessagesControllerInstance = new MessagesController();
+export default MessagesControllerInstance;
