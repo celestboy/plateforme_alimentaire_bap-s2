@@ -60,6 +60,11 @@ class ChatController {
             user_type: true,
           },
         },
+        don: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
     return chats;
