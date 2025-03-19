@@ -11,6 +11,7 @@ const GetChatMessages = async (chatId: number) => {
       return {
         success: false,
         message: "Impossible de récupérer les messages",
+        messages: [],
       };
     }
 
@@ -30,6 +31,7 @@ const GetChatMessages = async (chatId: number) => {
     return {
       success: false,
       message: "Impossible de récupérer les messages",
+      messages: [],
     };
   }
 };

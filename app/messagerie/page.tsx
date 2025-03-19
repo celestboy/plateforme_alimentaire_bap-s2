@@ -35,7 +35,7 @@ interface Chat {
 
 export default function MessageriePage() {
   const [idUser, setIdUser] = useState<number | null>(null);
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState<number>();
   const [username, setUsername] = useState("");
   const [groupChats, setGroupChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
