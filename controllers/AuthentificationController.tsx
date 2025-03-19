@@ -11,4 +11,5 @@ class AuthentificationController {
   }
 }
 
-export default new AuthentificationController();
+const AuthentificationControllerInstance = new AuthentificationController();
+export default AuthentificationControllerInstance;

@@ -1,27 +1,47 @@
 [
   {
     "id": 1,
-    "lieu": "Place de l'église",
-    "value": "place-de-leglise"
+    "lieu": "Gare de Rueil-Malmaison",
+    "value": "gare-de-rueil"
   },
   {
     "id": 2,
-    "lieu": "Rue de la Barque",
-    "value": "rue-de-la-barque"
+    "lieu": "Mairie de Rueil-Malmaison",
+    "value": "mairie-de-rueil"
   },
   {
     "id": 3,
-    "lieu": "Rue du Gard",
-    "value": "rue-du-gard"
+    "lieu": "Parc de Bois-Préau",
+    "value": "parc-de-bois-preau"
   },
   {
     "id": 4,
-    "lieu": "Avenue du Temple",
-    "value": "avenue-du-temple"
+    "lieu": "Stade du Parc",
+    "value": "stade-du-parc"
   },
   {
     "id": 5,
-    "lieu": "Allée de Toulouse",
-    "value": "allee-de-toulouse"
+    "lieu": "Complexe sportif Jules Ladoumègue",
+    "value": "complexe-sportif-jules-ladoumegue"
+  },
+  {
+    "id": 6,
+    "lieu": "Centre Commercial E. Leclerc",
+    "value": "centre-commercial-e-leclerc"
+  },
+  {
+    "id": 7,
+    "lieu": "Centre Aquatique Arsenal",
+    "value": "centre-aquatique-arsenal"
+  },
+  {
+    "id": 8,
+    "lieu": "Forêt Domaniale de la Malmaison",
+    "value": "foret-domaniale-de-la-malmaison"
+  },
+  {
+    "id": 9,
+    "lieu": "Cimetière du Mont Valérien",
+    "value": "cimmetière-du-mont-valerien"
   }
 ]

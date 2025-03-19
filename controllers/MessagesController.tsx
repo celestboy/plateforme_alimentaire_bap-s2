@@ -1,13 +1,14 @@
-import { ValidateSchemaType } from "@/types/forms";
+import { MessageSchemaType, ValidateSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
 
 class MessagesController {
-  async store(content: string, author_id: number, receiver_id: number) {
+  async store(data: MessageSchemaType) {
     const message = await prisma.messages.create({
       data: {
-        content,
-        author_id,
-        receiver_id,
+        content: data.content,
+        author_id: data.author_id,
+        receiver_id: data.receiver_id,
+        chat_id: data.chat_id,
       },
     });
     return message;
@@ -36,6 +37,30 @@ class MessagesController {
     });
     return supp;
   }
+
+  async getByChatId(chatId: number) {
+    try {
+      const messages = await prisma.messages.findMany({
+        where: { chat_id: chatId },
+        orderBy: { sentAt: "asc" },
+        include: {
+          author: {
+            select: {
+              user_id: true,
+              username: true,
+              commerce_name: true,
+            },
+          },
+        },
+      });
+
+      return messages;
+    } catch (error) {
+      console.error("Error getting messages by chat ID:", error);
+      return null;
+    }
+  }
 }
 
-export default new MessagesController();
+const MessagesControllerInstance = new MessagesController();
+export default MessagesControllerInstance;
