@@ -120,3 +120,10 @@ export const CreateChatSchema = z.object({
   receveur_id: z.number(),
   don_id: z.number(),
 });
+
+export const MessageSchema = z.object({
+  content: z.string().nonempty(),
+  author_id: z.number(),
+  receiver_id: z.number(),
+  chat_id: z.number(),
+});
