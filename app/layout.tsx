@@ -87,7 +87,7 @@ export default function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${FuturaPTBold.variable} ${FuturaPTLight.variable} ${FuturaPTMedium.variable} ${FuturaPTBook.variable} ${FuturaPTHeavy.variable} antialiased`}>
-				<ClientLayout>{children}</ClientLayout>
+				{children}
 				<Toaster />
 			</body>
 		</html>
