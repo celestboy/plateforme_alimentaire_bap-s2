@@ -79,7 +79,6 @@ export default function HomePage() {
     <div className="text-center bg-gray-100 h-full w-screen box-border">
       <div className="text-center">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-12 font-futuraPTMedium">
-
           <Link href="/" className="absolute top-6 left-6 text-white">
             Retour
           </Link>
@@ -96,9 +95,7 @@ export default function HomePage() {
             </span>
           </div>
 
-          <button className="absolute top-[33%] right-[22%]">
-            Filtres
-          </button>
+          <button className="absolute top-[33%] right-[22%]">Filtres</button>
 
           <p className="mt-2 text-white">
             Cherchez des annonces selon votre localisation
@@ -106,8 +103,10 @@ export default function HomePage() {
         </div>
 
         <div className="relative w-3/4 mx-auto">
-          <h2 className="text-[#B0C482] font-futuraPTBook text-[3.5rem] my-12">Annonces</h2>
-          {/* <div className="text-left relative">
+          <h2 className="text-[#B0C482] font-futuraPTBook text-[3.5rem] my-12">
+            Annonces
+          </h2>
+          <div className="text-left relative">
             <div
               className="inline-flex items-center ml-12 transition-all cursor-pointer"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -143,7 +142,7 @@ export default function HomePage() {
                 ))}
               </div>
             )}
-          </div> */}
+          </div>
 
           <div
             id="articlecontainerteaser"
