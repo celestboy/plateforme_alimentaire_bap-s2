@@ -149,7 +149,7 @@ export default function HomePage() {
             ) : dons.length === 0 ? (
               <div id="nodonfound">
                 <p className="flex items-center justify-center text-5xl font-bold text-center">
-                  Aucun don trouvé pour ce lieu.
+                  Aucun don trouvé.
                 </p>
               </div>
             ) : (
