@@ -9,9 +9,15 @@ import submitLoginForm from "@/actions/login-form";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
 import { cn } from "@/utils/cn";
-import { Eye } from "lucide-react";
-import { EyeOff } from "lucide-react";
-import { X } from "lucide-react";
+import {
+  ShoppingBasket,
+  Pin,
+  Mail,
+  KeyRound,
+  Eye,
+  EyeOff,
+  X,
+} from "lucide-react";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +56,10 @@ function LoginForm() {
           onSubmit={handleSubmit(handleSubmitForm)}
         >
           <div className="relative text-center w-[600px]">
+            <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
+              <Mail className="mr-4" />
+              Adresse Mail :
+            </span>
             <input
               {...register("email")}
               className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
@@ -57,6 +67,10 @@ function LoginForm() {
             />
           </div>
           <div className="relative text-center w-[600px]">
+            <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
+              <KeyRound className="mr-4" />
+              Mot de passe :
+            </span>
             <input
               type={showPassword ? "text" : "password"}
               {...register("password")}
@@ -65,7 +79,7 @@ function LoginForm() {
             />
             <span
               onClick={togglePasswordVisibility}
-              className="cursor-pointer absolute top-8 right-5"
+              className="cursor-pointer absolute top-14 right-5"
             >
               {showPassword ? <EyeOff /> : <Eye />}
             </span>
@@ -74,13 +88,9 @@ function LoginForm() {
           <div className="flex justify-center items-center">
             <button
               type="submit"
-              className={cn(
-                (formState.isSubmitting || !formState.isValid) &&
-                  "!cursor-not-allowed opacity-40"
-              )}
-              disabled={formState.isSubmitting || !formState.isValid}
+              className="bg-slate-300 hover:bg-slate-400 py-4 px-8 rounded-full duration-200"
             >
-              Je me connecte
+              Se connecter
             </button>
           </div>
         </form>
