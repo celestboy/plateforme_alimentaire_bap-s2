@@ -21,7 +21,7 @@ interface Annonce {
 export default function HomePage() {
   return (
     <div>
-      <section className="hero bg-cover bg-center mt-[60px] text-white h-[600px] w-full flex flex-col items-center justify-center">
+      <section className="hero bg-cover bg-center text-white h-[600px] w-full flex flex-col items-center justify-center">
         {/* Conteneur principal */}
         <div className="flex items-center justify-center w-full px-10">
           {/* Bloc de gauche avec CTA */}
@@ -123,52 +123,52 @@ export default function HomePage() {
           </article>
           <article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
             <p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
-              Liste facile des articles
+              Disponibilite basee sur la localisation
             </p>
             <p>
-              Repertoriez rapidement les articles alimentaires en surplus de
-              votre garde-manger ou de votre refrigerateur, pour que les autres
-              membres de votre communaute puissent voir ce qui est disponible.
+              Trouvez des articles alimentaires pres de chez vous grace a la
+              recherche et aux filtres bases sur la localisation, ce qui rend
+              l’acces aux ressources alimentaires locales plus pratique.
             </p>
           </article>
           <article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
             <p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
-              Liste facile des articles
+              Profils de donateurs verifies
             </p>
             <p>
-              Repertoriez rapidement les articles alimentaires en surplus de
-              votre garde-manger ou de votre refrigerateur, pour que les autres
-              membres de votre communaute puissent voir ce qui est disponible.
+              Consultez des profils verifies des personnes offrant des aliments,
+              vous assurant ainsi de savoir a qui vous vous adressez pour des
+              echanges surs et fiables.
             </p>
           </article>
           <article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
             <p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
-              Liste facile des articles
+              Mises a jour a temps reel
             </p>
             <p>
-              Repertoriez rapidement les articles alimentaires en surplus de
-              votre garde-manger ou de votre refrigerateur, pour que les autres
-              membres de votre communaute puissent voir ce qui est disponible.
+              Recevez des notifications sur les nouveaux articles alimentaires
+              disponibles et ceux qui approchent de leur date de peremption,
+              pour agir rapidement et eviter le gaspillage.
             </p>
           </article>
           <article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
             <p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
-              Liste facile des articles
+              Engagement communautaire
             </p>
             <p>
-              Repertoriez rapidement les articles alimentaires en surplus de
-              votre garde-manger ou de votre refrigerateur, pour que les autres
-              membres de votre communaute puissent voir ce qui est disponible.
+              Engagez-vous avec d’autres membres, partagez des conseils et
+              rejoignez des initiatives communautiares pour reduire le
+              gaspillage alimentaire dans votre quartier.
             </p>
           </article>
           <article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
             <p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
-              Liste facile des articles
+              Tableau de bord
             </p>
             <p>
-              Repertoriez rapidement les articles alimentaires en surplus de
-              votre garde-manger ou de votre refrigerateur, pour que les autres
-              membres de votre communaute puissent voir ce qui est disponible.
+              Suivez la quantite de gaspillage alimentaire evitee et voyez votre
+              contribution personnelle a la reduction du gaspillage dans la
+              communaute.
             </p>
           </article>
         </div>
@@ -202,22 +202,20 @@ export default function HomePage() {
             </article>
             <article>
               <p className="text-[#084784]">
-                Repertorier facilement les aliments excedentaires
+                Partager des aliments en quelques minutes
               </p>
               <p>
-                Ajoutez rapidement des articles alimentaires excedentaires de
-                votre cuisine, les rendant disponibles pour que les autres les
-                trouvent et contribuent a reduire le gaspillage.
+                Repertoriez et partagez des aliments excedentaires avec la
+                communaute en quelques clics, contribuant instantanement a la
+                reduction du gaspillage.
               </p>
             </article>
             <article>
-              <p className="text-[#084784]">
-                Repertorier facilement les aliments excedentaires
-              </p>
+              <p className="text-[#084784]">Suivre votre impact</p>
               <p>
-                Ajoutez rapidement des articles alimentaires excedentaires de
-                votre cuisine, les rendant disponibles pour que les autres les
-                trouvent et contribuent a reduire le gaspillage.
+                Voyez combien de gaspillage alimentaire vous avez contribue a
+                prevenir, creant un impact positif dans votre communaute et pour
+                l&apos;environnement.
               </p>
             </article>
           </div>
