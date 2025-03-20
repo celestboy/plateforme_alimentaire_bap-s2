@@ -4,8 +4,10 @@ import React, { useState } from "react";
 
 const ChatForm = ({
   onSendMessage,
+  onValidateDonation,
 }: {
   onSendMessage: (message: string) => void;
+  onValidateDonation: () => void;
 }) => {
   const [message, setMessage] = useState("");
 
@@ -31,7 +33,14 @@ const ChatForm = ({
           type="submit"
           className="px-4 py-2 text-white rounded-lg bg-blue-500"
         >
-          Send
+          Envoyer
+        </button>
+        <button
+          type="button"
+          className="px-4 py-2 text-white rounded-lg bg-blue-500"
+          onClick={onValidateDonation}
+        >
+          Valider le don
         </button>
       </form>
     </div>

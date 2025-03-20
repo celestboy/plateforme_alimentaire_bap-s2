@@ -15,6 +15,13 @@ class MessagesController {
   }
 
   async validatedRDV(info: ValidateSchemaType, id_don: number) {
+    const parsedHeureValid = new Date(info.heure);
+    if (isNaN(parsedHeureValid.getTime())) {
+      throw new Error(
+        "Date invalide, assurez-vous qu'elle est au format ISO-8601."
+      );
+    }
+
     const changeStatus = await prisma.dons.update({
       where: {
         don_id: id_don,
@@ -22,7 +29,7 @@ class MessagesController {
       data: {
         status: true,
         lieu: info.lieu,
-        Heure: info.heure,
+        Heure: parsedHeureValid,
       },
     });
 
