@@ -16,3 +16,7 @@ body {
 .hero {
   background-image: url("/images/Vector.png");
 }
+
+.no-scroll {
+  overflow: hidden;
+}
