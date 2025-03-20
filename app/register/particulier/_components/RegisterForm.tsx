@@ -111,7 +111,7 @@ export default function RegisterForm() {
 
         {/* Bouton de soumission */}
         <div className="flex justify-center items-center font-futuraPTMedium">
-          <button type="submit">Je m&apos;inscris</button>
+          <button type="submit" className="bg-slate-300 hover:bg-slate-400 py-4 px-8 rounded-full duration-200">Je m&apos;inscris</button>
         </div>
       </form>
     </div>

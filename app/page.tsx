@@ -4,6 +4,7 @@ import React from "react";
 // app/page.tsx
 
 import Image from "next/image";
+import ClientLayout from "./client-layout";
 
 interface Annonce {
   id: number;
@@ -20,6 +21,7 @@ interface Annonce {
 
 export default function HomePage() {
   return (
+    <ClientLayout>
     <div>
       <section className="hero bg-cover bg-center text-white h-[600px] w-full flex flex-col items-center justify-center">
         {/* Conteneur principal */}
@@ -222,5 +224,6 @@ export default function HomePage() {
         </div>
       </section>
     </div>
+    </ClientLayout>
   );
 }
