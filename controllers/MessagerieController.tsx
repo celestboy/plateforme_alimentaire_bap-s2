@@ -60,9 +60,28 @@ class ChatController {
             user_type: true,
           },
         },
+        don: {
+          select: {
+            title: true,
+          },
+        },
+        messages: {
+          select: {
+            sentAt: true,
+          },
+          orderBy: {
+            sentAt: "desc",
+          },
+          take: 1,
+        },
       },
     });
-    return chats;
+
+    return chats.sort((a, b) => {
+      const dateA = a.messages[0]?.sentAt || new Date(0);
+      const dateB = b.messages[0]?.sentAt || new Date(0);
+      return dateB.getTime() - dateA.getTime();
+    });
   }
 }
 const ChatControllerInstance = new ChatController();
