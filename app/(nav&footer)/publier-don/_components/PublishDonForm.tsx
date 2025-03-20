@@ -138,7 +138,7 @@ export default function PublishDonForm() {
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         id="registerform"
-        className="w-[600px]"
+        className="w-max bg-blue-200"
       >
         {/* Type de Client */}
         <div className="relative w-[600px]">

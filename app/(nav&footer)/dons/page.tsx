@@ -77,30 +77,37 @@ export default function HomePage() {
 
   return (
     <div className="text-center bg-gray-100 h-full w-screen box-border">
-      <div className="text-5xl text-center font-title italic uppercase font-bold text-aja-blue py-10 font-Bai_Jamjuree">
-        <Link href={"/"}>
-          <h2>FoodShare</h2>
-        </Link>
-      </div>
-
       <div className="text-center">
-        <div className="relative flex items-center justify-center max-w-[500px] mx-auto">
-          <input
-            type="text"
-            id="mainsearchbox"
-            className="w-full h-12 rounded-full py-2 pl-6 pr-12 border border-gray-600 font-Montserrat text-sm"
-            placeholder="Recherchez du contenu..."
-          />
-          <span>
-            <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
-          </span>
+        <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-12 font-futuraPTMedium">
+
+          <Link href="/" className="absolute top-6 left-6 text-white">
+            Retour
+          </Link>
+
+          <div className="relative flex items-center justify-center">
+            <input
+              type="text"
+              id="mainsearchbox"
+              className="w-1/2 h-12 rounded-full py-2 pl-16 pr-12 border border-gray-600 font-Montserrat"
+              placeholder="Adresse, quartier, ..."
+            />
+            <span>
+              <Search className="absolute left-[27%] top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
+            </span>
+          </div>
+
+          <button className="absolute top-[33%] right-[22%]">
+            Filtres
+          </button>
+
+          <p className="mt-2 text-white">
+            Cherchez des annonces selon votre localisation
+          </p>
         </div>
 
         <div className="relative w-3/4 mx-auto">
-          <p className="text-xl font-Montserrat font-semibold text-left ml-12 py-6 ">
-            Résultats les plus pertinents :
-          </p>
-          <div className="text-left relative">
+          <h2 className="text-[#B0C482] font-futuraPTBook text-[3.5rem] my-12">Annonces</h2>
+          {/* <div className="text-left relative">
             <div
               className="inline-flex items-center ml-12 transition-all cursor-pointer"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -136,7 +143,7 @@ export default function HomePage() {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
 
           <div
             id="articlecontainerteaser"
@@ -147,7 +154,7 @@ export default function HomePage() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-8 rounded-full border-t-8 border-white border-t-aja-blue animate-spin"></div>
               </div>
             ) : dons.length === 0 ? (
-              <div id="nodonfound">
+              <div id="nodonfound" className="w-screen">
                 <p className="flex items-center justify-center text-5xl font-bold text-center">
                   Aucun don trouvé.
                 </p>
