@@ -16,8 +16,11 @@ export default {
         futuraPTHeavy: "var(--font-futura-pt-heavy)",
       },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        cream: "#FDEAD8",
+        "dark-blue": "#084784",
+        "vivid-red": "#F87060",
+        "dark-gray": "#2D3142",
+        "fluo-green": "#47E5BC",
       },
     },
   },

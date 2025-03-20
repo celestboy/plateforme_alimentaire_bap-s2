@@ -9,8 +9,8 @@ export default function ClientLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="fixed top-0 left-0 w-full bg-[#b0c482] flex justify-between items-center px-12 py-5 z-50">
+    <div className="min-h-screen flex flex-col my-20">
+      <header className="fixed top-0 left-0 w-full h-20 bg-[#b0c482] flex justify-between items-center px-12 py-5 z-50">
         <Link href={"/"}>
           <div className="w-52">
             <Image
