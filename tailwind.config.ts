@@ -21,6 +21,7 @@ export default {
         "vivid-red": "#F87060",
         "dark-gray": "#2D3142",
         "fluo-green": "#47E5BC",
+        "nav-overlay-color": "rgba(0, 0, 0, 0.7)",
       },
     },
   },

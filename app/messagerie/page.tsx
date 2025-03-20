@@ -8,6 +8,7 @@ import ChatForm from "./_components/ChatForm";
 import { socket } from "@/lib/socketClient";
 import StoreMessage from "@/actions/store-message";
 import GetChatMessages from "@/actions/get-chat-messages";
+import ValidationForm from "./_components/NewValidationForm";
 
 interface JwtPayload {
   userId: number;
@@ -38,6 +39,7 @@ interface Chat {
 
 export default function MessageriePage() {
   const [idUser, setIdUser] = useState<number | null>(null);
+  const [donId, setDonId] = useState<number | null>(null);
   const [room, setRoom] = useState<number>();
   const [username, setUsername] = useState("");
   const [groupChats, setGroupChats] = useState<Chat[]>([]);
@@ -47,11 +49,16 @@ export default function MessageriePage() {
   const [messages, setMessages] = useState<
     { sender: string; message: string }[]
   >([]);
+  const [showValidationForm, setShowValidationForm] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "start",
+    });
   };
 
   useEffect(() => {
@@ -102,7 +109,6 @@ export default function MessageriePage() {
   }, [messages]);
 
   useEffect(() => {
-    // Réinitialiser les listeners à chaque modification de la chambre
     socket.off("message");
     socket.off("user_joined");
 
@@ -122,24 +128,32 @@ export default function MessageriePage() {
     };
   }, [room]);
 
+  useEffect(() => {
+    if (showValidationForm) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [showValidationForm]);
+
   const handleJoinRoom = async (chat: Chat) => {
     setMessages([]);
-
     setRoom(chat.chat_id);
+    setDonId(chat.don_id);
 
-    if (idUser === chat.donneur_id) {
-      setUsername(
-        chat.donneur.username ||
-          chat.donneur.commerce_name ||
-          "Utilisateur inconnu"
-      );
-    } else {
-      setUsername(
-        chat.receveur.username ||
-          chat.receveur.commerce_name ||
-          "Utilisateur inconnu"
-      );
-    }
+    setUsername(
+      idUser === chat.donneur_id
+        ? chat.donneur.username ||
+            chat.donneur.commerce_name ||
+            "Utilisateur inconnu"
+        : chat.receveur.username ||
+            chat.receveur.commerce_name ||
+            "Utilisateur inconnu"
+    );
 
     socket.emit("join-room", { room: chat.chat_id, username });
 
@@ -196,12 +210,30 @@ export default function MessageriePage() {
     }
   };
 
+  const handleSendValidation = (validationMessage: {
+    lieu: string;
+    heure: string;
+  }) => {
+    const data = {
+      room,
+      message: JSON.stringify(validationMessage),
+      sender: username,
+    };
+
+    setMessages((prev) => [
+      ...prev,
+      { sender: username, message: JSON.stringify(validationMessage) },
+    ]);
+
+    socket.emit("message", data);
+  };
+
   if (loading)
     return <div className="p-4">Chargement des conversations...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
-    <div className="p-4">
+    <div className="mt-4 p-4">
       <h1 className="font-bold mb-4 text-center font-futuraPTBold uppercase text-3xl">
         Messagerie
       </h1>
@@ -266,7 +298,7 @@ export default function MessageriePage() {
           <div className="w-[800px] h-[550px] bg-gray-200 flex items-center justify-center">
             {room && (
               <div className="w-full max-w-3xl mx-auto">
-                <div className="h-[500px] overflow-y-auto p-4 mb-4 bg-gray-200 border-2 rounded-lg">
+                <div className="overflow-y-auto p-4 mb-4 bg-gray-200 border-2 rounded-lg h-[475px]">
                   {messages.map((msg, index) => (
                     <ChatMessage
                       key={index}
@@ -275,10 +307,19 @@ export default function MessageriePage() {
                       isOwnMessage={msg.sender === username}
                     />
                   ))}
-                  {/* Add div ref for scrolling to bottom */}
                   <div ref={messagesEndRef} />
                 </div>
-                <ChatForm onSendMessage={handleSendMessage} />
+                {showValidationForm && (
+                  <ValidationForm
+                    onSendForm={handleSendValidation}
+                    donId={donId}
+                    onClose={() => setShowValidationForm(false)}
+                  />
+                )}
+                <ChatForm
+                  onSendMessage={handleSendMessage}
+                  onValidateDonation={() => setShowValidationForm(true)}
+                />
               </div>
             )}
           </div>
