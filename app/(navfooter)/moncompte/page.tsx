@@ -46,7 +46,7 @@ export default function MonCompte() {
         const token = localStorage.getItem("token");
 
         if (!token) {
-          window.location.href = "/login";
+          window.location.href = "/connexion";
           throw new Error("Aucun token d'authentification trouvé");
         }
 
