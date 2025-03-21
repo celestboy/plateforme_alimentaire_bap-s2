@@ -2,11 +2,17 @@ import React from "react";
 
 interface ChatMessageProps {
   sender: string;
+  sentAt: string;
   message: string;
   isOwnMessage: boolean;
 }
 
-const ChatMessage = ({ sender, message, isOwnMessage }: ChatMessageProps) => {
+const ChatMessage = ({
+  sender,
+  message,
+  sentAt,
+  isOwnMessage,
+}: ChatMessageProps) => {
   const isSystemMessage = sender === "system";
 
   let parsedMessage;
@@ -37,15 +43,31 @@ const ChatMessage = ({ sender, message, isOwnMessage }: ChatMessageProps) => {
       } mb-3`}
     >
       <div
-        className={`max-w-xs px-4 py-2 rounded-lg ${
+        className={`w-auto px-4 py-2 rounded-lg ${
           isSystemMessage
             ? "bg-gray-800 text-white text-center text-xs"
             : isOwnMessage
-            ? "bg-blue-500 text-white"
+            ? "bg-base-green text-white"
             : "bg-white text-black"
         }`}
       >
-        {!isSystemMessage && <p className="text-sm font-bold">{sender}</p>}
+        {!isSystemMessage && (
+          <div className="flex items-center gap-2">
+            <p className="font-futuraPTMedium text-lg">{sender}</p>
+            <p className="font-futuraPTBook text-xs">
+              {new Date(sentAt).toLocaleDateString("fr-FR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}{" "}
+              {new Date(sentAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
+            </p>
+          </div>
+        )}
 
         {parsedMessage && parsedMessage.lieu && parsedMessage.heure ? (
           <div className="bg-green-100 text-green-700 p-3 rounded-lg my-2">
@@ -71,7 +93,7 @@ const ChatMessage = ({ sender, message, isOwnMessage }: ChatMessageProps) => {
             </div>
           </div>
         ) : (
-          <p>{message}</p>
+          <p className="text-lg font-futuraPTBook">{message}</p>
         )}
       </div>
     </div>

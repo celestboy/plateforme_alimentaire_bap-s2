@@ -31,13 +31,13 @@ const ChatForm = ({
         />
         <button
           type="submit"
-          className="px-4 py-2 text-white rounded-lg bg-blue-500"
+          className="px-4 py-2 text-white rounded-lg bg-base-green"
         >
           Envoyer
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-white rounded-lg bg-blue-500"
+          className="px-4 py-2 text-white rounded-lg bg-base-green"
           onClick={onValidateDonation}
         >
           Valider le don
