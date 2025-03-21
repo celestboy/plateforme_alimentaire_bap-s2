@@ -15,7 +15,7 @@ export default function NavFooterLayout({
   return (
     <div>
       <Navbar />
-      <main className="mt-20">{children}</main>
+      <main className="mt-20 overflow-x-hidden min-h-screen">{children}</main>
       <Footer />
     </div>
   );
