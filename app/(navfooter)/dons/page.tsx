@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SearchInput from "./_components/SearchInput";
@@ -19,9 +19,11 @@ interface Don {
 
 export default function HomePage() {
   const search = useSearchParams();
+  const router = useRouter();
   const searchQuery = search ? search.get("q") || "" : "";
   const [dons, setDons] = useState<Don[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     async function fetchDons() {
@@ -36,16 +38,29 @@ export default function HomePage() {
     fetchDons();
   }, [searchQuery]);
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchValue("");
+    router.push("/dons");
+  };
+
   return (
     <div className="text-center bg-gray-100 h-full w-screen box-border">
-      <div className="text-center">
+      <div className="text-center  overflow-x-hidden">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-6 font-futuraPTMedium">
           <Link href="/" className="absolute top-6 left-6 text-white">
             Retour
           </Link>
 
           <div className="relative flex items-center justify-center">
-            <SearchInput />
+            <SearchInput value={searchValue} onChange={handleSearchChange} />
+          </div>
+
+          <div>
+            <button onClick={clearSearch}>Réinitialiser la recherche</button>
           </div>
 
           <p className="mt-2 text-white">

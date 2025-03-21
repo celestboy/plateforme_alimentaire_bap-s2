@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Search, ArrowDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const SearchInput = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+interface SearchInputProps {
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const SearchInput = ({ value, onChange }: SearchInputProps) => {
   const router = useRouter();
 
   const onSearch = (event: React.FormEvent) => {
     event.preventDefault();
-    router.push(`/dons?q=${encodeURIComponent(searchQuery)}`);
+    router.push(`/dons?q=${encodeURIComponent(value)}`);
   };
 
   return (
@@ -21,8 +25,8 @@ const SearchInput = () => {
         </span>
         <input
           type="text"
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          value={value} // 🔥 Utilise la valeur passée en prop
+          onChange={onChange} // 🔥 Utilise la fonction passée en prop
           className="w-[600px] h-12 rounded-full px-2 pl-12 pr-28 border border-gray-600 font-Montserrat"
           placeholder="Adresse, quartier, ..."
         />
