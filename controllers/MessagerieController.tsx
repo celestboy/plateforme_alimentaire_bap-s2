@@ -68,6 +68,8 @@ class ChatController {
         messages: {
           select: {
             sentAt: true,
+            content: true,
+            author_id: true,
           },
           orderBy: {
             sentAt: "desc",

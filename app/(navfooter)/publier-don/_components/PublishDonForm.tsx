@@ -29,7 +29,8 @@ interface JwtPayload {
 
 interface RdvPts {
   id: number;
-  lieu: string;
+  type: string;
+  name: string;
   value: string;
 }
 
@@ -42,7 +43,7 @@ export default function PublishDonForm() {
   });
 
   useEffect(() => {
-    fetch("/data/rdv-pts.json")
+    fetch("/data/filters.json")
       .then((response) => response.json())
       .then((data) => setRdvpts(data))
       .catch((error) =>
@@ -138,7 +139,7 @@ export default function PublishDonForm() {
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         id="registerform"
-        className="w-max bg-blue-200"
+        className="w-max"
       >
         {/* Type de Client */}
         <div className="relative w-[600px]">
@@ -237,23 +238,28 @@ export default function PublishDonForm() {
             style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}
             className="w-w-600 bg-white rounded-2xl border border-gray-600 my-4"
           >
-            {rdvpts.map((point: RdvPts) => (
-              <div
-                key={point.id}
-                className="relative pl-2 cursor-pointer flex items-center"
-              >
-                <input
-                  type="checkbox"
-                  {...register("rdv_pts")}
-                  value={point.value}
-                  className="my-4 mx-2"
-                />
+            {rdvpts
+              .filter((point: RdvPts) => point.type === "location") // Filtrer uniquement ceux avec type "location"
+              .map((point: RdvPts) => (
+                <div
+                  key={point.id}
+                  className="relative pl-2 cursor-pointer flex items-center"
+                >
+                  <input
+                    type="checkbox"
+                    {...register("rdv_pts")}
+                    value={point.value}
+                    className="my-4 mx-2"
+                  />
 
-                <label htmlFor={`checkbox`} className="cursor-pointer">
-                  {point.lieu}
-                </label>
-              </div>
-            ))}
+                  <label
+                    htmlFor={`checkbox`}
+                    className="cursor-pointer text-black"
+                  >
+                    {point.name}
+                  </label>
+                </div>
+              ))}
           </div>
         </div>
 

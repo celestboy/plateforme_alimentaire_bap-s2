@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,8 +35,9 @@ export default function HomePage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState(searchQuery);
+  const filterRef = useRef<HTMLDivElement>(null); // Référence pour la div des filtres
 
-  // Fetch filters from your JSON file
+  // Fetch filters depuis le JSON
   useEffect(() => {
     async function fetchFilters() {
       try {
@@ -54,12 +55,11 @@ export default function HomePage() {
     fetchFilters();
   }, []);
 
-  // Fetch dons based on both search query and category filter
+  // Fetch dons en fonction des filtres
   useEffect(() => {
     async function fetchDons() {
       setIsLoading(true);
       try {
-        // Pass both search query and category to your server action
         const data: Don[] = await getDons({
           query: searchQuery || undefined,
           category: categoryFilter || undefined,
@@ -75,6 +75,28 @@ export default function HomePage() {
     fetchDons();
   }, [searchQuery, categoryFilter]);
 
+  // Gérer la fermeture du menu au clic en dehors
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target as Node)
+      ) {
+        setIsFilterOpen(false);
+      }
+    }
+
+    if (isFilterOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFilterOpen]);
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
@@ -89,17 +111,9 @@ export default function HomePage() {
   };
 
   const applyFilter = (category: string) => {
-    // Build URL with both search query and category filter
     const params = new URLSearchParams();
-
-    if (searchQuery) {
-      params.set("q", searchQuery);
-    }
-
-    if (category) {
-      params.set("category", category);
-    }
-
+    if (searchQuery) params.set("q", searchQuery);
+    if (category) params.set("category", category);
     router.push(`/dons?${params.toString()}`);
     setIsFilterOpen(false);
   };
@@ -118,30 +132,55 @@ export default function HomePage() {
               onChange={handleSearchChange}
               onFilterClick={toggleFilterMenu}
             />
-          </div>
 
-          {/* Filter dropdown */}
-          {isFilterOpen && (
-            <div className="absolute z-10 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 right-1/2 transform translate-x-1/2">
-              <div className="py-1">
-                <button
-                  onClick={() => applyFilter("")}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                >
-                  Tous les dons
-                </button>
-                {filters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => applyFilter(filter.value)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                  >
-                    {filter.name}
-                  </button>
-                ))}
+            {/* Menu des filtres */}
+            {isFilterOpen && (
+              <div
+                ref={filterRef}
+                className="absolute z-10 mt-4 w-[748px] p-4 bg-white ring-1 ring-black ring-opacity-5 top-3 right-1/2 transform translate-x-1/2"
+              >
+                <div className="py-1">
+                  <div className="grid grid-cols-2 gap-4 p-4">
+                    {/* Localisation */}
+                    <div>
+                      <h3 className="text-lg font-semibold border-b pb-2 mb-2">
+                        Localisation
+                      </h3>
+                      {filters
+                        .filter((filter) => filter.type === "location")
+                        .map((filter) => (
+                          <button
+                            key={filter.id}
+                            onClick={() => applyFilter(filter.value)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                          >
+                            {filter.name}
+                          </button>
+                        ))}
+                    </div>
+
+                    {/* Produits */}
+                    <div>
+                      <h3 className="text-lg font-semibold border-b pb-2 mb-2">
+                        Produits
+                      </h3>
+                      {filters
+                        .filter((filter) => filter.type === "produit")
+                        .map((filter) => (
+                          <button
+                            key={filter.id}
+                            onClick={() => applyFilter(filter.value)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                          >
+                            {filter.name}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="mt-4">
             <button
@@ -158,7 +197,6 @@ export default function HomePage() {
             Annonces
           </h2>
 
-          {/* Active filters display */}
           {(searchQuery || categoryFilter) && (
             <div className="mb-6 flex flex-wrap gap-2 justify-center">
               {searchQuery && (

@@ -23,8 +23,6 @@ app.prepare().then(() => {
     socket.on("join-room", ({ room, username }) => {
       socket.join(room);
       console.log(`User ${username} joined room ${room}`);
-      // Diffuser à tous les autres membres de la salle
-      socket.to(room).emit("user_joined", `${username} vient de se connecter`);
     });
 
     socket.on("message", async (data) => {
