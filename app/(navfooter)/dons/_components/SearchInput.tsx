@@ -31,7 +31,7 @@ const SearchInput = ({ value, onChange, onFilterClick }: SearchInputProps) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-20">
       <form onSubmit={onSearch}>
         <span>
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
@@ -40,7 +40,7 @@ const SearchInput = ({ value, onChange, onFilterClick }: SearchInputProps) => {
           type="text"
           value={value}
           onChange={onChange}
-          className="w-[600px] h-12 rounded-full px-2 pl-12 pr-28 border border-gray-600 font-Montserrat"
+          className="w-[750px] h-12 rounded-full px-2 pl-12 pr-28 border border-gray-600 font-Montserrat"
           placeholder="Adresse, quartier, ..."
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer border-l border-gray-600 pl-4">
