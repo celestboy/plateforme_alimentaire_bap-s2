@@ -97,62 +97,62 @@ export default function HomePage() {
 					<span className="text-[#084784]">gaspillage alimentaire</span>
 				</h3>
 
-				<div className="flex flex-wrap gap-5 m-12">
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+				<div className=" grid grid-cols-2 md:grid-cols-3 m-12 gap-8">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Liste facile des articles
 						</p>
-						<p>
+						<p className="text-lg">
 							Repertoriez rapidement les articles alimentaires en surplus de
 							votre garde-manger ou de votre refrigerateur, pour que les autres
 							membres de votre communaute puissent voir ce qui est disponible.
 						</p>
 					</article>
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Disponibilite basee sur la localisation
 						</p>
-						<p>
+						<p className="text-lg">
 							Trouvez des articles alimentaires pres de chez vous grace a la
 							recherche et aux filtres bases sur la localisation, ce qui rend
-							l’acces aux ressources alimentaires locales plus pratique.
+							l'acces aux ressources alimentaires locales plus pratique.
 						</p>
 					</article>
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Profils de donateurs verifies
 						</p>
-						<p>
+						<p className="text-lg">
 							Consultez des profils verifies des personnes offrant des aliments,
 							vous assurant ainsi de savoir a qui vous vous adressez pour des
 							echanges surs et fiables.
 						</p>
 					</article>
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Mises a jour a temps reel
 						</p>
-						<p>
+						<p className="text-lg">
 							Recevez des notifications sur les nouveaux articles alimentaires
 							disponibles et ceux qui approchent de leur date de peremption,
 							pour agir rapidement et eviter le gaspillage.
 						</p>
 					</article>
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Engagement communautaire
 						</p>
-						<p>
-							Engagez-vous avec d’autres membres, partagez des conseils et
+						<p className="text-lg">
+							Engagez-vous avec d'autres membres, partagez des conseils et
 							rejoignez des initiatives communautiares pour reduire le
 							gaspillage alimentaire dans votre quartier.
 						</p>
 					</article>
-					<article className="flex-1 basis-full sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
-						<p className="text-[#B0C482] text-lg mb-2 font-futuraPTBold">
+					<article className="flex flex-col justify-center items-center flex-1 basis-full aspect-square sm:basis-[calc(50%-20px)] lg:basis-[calc(33.333%-20px)] p-16 text-center border-[#B0C482] border-2 rounded-[50px] box-border">
+						<p className="text-[#B0C482] text-2xl mb-2 font-futuraPTBold">
 							Tableau de bord
 						</p>
-						<p>
+						<p className="text-lg">
 							Suivez la quantite de gaspillage alimentaire evitee et voyez votre
 							contribution personnelle a la reduction du gaspillage dans la
 							communaute.
