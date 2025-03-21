@@ -182,12 +182,13 @@ export default function PublishDonForm() {
             <option value="">
               Veuillez séléctionner la catégorie du produit
             </option>
-            <option value="feculents">Féculents</option>
-            <option value="viande">Viande</option>
-            <option value="boisson">Boisson</option>
-            <option value="desserts">Desserts</option>
-            <option value="produits-laiters">Produits Laitiers</option>
-            <option value="autres">Autres</option>
+            <option value="prod-frais">Produits frais</option>
+            <option value="prod-secs">Produits secs</option>
+            <option value="conserves">Conserves</option>
+            <option value="prod-surgeles">Produits surgelés</option>
+            <option value="prod-boulangerie">Produits de boulangerie</option>
+            <option value="boissons">Boissons</option>
+            <option value="autres">Autres produits</option>
           </select>
         </div>
         <div className="relative w-[600px]">

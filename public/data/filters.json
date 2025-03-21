@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "type": "location",
+    "name": "Gare de Rueil-Malmaison",
+    "value": "gare-de-rueil"
+  },
+  {
+    "id": 2,
+    "type": "location",
+    "name": "Mairie de Rueil-Malmaison",
+    "value": "mairie-de-rueil"
+  },
+  {
+    "id": 3,
+    "type": "location",
+    "name": "Parc de Bois-Préau",
+    "value": "parc-de-bois-preau"
+  },
+  {
+    "id": 4,
+    "type": "location",
+    "name": "Stade du Parc",
+    "value": "stade-du-parc"
+  },
+  {
+    "id": 5,
+    "type": "location",
+    "name": "Complexe sportif Jules Ladoumègue",
+    "value": "complexe-sportif-jules-ladoumegue"
+  },
+  {
+    "id": 6,
+    "type": "location",
+    "name": "Centre Commercial E. Leclerc",
+    "value": "centre-commercial-e-leclerc"
+  },
+  {
+    "id": 7,
+    "type": "location",
+    "name": "Centre Aquatique Arsenal",
+    "value": "centre-aquatique-arsenal"
+  },
+  {
+    "id": 8,
+    "type": "location",
+    "name": "Forêt Domaniale de la Malmaison",
+    "value": "foret-domaniale-de-la-malmaison"
+  },
+  {
+    "id": 9,
+    "type": "location",
+    "name": "Cimetière du Mont Valérien",
+    "value": "cimetière-du-mont-valerien"
+  },
+  {
+    "id": 10,
+    "type": "produit",
+    "name": "Produits Frais",
+    "value": "produits-frais"
+  },
+  {
+    "id": 11,
+    "type": "produit",
+    "name": "Produits Secs",
+    "value": "produits-secs"
+  },
+  {
+    "id": 12,
+    "type": "produit",
+    "name": "Conserves",
+    "value": "conserves"
+  },
+  {
+    "id": 13,
+    "type": "produit",
+    "name": "Produits Surgelés",
+    "value": "produits-surgeles"
+  },
+  {
+    "id": 14,
+    "type": "produit",
+    "name": "Produits de Boulangerie",
+    "value": "produits-boulangerie"
+  },
+  {
+    "id": 15,
+    "type": "produit",
+    "name": "Boissons",
+    "value": "boissons"
+  },
+  {
+    "id": 16,
+    "type": "produit",
+    "name": "Autres",
+    "value": "autres"
+  }
+]

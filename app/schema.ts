@@ -67,11 +67,12 @@ export const DonSchema = z.object({
     .nonempty(),
   category: z.enum(
     [
-      "produits-laitiers",
-      "feculents",
-      "viande",
-      "boisson",
-      "desserts",
+      "produits-frais",
+      "produits-secs",
+      "conserves",
+      "produits-surgeles",
+      "produits-boulangerie",
+      "boissons",
       "autres",
     ],
     {
