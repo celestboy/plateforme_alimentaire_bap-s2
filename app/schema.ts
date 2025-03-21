@@ -101,7 +101,9 @@ export const DonSchema = z.object({
 });
 
 export const ValidateSchema = z.object({
-  lieu: z.string().nonempty(),
+  lieu: z
+    .string({ message: "Veuillez sélectionner un lieu." })
+    .nonempty({ message: "Veuillez sélectionner un lieu" }),
   heure: z
     .string()
     .nonempty({ message: "L'heure est requise." })
