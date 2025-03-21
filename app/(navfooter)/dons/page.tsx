@@ -17,50 +17,139 @@ interface Don {
   img_url: string;
 }
 
-export default function HomePage() {
-  const search = useSearchParams();
-  const router = useRouter();
-  const searchQuery = search ? search.get("q") || "" : "";
-  const [dons, setDons] = useState<Don[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchValue, setSearchValue] = useState("");
+interface Filter {
+  id: number;
+  type: string;
+  name: string;
+  value: string;
+}
 
+export default function HomePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchQuery = searchParams ? searchParams.get("q") || "" : "";
+  const categoryFilter = searchParams ? searchParams.get("category") || "" : "";
+
+  const [dons, setDons] = useState<Don[]>([]);
+  const [filters, setFilters] = useState<Filter[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchValue, setSearchValue] = useState(searchQuery);
+
+  // Fetch filters from your JSON file
+  useEffect(() => {
+    async function fetchFilters() {
+      try {
+        const response = await fetch("/data/filters.json");
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+        const data: Filter[] = await response.json();
+        setFilters(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des filtres :", error);
+      }
+    }
+
+    fetchFilters();
+  }, []);
+
+  // Fetch dons based on both search query and category filter
   useEffect(() => {
     async function fetchDons() {
       setIsLoading(true);
-
-      const data: Don[] = await getDons(searchQuery || undefined);
-
-      setDons(data);
-      setIsLoading(false);
+      try {
+        // Pass both search query and category to your server action
+        const data: Don[] = await getDons({
+          query: searchQuery || undefined,
+          category: categoryFilter || undefined,
+        });
+        setDons(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des dons :", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchDons();
-  }, [searchQuery]);
+  }, [searchQuery, categoryFilter]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
 
-  const clearSearch = () => {
+  const clearFilters = () => {
     setSearchValue("");
     router.push("/dons");
   };
 
+  const toggleFilterMenu = () => {
+    setIsFilterOpen(!isFilterOpen);
+  };
+
+  const applyFilter = (category: string) => {
+    // Build URL with both search query and category filter
+    const params = new URLSearchParams();
+
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    }
+
+    if (category) {
+      params.set("category", category);
+    }
+
+    router.push(`/dons?${params.toString()}`);
+    setIsFilterOpen(false);
+  };
+
   return (
     <div className="text-center bg-gray-100 h-full w-screen box-border">
-      <div className="text-center  overflow-x-hidden">
+      <div className="text-center overflow-x-hidden">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-6 font-futuraPTMedium">
           <Link href="/" className="absolute top-6 left-6 text-white">
             Retour
           </Link>
 
           <div className="relative flex items-center justify-center">
-            <SearchInput value={searchValue} onChange={handleSearchChange} />
+            <SearchInput
+              value={searchValue}
+              onChange={handleSearchChange}
+              onFilterClick={toggleFilterMenu}
+            />
           </div>
 
-          <div>
-            <button onClick={clearSearch}>Réinitialiser la recherche</button>
+          {/* Filter dropdown */}
+          {isFilterOpen && (
+            <div className="absolute z-10 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 right-1/2 transform translate-x-1/2">
+              <div className="py-1">
+                <button
+                  onClick={() => applyFilter("")}
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                >
+                  Tous les dons
+                </button>
+                {filters.map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => applyFilter(filter.value)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                  >
+                    {filter.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 bg-white text-[#B0C482] rounded-full hover:bg-gray-100"
+            >
+              Réinitialiser la recherche
+            </button>
           </div>
         </div>
 
@@ -68,6 +157,24 @@ export default function HomePage() {
           <h2 className="text-[#B0C482] font-futuraPTBook text-[3.5rem] my-12">
             Annonces
           </h2>
+
+          {/* Active filters display */}
+          {(searchQuery || categoryFilter) && (
+            <div className="mb-6 flex flex-wrap gap-2 justify-center">
+              {searchQuery && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#B0C482] text-white">
+                  Recherche: {searchQuery}
+                </span>
+              )}
+              {categoryFilter && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#B0C482] text-white">
+                  Catégorie:{" "}
+                  {filters.find((f) => f.value === categoryFilter)?.name ||
+                    categoryFilter}
+                </span>
+              )}
+            </div>
+          )}
 
           <div
             id="articlecontainerteaser"
@@ -78,7 +185,7 @@ export default function HomePage() {
                 <div className="w-12 h-12 border-4 border-t-[#B0C482] border-gray-300 rounded-full animate-spin"></div>
               </div>
             ) : dons.length === 0 ? (
-              <p className="text-2xl font-semibold text-gray-600">
+              <p className="text-2xl font-semibold text-gray-600 col-span-2 my-12">
                 Aucun don trouvé.
               </p>
             ) : (

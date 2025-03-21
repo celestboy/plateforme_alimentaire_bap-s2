@@ -7,14 +7,27 @@ import { useRouter } from "next/navigation";
 interface SearchInputProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFilterClick: () => void;
 }
 
-const SearchInput = ({ value, onChange }: SearchInputProps) => {
+const SearchInput = ({ value, onChange, onFilterClick }: SearchInputProps) => {
   const router = useRouter();
 
   const onSearch = (event: React.FormEvent) => {
     event.preventDefault();
-    router.push(`/dons?q=${encodeURIComponent(value)}`);
+    // Preserve any existing category filter when searching
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentCategory = urlParams.get("category");
+
+    const params = new URLSearchParams();
+    if (value) {
+      params.set("q", value);
+    }
+    if (currentCategory) {
+      params.set("category", currentCategory);
+    }
+
+    router.push(`/dons?${params.toString()}`);
   };
 
   return (
@@ -25,13 +38,17 @@ const SearchInput = ({ value, onChange }: SearchInputProps) => {
         </span>
         <input
           type="text"
-          value={value} // 🔥 Utilise la valeur passée en prop
-          onChange={onChange} // 🔥 Utilise la fonction passée en prop
+          value={value}
+          onChange={onChange}
           className="w-[600px] h-12 rounded-full px-2 pl-12 pr-28 border border-gray-600 font-Montserrat"
           placeholder="Adresse, quartier, ..."
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer border-l border-gray-600 pl-4">
-          <button className="flex gap-2 items-center">
+          <button
+            type="button"
+            className="flex gap-2 items-center"
+            onClick={onFilterClick}
+          >
             Filtrer <ArrowDown size={18} />
           </button>
         </div>
