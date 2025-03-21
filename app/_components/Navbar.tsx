@@ -15,24 +15,24 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full h-20 bg-[#b0c482] flex justify-between items-center px-12 py-5 z-50">
+    <header className="fixed top-0 left-0 w-full h-20 bg-white text-black flex justify-between items-center px-12 py-5 z-50">
       <Link href={"/"}>
         <div className="w-52">
           <Image
-            width={208}
-            height={208}
-            src="/images/logo-sharefood.png"
+            width={512}
+            height={512}
+            src="/images/logo-sharefood-full-black.png"
             alt="Logo Gaspillage Alimentaire"
           />
         </div>
       </Link>
 
       <nav>
-        <ul className="flex space-x-12">
+        <ul className="flex space-x-8">
           <li>
             <Link
               href={"/"}
-              className="text-white text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-white hover:text-black"
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
             >
               Accueil
             </Link>
@@ -40,7 +40,7 @@ const Navbar = () => {
           <li>
             <Link
               href={"/contact"}
-              className="text-white text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-white hover:text-black"
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
             >
               Contact
             </Link>
@@ -48,9 +48,25 @@ const Navbar = () => {
           <li>
             <Link
               href={"/dons"}
-              className="text-white text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-white hover:text-black"
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
             >
               Annonces
+            </Link>
+          </li>
+          <li>
+            <Link
+              href={"/messagerie"}
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
+            >
+              Messagerie
+            </Link>
+          </li>
+          <li>
+            <Link
+              href={"/publier-don"}
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
+            >
+              Publier un don
             </Link>
           </li>
         </ul>
@@ -58,13 +74,13 @@ const Navbar = () => {
 
       {isAuthenticated ? (
         <Link href={"/moncompte"}>
-          <button className="bg-white text-black px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
+          <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
             Mon compte
           </button>
         </Link>
       ) : (
         <Link href={"/register"}>
-          <button className="bg-white text-black px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
+          <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
             Créer un compte
           </button>
         </Link>
