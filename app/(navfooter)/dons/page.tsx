@@ -62,10 +62,6 @@ export default function HomePage() {
           <div>
             <button onClick={clearSearch}>Réinitialiser la recherche</button>
           </div>
-
-          <p className="mt-2 text-white">
-            Cherchez des annonces selon votre localisation
-          </p>
         </div>
 
         <div className="relative w-3/4 mx-auto">
