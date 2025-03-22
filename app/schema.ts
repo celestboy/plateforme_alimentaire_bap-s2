@@ -101,6 +101,7 @@ export const DonSchema = z.object({
 });
 
 export const ValidateSchema = z.object({
+  id_don: z.number(),
   lieu: z
     .string({ message: "Veuillez sélectionner un lieu." })
     .nonempty({ message: "Veuillez sélectionner un lieu" }),

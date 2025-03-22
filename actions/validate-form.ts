@@ -5,8 +5,7 @@ import MessagesController from "@/controllers/MessagesController";
 import { FormResponse, ValidateSchemaType } from "@/types/forms";
 
 const validateForm = async (
-  data: ValidateSchemaType,
-  id_don: number
+  data: ValidateSchemaType
 ): Promise<FormResponse> => {
   try {
     const parsedData = ValidateSchema.safeParse(data);
@@ -15,7 +14,7 @@ const validateForm = async (
       return { success: false, errors: parsedData.error.errors };
     }
 
-    const validatedRdv = await MessagesController.validatedRDV(data, id_don);
+    const validatedRdv = await MessagesController.validatedRDV(data);
     if (!validatedRdv) {
       return {
         success: false,

@@ -4,19 +4,19 @@ import { ValidateSchema } from "@/app/schema";
 import { ValidateSchemaType } from "@/types/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import validateForm from "@/actions/validate-form";
 import { toast } from "sonner";
 
 export default function ValidationForm({
-  onSendForm,
   donId,
+  onSendForm,
   onClose,
 }: {
-  onSendForm: (validationMessage: { lieu: string; heure: string }) => void;
   donId: number | null;
+  onSendForm: (validationMessage: { lieu: string; heure: string }) => void;
+
   onClose: () => void;
 }) {
-  const { register, handleSubmit, watch, formState } =
+  const { register, handleSubmit, setValue, watch, formState } =
     useForm<ValidateSchemaType>({
       resolver: zodResolver(ValidateSchema),
       mode: "onChange",
@@ -24,6 +24,12 @@ export default function ValidationForm({
 
   const lieu = watch("lieu");
   const heure = watch("heure");
+
+  useEffect(() => {
+    if (donId !== null) {
+      setValue("id_don", donId);
+    }
+  }, [donId, setValue]);
 
   const handleSubmitForm = async (data: ValidateSchemaType) => {
     if (!donId) {
@@ -34,16 +40,7 @@ export default function ValidationForm({
       return;
     }
 
-    const response = await validateForm(data, donId);
-    if (response.success) {
-      onSendForm({ lieu, heure });
-      onClose();
-    } else {
-      toast.error(response.message || response.errors?.[0]?.message, {
-        icon: <X className="text-white" />,
-        className: "bg-red-500 border border-red-200 text-white text-base",
-      });
-    }
+    onSendForm({ lieu: data.lieu, heure: data.heure });
   };
 
   useEffect(() => {
@@ -83,6 +80,7 @@ export default function ValidationForm({
           </h3>
           <div className="my-4 w-[85%] mx-auto flex flex-col gap-4">
             <div className="flex flex-col justify-center gap-2">
+              <input type="hidden" {...register("id_don")} />
               <label className="font-futuraPTBook text-lg">Lieu*</label>
               <select
                 {...register("lieu", { required: true })}
