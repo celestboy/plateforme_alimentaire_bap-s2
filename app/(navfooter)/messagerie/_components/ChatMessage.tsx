@@ -22,6 +22,37 @@ const ChatMessage = ({
     parsedMessage = message;
   }
 
+  const formatDate = () => {
+    try {
+      // First try to parse the date from ISO string
+      const dateObj = new Date(sentAt);
+
+      // Check if the date is valid
+      if (isNaN(dateObj.getTime())) {
+        console.error("Invalid date:", sentAt);
+        return "Date inconnue";
+      }
+
+      return {
+        date: dateObj.toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+        time: dateObj.toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+      };
+    } catch (error) {
+      console.error("Error formatting date:", error, sentAt);
+      return { date: "Date inconnue", time: "" };
+    }
+  };
+
+  const formattedDate = formatDate();
+
   const handleAccept = () => {
     alert(
       `Tu as accepté le rendez-vous à ${parsedMessage.lieu} à ${parsedMessage.heure}`
@@ -55,16 +86,9 @@ const ChatMessage = ({
           <div className="flex items-center gap-2">
             <p className="font-futuraPTMedium text-lg">{sender}</p>
             <p className="font-futuraPTBook text-xs">
-              {new Date(sentAt).toLocaleDateString("fr-FR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              })}{" "}
-              {new Date(sentAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
+              {typeof formattedDate === "string"
+                ? formattedDate
+                : `${formattedDate.date} ${formattedDate.time}`}
             </p>
           </div>
         )}
@@ -80,21 +104,13 @@ const ChatMessage = ({
             <div className="flex gap-2 mt-2">
               <button
                 onClick={handleAccept}
-                className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage
-                    ? "bg-green-300 cursor-not-allowed"
-                    : "bg-green-500"
-                }`}
-                disabled={isOwnMessage}
+                className="px-4 py-1 bg-green-500 text-white rounded-lg"
               >
                 Accepter
               </button>
               <button
                 onClick={handleReject}
-                className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage ? "bg-red-300 cursor-not-allowed" : "bg-red-500"
-                }`}
-                disabled={isOwnMessage}
+                className="px-4 py-1 bg-red-500 text-white rounded-lg"
               >
                 Refuser
               </button>
