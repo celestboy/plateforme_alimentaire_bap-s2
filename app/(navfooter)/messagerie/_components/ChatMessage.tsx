@@ -1,3 +1,5 @@
+import validateForm from "@/actions/validate-form";
+import { ValidateSchemaType } from "@/types/forms";
 import React from "react";
 
 interface ChatMessageProps {
@@ -5,6 +7,7 @@ interface ChatMessageProps {
   sentAt: string;
   message: string;
   isOwnMessage: boolean;
+  donId?: number | null;
 }
 
 const ChatMessage = ({
@@ -12,6 +15,7 @@ const ChatMessage = ({
   message,
   sentAt,
   isOwnMessage,
+  donId,
 }: ChatMessageProps) => {
   const isSystemMessage = sender === "system";
 
@@ -53,10 +57,33 @@ const ChatMessage = ({
 
   const formattedDate = formatDate();
 
-  const handleAccept = () => {
-    alert(
-      `Tu as accepté le rendez-vous à ${parsedMessage.lieu} à ${parsedMessage.heure}`
-    );
+  const handleAccept = async () => {
+    console.log("hello");
+    try {
+      // Préparer les données à envoyer à validateForm
+      const data: ValidateSchemaType = {
+        id_don: donId !== null && donId !== undefined ? donId : 0,
+        lieu: parsedMessage.lieu,
+        heure: parsedMessage.heure,
+      };
+
+      const response = await validateForm(data);
+      console.log("Response:", response);
+
+      // Afficher une confirmation à l'utilisateur
+      if (response?.success) {
+        alert("Offre acceptée avec succès!");
+      } else {
+        alert(
+          "Erreur lors de l'acceptation: " +
+            (response?.message || "Erreur inconnue")
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'acceptation:", error);
+      alert("Une erreur s'est produite lors de l'acceptation de l'offre.");
+    }
+    console.log("adios");
   };
 
   const handleReject = () => {
@@ -107,7 +134,7 @@ const ChatMessage = ({
                 className={`px-4 py-1 rounded-lg ${
                   isOwnMessage
                     ? "bg-green-300 cursor-not-allowed"
-                    : "bg-green-500"
+                    : "bg-green-500 text-white hover:bg-green-600"
                 }`}
                 disabled={isOwnMessage}
               >
@@ -116,7 +143,9 @@ const ChatMessage = ({
               <button
                 onClick={handleReject}
                 className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage ? "bg-red-300 cursor-not-allowed" : "bg-red-500"
+                  isOwnMessage
+                    ? "bg-red-300 cursor-not-allowed"
+                    : "bg-red-500 text-white hover:bg-red-600"
                 }`}
                 disabled={isOwnMessage}
               >
