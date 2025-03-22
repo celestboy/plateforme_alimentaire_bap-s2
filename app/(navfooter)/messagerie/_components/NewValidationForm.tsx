@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import { ValidateSchema } from "@/app/schema";
 import { ValidateSchemaType } from "@/types/forms";
@@ -16,10 +16,11 @@ export default function ValidationForm({
   donId: number | null;
   onClose: () => void;
 }) {
-  const { register, handleSubmit, watch } = useForm<ValidateSchemaType>({
-    resolver: zodResolver(ValidateSchema),
-    mode: "onChange",
-  });
+  const { register, handleSubmit, watch, formState } =
+    useForm<ValidateSchemaType>({
+      resolver: zodResolver(ValidateSchema),
+      mode: "onChange",
+    });
 
   const lieu = watch("lieu");
   const heure = watch("heure");
@@ -44,6 +45,18 @@ export default function ValidationForm({
       });
     }
   };
+
+  useEffect(() => {
+    Object.values(formState.errors).forEach((error) => {
+      if (error && "message" in error) {
+        toast.error(error.message as string, {
+          icon: <X className="text-white" />,
+          className:
+            "bg-red-500 !important border border-red-200 text-white text-base",
+        });
+      }
+    });
+  }, [formState.errors]);
 
   return (
     <div

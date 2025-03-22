@@ -8,21 +8,12 @@ import { useForm } from "react-hook-form";
 import submitLoginForm from "@/actions/login-form";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
-import { cn } from "@/utils/cn";
-import {
-  ShoppingBasket,
-  Pin,
-  Mail,
-  KeyRound,
-  Eye,
-  EyeOff,
-  X,
-} from "lucide-react";
+import { Mail, KeyRound, Eye, EyeOff, X } from "lucide-react";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState } = useForm<LoginSchemaType>({
+  const { register, handleSubmit } = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
   });
 

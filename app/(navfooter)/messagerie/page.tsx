@@ -35,6 +35,11 @@ interface Chat {
     commerce_name?: string | null;
     user_type: string;
   };
+  messages: {
+    sentAt: Date;
+    content: string;
+    author_id: number;
+  }[];
 }
 
 export default function MessageriePage() {
@@ -47,7 +52,7 @@ export default function MessageriePage() {
   const [error, setError] = useState<string | null>(null);
   const [isConvOpen, setIsConvOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<
-    { sender: string; message: string }[]
+    { sender: string; message: string; sentAt: Date }[]
   >([]);
   const [showValidationForm, setShowValidationForm] = useState(false);
 
@@ -119,7 +124,10 @@ export default function MessageriePage() {
 
     socket.on("user_joined", (message) => {
       console.log("Notification de connexion reçue:", message);
-      setMessages((prev) => [...prev, { sender: "system", message }]);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "system", message, sentAt: new Date() },
+      ]);
     });
 
     return () => {
@@ -191,7 +199,14 @@ export default function MessageriePage() {
     console.log("Envoi du message via socket:", socketData);
     socket.emit("message", socketData);
 
-    setMessages((prev) => [...prev, { sender: username, message }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: username,
+        message,
+        sentAt: new Date(),
+      },
+    ]);
 
     const messageData = {
       content: message,
@@ -222,7 +237,11 @@ export default function MessageriePage() {
 
     setMessages((prev) => [
       ...prev,
-      { sender: username, message: JSON.stringify(validationMessage) },
+      {
+        sender: username,
+        message: JSON.stringify(validationMessage),
+        sentAt: new Date(),
+      },
     ]);
 
     socket.emit("message", data);
@@ -234,9 +253,6 @@ export default function MessageriePage() {
 
   return (
     <div className="mt-4 p-4">
-      <h1 className="font-bold mb-4 text-center font-futuraPTBold uppercase text-3xl">
-        Messagerie
-      </h1>
       <div className="flex items-center justify-center">
         {groupChats.length === 0 ? (
           <p>Aucune conversation trouvée.</p>
@@ -249,39 +265,48 @@ export default function MessageriePage() {
                 onClick={() => handleJoinRoom(chat)}
               >
                 <div className="flex justify-between mb-2">
-                  <div className="font-medium">
+                  <div className="">
                     {idUser === chat.donneur_id ? (
                       <div>
-                        <span className="text-gray-500">
-                          Conversation avec:
-                        </span>{" "}
-                        <span className="font-semibold">
+                        <span className="font-futuraPTBold text-xl">
                           {chat.receveur.username}
                         </span>
                         {chat.receveur.commerce_name && (
-                          <span className="ml-2 text-sm text-gray-600">
+                          <span className="font-futuraPTBold text-xl">
                             ({chat.receveur.commerce_name})
                           </span>
                         )}
                       </div>
                     ) : (
                       <div>
-                        <span className="text-gray-500">
-                          Conversation avec:
-                        </span>{" "}
-                        <span className="font-semibold">
+                        <span className="font-futuraPTBold text-xl">
                           {chat.donneur.username}
                         </span>
                         {chat.donneur.commerce_name && (
-                          <span className="font-semibold">
+                          <span className="font-futuraPTBold text-xl">
                             {chat.donneur.commerce_name}
                           </span>
                         )}
                       </div>
                     )}
-                    <span className="text-sm text-blue-500">
+                    <span className="text-sm font-futuraPTBook text-base-green">
                       Produit concerné : {chat.don.title}
                     </span>
+                    {chat.messages.length > 0 ? (
+                      <p className="text-base font-futuraPTBook text-gray-500">
+                        <strong className="text-base font-futuraPTBook mr-2 text-black">
+                          {chat.messages[0].author_id === idUser
+                            ? "Vous"
+                            : "Reçu"}{" "}
+                          :
+                        </strong>
+                        {chat.messages[0].content}
+                      </p>
+                    ) : (
+                      <p className="text-base font-futuraPTBook text-gray-500">
+                        Aucun message
+                      </p>
+                    )}
                   </div>
                 </div>
               </li>
@@ -304,6 +329,7 @@ export default function MessageriePage() {
                       key={index}
                       sender={msg.sender}
                       message={msg.message}
+                      sentAt={msg.sentAt.toLocaleString()}
                       isOwnMessage={msg.sender === username}
                     />
                   ))}
