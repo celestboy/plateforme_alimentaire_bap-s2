@@ -1,7 +1,7 @@
 "use client";
 
 import displayUserChats from "@/actions/get-user-chats";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { jwtDecode } from "jwt-decode";
 import ChatMessage from "./_components/ChatMessage";
 import ChatForm from "./_components/ChatForm";
@@ -398,6 +398,25 @@ export default function MessageriePage() {
 		}
 	};
 
+	const sortChatsByLatestMessage = (chats: Chat[]): Chat[] => {
+		return [...chats].sort((a, b) => {
+			// Get the most recent message timestamp for each chat (or use epoch start if no messages)
+			const aLatest =
+				a.messages.length > 0 ? new Date(a.messages[0].sentAt).getTime() : 0;
+
+			const bLatest =
+				b.messages.length > 0 ? new Date(b.messages[0].sentAt).getTime() : 0;
+
+			// Sort in descending order (newest first)
+			return bLatest - aLatest;
+		});
+	};
+
+	// Apply sorting when displaying chats
+	const sortedGroupChats = useMemo(() => {
+		return sortChatsByLatestMessage(groupChats);
+	}, [groupChats]);
+
 	if (loading)
 		return <div className="p-4">Chargement des conversations...</div>;
 	if (error) return <div className="p-4 text-red-500">{error}</div>;
@@ -409,7 +428,7 @@ export default function MessageriePage() {
 					<p>Aucune conversation trouvée.</p>
 				) : (
 					<ul className="space-y-4 bg-gray-100 p-4 flex flex-col items-center justify-start w-[350px] h-[550px] overflow-y-auto">
-						{groupChats.map((chat) => (
+						{sortedGroupChats.map((chat) => (
 							<li
 								key={chat.chat_id}
 								className={`border p-4 rounded-lg shadow-sm hover:bg-gray-50 w-full relative transition-all duration-200 ${
