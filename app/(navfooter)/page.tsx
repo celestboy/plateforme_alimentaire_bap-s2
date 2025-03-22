@@ -121,7 +121,7 @@ export default function HomePage() {
 							<p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
 								Trouvez des articles alimentaires pres de chez vous grace a la
 								recherche et aux filtres bases sur la localisation, ce qui rend
-								l'acces aux ressources alimentaires locales plus pratique.
+								l&apos;acces aux ressources alimentaires locales plus pratique.
 							</p>
 						</article>
 					</div>
@@ -155,8 +155,8 @@ export default function HomePage() {
 								Engagement communautaire
 							</p>
 							<p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
-								Engagez-vous avec d'autres membres, partagez des conseils et
-								rejoignez des initiatives communautiares pour reduire le
+								Engagez-vous avec d&apos;autres membres, partagez des conseils
+								et rejoignez des initiatives communautiares pour reduire le
 								gaspillage alimentaire dans votre quartier.
 							</p>
 						</article>
