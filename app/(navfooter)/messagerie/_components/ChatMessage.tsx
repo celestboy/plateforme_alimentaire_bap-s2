@@ -104,13 +104,21 @@ const ChatMessage = ({
             <div className="flex gap-2 mt-2">
               <button
                 onClick={handleAccept}
-                className="px-4 py-1 bg-green-500 text-white rounded-lg"
+                className={`px-4 py-1 rounded-lg ${
+                  isOwnMessage
+                    ? "bg-green-300 cursor-not-allowed"
+                    : "bg-green-500"
+                }`}
+                disabled={isOwnMessage}
               >
                 Accepter
               </button>
               <button
                 onClick={handleReject}
-                className="px-4 py-1 bg-red-500 text-white rounded-lg"
+                className={`px-4 py-1 rounded-lg ${
+                  isOwnMessage ? "bg-red-300 cursor-not-allowed" : "bg-red-500"
+                }`}
+                disabled={isOwnMessage}
               >
                 Refuser
               </button>
