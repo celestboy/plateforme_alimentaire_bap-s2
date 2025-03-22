@@ -79,4 +79,5 @@ model Messages {
   chat_id Int
   chat Chats @relation(fields: [chat_id], references: [chat_id], onDelete: Cascade)
   read Boolean @default(false)
+  isSystemMessage Boolean @default(false)
 }
