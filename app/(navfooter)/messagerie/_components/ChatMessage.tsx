@@ -22,34 +22,17 @@ const ChatMessage = ({
 		parsedMessage = message;
 	}
 
+
 	const formatDate = () => {
 		try {
 			// First try to parse the date from ISO string
 			const dateObj = new Date(sentAt);
-
+      
 			// Check if the date is valid
 			if (isNaN(dateObj.getTime())) {
 				console.error("Invalid date:", sentAt);
 				return "Date inconnue";
 			}
-
-			return {
-				date: dateObj.toLocaleDateString("fr-FR", {
-					day: "2-digit",
-					month: "2-digit",
-					year: "numeric",
-				}),
-				time: dateObj.toLocaleTimeString("fr-FR", {
-					hour: "2-digit",
-					minute: "2-digit",
-					hour12: false,
-				}),
-			};
-		} catch (error) {
-			console.error("Error formatting date:", error, sentAt);
-			return { date: "Date inconnue", time: "" };
-		}
-	};
 
 	const formattedDate = formatDate();
 
