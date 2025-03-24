@@ -136,20 +136,6 @@ class DonsController {
     return dons;
   }
 
-  async pastLimitDate(id_don: number) {
-    const currentDate = new Date();
-
-    const don = await prisma.dons.deleteMany({
-      where: {
-        don_id: id_don,
-        limit_date: {
-          lt: currentDate,
-        },
-      },
-    });
-    return don;
-  }
-
   async validateRDV(info: ValidateSchemaType) {
     const id_don = info.id_don;
 
@@ -172,6 +158,20 @@ class DonsController {
     });
 
     return changeStatus;
+  }
+
+  async pastLimitDate(id_don: number) {
+    const currentDate = new Date();
+
+    const don = await prisma.dons.deleteMany({
+      where: {
+        don_id: id_don,
+        limit_date: {
+          lt: currentDate,
+        },
+      },
+    });
+    return don;
   }
 }
 
