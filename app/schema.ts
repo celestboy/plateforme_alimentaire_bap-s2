@@ -130,4 +130,5 @@ export const MessageSchema = z.object({
   author_id: z.number(),
   receiver_id: z.number(),
   chat_id: z.number(),
+  isSystemMessage: z.boolean().default(false).optional(),
 });

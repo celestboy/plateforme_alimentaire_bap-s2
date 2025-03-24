@@ -13,14 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum StatusEnum{
-  NONE
-  PENDING
-  ACCEPTED
-  REJECTED
-  CANCELED
-}
-
 model Users {
   user_id  Int @id @default(autoincrement())
   user_type String
@@ -47,7 +39,6 @@ model Dons {
   rdv_pts Json
   img_url String
   publishedAt DateTime @default(now())
-  status StatusEnum @default(NONE)
   archived Boolean @default(false)
   lieu String?
   Heure DateTime?
@@ -65,7 +56,9 @@ model Chats {
   don_id Int
   don Dons @relation(fields: [don_id], references: [don_id], onDelete: Cascade)
   messages Messages[]
-  isForm Boolean @default(false)
+  isFormActive Boolean @default(false)
+  isFormAccepted Boolean @default(false)
+  isFormRejected Boolean @default(false)
   createdAt DateTime @default(now())
 }
 
