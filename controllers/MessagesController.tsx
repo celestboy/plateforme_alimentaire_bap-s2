@@ -1,4 +1,4 @@
-import { MessageSchemaType, ValidateSchemaType } from "@/types/forms";
+import { MessageSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
 
 class MessagesController {

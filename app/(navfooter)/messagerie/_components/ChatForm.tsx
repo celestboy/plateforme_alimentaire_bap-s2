@@ -5,9 +5,11 @@ import React, { useState } from "react";
 const ChatForm = ({
   onSendMessage,
   onValidateDonation,
+  isFormSubmitted,
 }: {
   onSendMessage: (message: string) => void;
   onValidateDonation: () => void;
+  isFormSubmitted?: boolean;
 }) => {
   const [message, setMessage] = useState("");
 
@@ -37,10 +39,13 @@ const ChatForm = ({
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-white rounded-lg bg-base-green"
+          className={`px-4 py-2 text-white rounded-lg ${
+            isFormSubmitted ? "bg-gray-400 cursor-not-allowed" : "bg-base-green"
+          }`}
           onClick={onValidateDonation}
+          disabled={isFormSubmitted}
         >
-          Valider le don
+          {isFormSubmitted ? "Formulaire en cours" : "Valider le don"}
         </button>
       </form>
     </div>

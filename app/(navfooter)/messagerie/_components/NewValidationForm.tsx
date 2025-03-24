@@ -5,13 +5,16 @@ import { ValidateSchemaType } from "@/types/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import updateFormStatus from "@/actions/update-form-status";
 
 export default function ValidationForm({
   donId,
+  chatId,
   onSendForm,
   onClose,
 }: {
   donId: number | null;
+  chatId: number;
   onSendForm: (validationMessage: { lieu: string; heure: string }) => void;
 
   onClose: () => void;
@@ -29,7 +32,7 @@ export default function ValidationForm({
     if (donId !== null) {
       setValue("id_don", donId);
     }
-  }, [donId, setValue]);
+  }, [donId, chatId, setValue]);
 
   const handleSubmitForm = async (data: ValidateSchemaType) => {
     if (!donId) {
@@ -39,6 +42,9 @@ export default function ValidationForm({
       });
       return;
     }
+
+    await updateFormStatus(donId, chatId);
+    console.log("updated status");
 
     onSendForm({ lieu: data.lieu, heure: data.heure });
   };
