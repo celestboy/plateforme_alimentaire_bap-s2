@@ -223,6 +223,17 @@ export default function HomePage() {
 					</div>
 				</div>
 			</section>
+
+			<section className="flex justify-center items-center m-16">
+				<article className="m-8 p-12 w-full text-center rounded-xl bg-slate-100">
+					<h3 className="mb-6 font-futuraPTBold text-3xl">Nombre total de dons</h3>
+					<p className="font-futuraPTMedium text-3xl">999</p>
+				</article>
+				<article className="m-8 p-12 w-full text-center rounded-xl bg-slate-100">
+					<h3 className="mb-6 font-futuraPTBold text-3xl">CO2 évité</h3>
+					<p className="font-futuraPTMedium text-3xl"><span>999 </span>Kg</p>
+				</article>
+			</section>
 		</div>
 	);
 }
