@@ -53,6 +53,7 @@ export default function MessageriePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isConvOpen, setIsConvOpen] = useState<boolean>(false);
+  const [isValidation, setIsValidation] = useState<boolean>(false);
   const [messages, setMessages] = useState<
     { sender: string; message: string; sentAt: Date }[]
   >([]);
@@ -251,6 +252,23 @@ export default function MessageriePage() {
       const result = await GetChatMessages(chat.chat_id);
       if (result.success) {
         setMessages(result.messages);
+        const hasValidationMessage = result.messages.some((msg) => {
+          try {
+            // Check if the message looks like JSON before parsing
+            if (!msg.message.trim().startsWith("{")) {
+              return false;
+            }
+            const parsedMsg = JSON.parse(msg.message);
+            return (
+              parsedMsg.lieu !== undefined && parsedMsg.heure !== undefined
+            );
+          } catch (e) {
+            console.error("Failed to parse message:", e);
+            return false;
+          }
+        });
+
+        setIsValidation(hasValidationMessage);
       } else {
         console.error("Failed to load messages:", result.message);
       }
@@ -393,6 +411,7 @@ export default function MessageriePage() {
 
     try {
       StoreMessage(messageData);
+      setIsValidation(true);
     } catch (error) {
       console.error("Erreur lors du stockage du message de validation:", error);
     }
@@ -529,12 +548,14 @@ export default function MessageriePage() {
                   <ValidationForm
                     onSendForm={handleSendValidation}
                     donId={donId}
+                    chatId={room}
                     onClose={() => setShowValidationForm(false)}
                   />
                 )}
                 <ChatForm
                   onSendMessage={handleSendMessage}
                   onValidateDonation={() => setShowValidationForm(true)}
+                  isFormSubmitted={isValidation}
                 />
               </div>
             )}

@@ -1,4 +1,4 @@
-import { MessageSchemaType, ValidateSchemaType } from "@/types/forms";
+import { MessageSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
 
 class MessagesController {
@@ -13,30 +13,6 @@ class MessagesController {
       },
     });
     return message;
-  }
-
-  async validatedRDV(info: ValidateSchemaType) {
-    const id_don = info.id_don;
-
-    const parsedHeureValid = new Date(info.heure);
-    if (isNaN(parsedHeureValid.getTime())) {
-      throw new Error(
-        "Date invalide, assurez-vous qu'elle est au format ISO-8601."
-      );
-    }
-
-    const changeStatus = await prisma.dons.update({
-      where: {
-        don_id: id_don,
-      },
-      data: {
-        archived: true,
-        lieu: info.lieu,
-        Heure: parsedHeureValid,
-      },
-    });
-
-    return [changeStatus];
   }
 
   async deleteRDV(id_don: number) {

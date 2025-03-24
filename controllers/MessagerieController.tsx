@@ -85,6 +85,18 @@ class ChatController {
       return dateB.getTime() - dateA.getTime();
     });
   }
+
+  async updateFormStatus(id_don: number, id_chat: number) {
+    await prisma.chats.update({
+      where: {
+        don_id: id_don,
+        chat_id: id_chat,
+      },
+      data: {
+        isForm: true,
+      },
+    });
+  }
 }
 const ChatControllerInstance = new ChatController();
 export default ChatControllerInstance;

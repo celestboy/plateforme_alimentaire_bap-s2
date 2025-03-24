@@ -58,9 +58,7 @@ const ChatMessage = ({
   const formattedDate = formatDate();
 
   const handleAccept = async () => {
-    console.log("hello");
     try {
-      // Préparer les données à envoyer à validateForm
       const data: ValidateSchemaType = {
         id_don: donId !== null && donId !== undefined ? donId : 0,
         lieu: parsedMessage.lieu,
@@ -70,7 +68,6 @@ const ChatMessage = ({
       const response = await validateForm(data);
       console.log("Response:", response);
 
-      // Afficher une confirmation à l'utilisateur
       if (response?.success) {
         alert("Offre acceptée avec succès!");
       } else {
@@ -83,7 +80,6 @@ const ChatMessage = ({
       console.error("Erreur lors de l'acceptation:", error);
       alert("Une erreur s'est produite lors de l'acceptation de l'offre.");
     }
-    console.log("adios");
   };
 
   const handleReject = () => {
