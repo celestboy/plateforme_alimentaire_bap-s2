@@ -6,12 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import SearchInput from "./_components/SearchInput";
 import { getDons } from "@/actions/fetch-don-by-keywords";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 interface Don {
   don_id: number;
   title: string;
   description: string;
   category: string;
+  rdv_pts: JsonValue;
   quantity: number;
   limit_date: Date;
   img_url: string;
@@ -29,6 +31,7 @@ export default function HomePage() {
   const router = useRouter();
   const searchQuery = searchParams ? searchParams.get("q") || "" : "";
   const categoryFilter = searchParams ? searchParams.get("category") || "" : "";
+  const rdvFilter = searchParams ? searchParams.get("rdv_pts") || "" : "";
 
   const [dons, setDons] = useState<Don[]>([]);
   const [filters, setFilters] = useState<Filter[]>([]);
@@ -63,6 +66,7 @@ export default function HomePage() {
         const data: Don[] = await getDons({
           query: searchQuery || undefined,
           category: categoryFilter || undefined,
+          rdv_pts: rdvFilter || undefined,
         });
         setDons(data);
       } catch (error) {
@@ -73,7 +77,7 @@ export default function HomePage() {
     }
 
     fetchDons();
-  }, [searchQuery, categoryFilter]);
+  }, [searchQuery, categoryFilter, rdvFilter]);
 
   // Gérer la fermeture du menu au clic en dehors
   useEffect(() => {
@@ -109,11 +113,43 @@ export default function HomePage() {
   const toggleFilterMenu = () => {
     setIsFilterOpen(!isFilterOpen);
   };
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(window.location.search);
 
-  const applyFilter = (category: string) => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set("q", searchQuery);
-    if (category) params.set("category", category);
+    // Keep existing filters
+    if (categoryFilter) {
+      params.set("category", categoryFilter);
+    }
+    if (rdvFilter) {
+      params.set("rdv_pts", rdvFilter);
+    }
+
+    // Update search query
+    if (searchValue) {
+      params.set("q", searchValue);
+    } else {
+      params.delete("q");
+    }
+
+    router.push(`/dons?${params.toString()}`);
+  };
+
+  const applyFilter = (filterType: string, value: string) => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Keep existing search query if present
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    }
+
+    // Update or add the new filter while keeping other filters
+    if (filterType === "location") {
+      params.set("rdv_pts", value);
+    } else if (filterType === "produit") {
+      params.set("category", value);
+    }
+
     router.push(`/dons?${params.toString()}`);
     setIsFilterOpen(false);
   };
@@ -131,6 +167,7 @@ export default function HomePage() {
               value={searchValue}
               onChange={handleSearchChange}
               onFilterClick={toggleFilterMenu}
+              onSubmit={handleSearch}
             />
 
             {/* Menu des filtres */}
@@ -151,7 +188,9 @@ export default function HomePage() {
                         .map((filter) => (
                           <button
                             key={filter.id}
-                            onClick={() => applyFilter(filter.value)}
+                            onClick={() =>
+                              applyFilter("location", filter.value)
+                            }
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                           >
                             {filter.name}
@@ -169,7 +208,7 @@ export default function HomePage() {
                         .map((filter) => (
                           <button
                             key={filter.id}
-                            onClick={() => applyFilter(filter.value)}
+                            onClick={() => applyFilter("produit", filter.value)}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                           >
                             {filter.name}
@@ -197,7 +236,7 @@ export default function HomePage() {
             Annonces
           </h2>
 
-          {(searchQuery || categoryFilter) && (
+          {(searchQuery || categoryFilter || rdvFilter) && (
             <div className="mb-6 flex flex-wrap gap-2 justify-center">
               {searchQuery && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#B0C482] text-white">
@@ -209,6 +248,13 @@ export default function HomePage() {
                   Catégorie:{" "}
                   {filters.find((f) => f.value === categoryFilter)?.name ||
                     categoryFilter}
+                </span>
+              )}
+              {rdvFilter && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#B0C482] text-white">
+                  Lieu:{" "}
+                  {filters.find((f) => f.value === rdvFilter)?.name ||
+                    rdvFilter}
                 </span>
               )}
             </div>

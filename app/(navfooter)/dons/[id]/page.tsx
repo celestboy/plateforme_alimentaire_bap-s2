@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import displayUniqueDon from "@/actions/get-single-don";
 import DonClient from "./_components/DonClient";
 import CreateChat from "@/actions/create-chat";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 interface JwtPayload {
   userId: number;
@@ -15,9 +16,11 @@ interface JwtPayload {
 export default function SingleDonPage() {
   const params = useParams();
   const router = useRouter(); // ✅ Initialisation du router
-  const [don, setDon] = useState<{ don_id: number; donneur_id: number } | null>(
-    null
-  );
+  const [don, setDon] = useState<{
+    don_id: number;
+    donneur_id: number;
+    rdv_pts: JsonValue;
+  } | null>(null);
   const [receveurId, setReceveurId] = useState<number | null>(null);
 
   // 🔹 Récupération des infos du don
@@ -69,9 +72,9 @@ export default function SingleDonPage() {
         don_id: don.don_id,
       };
 
-      await CreateChat(data); 
+      await CreateChat(data);
 
-      router.push("/messagerie"); 
+      router.push("/messagerie");
     } catch (error) {
       console.error("Erreur lors de la création du chat:", error);
     }
@@ -83,6 +86,7 @@ export default function SingleDonPage() {
         <DonClient />
       </div>
       <div className="mt-4 p-4 border rounded-md bg-gray-100">
+        <p>{JSON.stringify(don?.rdv_pts) ?? "Chargement..."}</p>
         <p>
           <strong>Don ID :</strong> {don?.don_id ?? "Chargement..."}
         </p>
