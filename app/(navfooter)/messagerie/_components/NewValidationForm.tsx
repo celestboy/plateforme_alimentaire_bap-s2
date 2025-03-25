@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import updatePendingStatus from "@/actions/update-is-don-pending";
+import { socket } from "@/lib/socketClient";
+import { DonStatus } from "@prisma/client";
 
 export default function ValidationForm({
   donId,
@@ -41,8 +43,19 @@ export default function ValidationForm({
       });
       return;
     }
-
-    await updatePendingStatus(donId, chatId);
+    console.log("data", data);
+    const updateResult = await updatePendingStatus(donId, chatId);
+    console.log("updateResult", updateResult);
+    if (updateResult.success) {
+      // Emit status update via socket
+      socket.emit("status_update", {
+        room: chatId,
+        donId: donId,
+        status: DonStatus.PENDING,
+        updatedAt: new Date().toISOString(),
+      });
+      console.log("status updated");
+    }
 
     onSendForm({ lieu: data.lieu, heure: data.heure });
   };

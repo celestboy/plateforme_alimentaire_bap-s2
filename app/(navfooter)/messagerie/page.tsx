@@ -180,6 +180,7 @@ export default function MessageriePage() {
   useEffect(() => {
     socket.off("message");
     socket.off("user_joined");
+    socket.off("local-system-message");
 
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
@@ -251,9 +252,23 @@ export default function MessageriePage() {
       ]);
     });
 
+    socket.on("local-system-message", (data) => {
+      console.log("Local system message:", data);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Système",
+          message: data.message,
+          sentAt: new Date(data.sentAt || new Date()),
+          isSystemMessage: true,
+        },
+      ]);
+    });
+
     return () => {
       socket.off("message");
       socket.off("user_joined");
+      socket.off("local-system-message"); // Clean up
     };
   }, [room, username, idUser, incrementChatNotification, markChatAsRead]);
 

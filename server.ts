@@ -37,6 +37,21 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("status_update", (data) => {
+      console.log("Status update received:", data);
+      if (data?.room && data?.status) {
+        // Broadcast status update to everyone in the room
+        io.to(data.room).emit("status_update", data);
+      }
+    });
+
+    socket.on("local-system-message", (data) => {
+      console.log("Local system message received:", data);
+      // This is a special case where we want to emit only to the sender
+      // (not using socket.to() which would emit to everyone else)
+      socket.emit("local-system-message", data);
+    });
+
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
     });
