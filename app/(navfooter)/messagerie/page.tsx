@@ -305,7 +305,7 @@ export default function MessageriePage() {
           ];
         });
 
-        if (idUser && senderID !== idUser) {
+        if (senderID !== idUser) {
           markChatAsRead(roomId);
         }
       }
@@ -350,6 +350,15 @@ export default function MessageriePage() {
       }
     });
 
+    socket.on("status_update", (data) => {
+      console.log("Status update received:", data);
+
+      // Mark chat as read if we're in the active chat
+      if (data.room === room && data.donId === donId) {
+        markChatAsRead(data.room);
+      }
+    });
+
     socket.on("user_joined", (message) => {
       console.log("Notification de connexion reçue:", message);
       setMessages((prev) => [
@@ -360,6 +369,17 @@ export default function MessageriePage() {
 
     socket.on("local-system-message", (data) => {
       console.log("Local system message:", data);
+
+      // Ensure room is a number
+      const roomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+
+      // If system message is for current active chat and we're viewing this chat, mark as read
+      if (roomId === room) {
+        console.log("System message received in active room - marking as read");
+        markChatAsRead(roomId);
+      }
+
       setMessages((prev) => [
         ...prev,
         {
@@ -369,6 +389,40 @@ export default function MessageriePage() {
           isSystemMessage: true,
         },
       ]);
+
+      // Also update the groupChats state to include this system message
+      setGroupChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat.chat_id === roomId) {
+            const newMessage = {
+              sentAt: new Date(data.sentAt || new Date()),
+              content: data.message,
+              author_id: 0, // System message from system
+              isSystemMessage: true,
+            };
+
+            // Check if this message already exists in the chat messages
+            const messageExists = chat.messages.some(
+              (msg) =>
+                new Date(msg.sentAt).getTime() ===
+                  newMessage.sentAt.getTime() &&
+                msg.content === newMessage.content &&
+                msg.isSystemMessage === true
+            );
+
+            if (messageExists) {
+              return chat; // Don't add duplicate messages
+            }
+
+            // Put the new message at the beginning of the messages array
+            return {
+              ...chat,
+              messages: [newMessage, ...chat.messages],
+            };
+          }
+          return chat;
+        });
+      });
     });
 
     // Updated new_chat handler that doesn't cause React errors
