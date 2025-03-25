@@ -160,14 +160,13 @@ class DonsController {
     return changeStatus;
   }
 
-  async pastLimitDate(id_don: number) {
+  async deletePastLimitDate() {
     const currentDate = new Date();
 
     const don = await prisma.dons.deleteMany({
       where: {
-        don_id: id_don,
         limit_date: {
-          lt: currentDate,
+          lt: new Date(currentDate.setHours(23, 59, 59, 999)),
         },
       },
     });
