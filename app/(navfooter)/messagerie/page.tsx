@@ -10,6 +10,7 @@ import StoreMessage from "@/actions/store-message";
 import GetChatMessages from "@/actions/get-chat-messages";
 import ValidationForm from "./_components/NewValidationForm";
 import { useNotifications } from "@/app/_context/NotificationContext";
+import getDonStatus from "@/actions/get-don-status";
 
 interface JwtPayload {
   userId: number;
@@ -54,7 +55,11 @@ export default function MessageriePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isConvOpen, setIsConvOpen] = useState<boolean>(false);
-  const [isValidation, setIsValidation] = useState<boolean>(false);
+  const [status, setStatus] = useState({
+    isAccepted: false,
+    isPending: false,
+    isRefused: false,
+  });
   const [messages, setMessages] = useState<
     {
       sender: string;
@@ -76,7 +81,22 @@ export default function MessageriePage() {
       inline: "start",
     });
   };
-  // Add this effect to join all rooms when the component mounts
+
+  useEffect(() => {
+    async function fetchStatus() {
+      if (donId !== null && room !== undefined) {
+        const newStatus = (await getDonStatus(donId, room)) as unknown as {
+          isAccepted: boolean;
+          isPending: boolean;
+          isRefused: boolean;
+        };
+        setStatus(newStatus);
+      }
+    }
+
+    fetchStatus();
+  }, [donId, room]);
+
   useEffect(() => {
     if (!idUser || groupChats.length === 0) return;
 
@@ -128,7 +148,15 @@ export default function MessageriePage() {
       try {
         const chats = await displayUserChats(idUser);
         if (Array.isArray(chats)) {
-          setGroupChats(chats);
+          // Format dates in chat messages
+          const formattedChats = chats.map((chat) => ({
+            ...chat,
+            messages: chat.messages.map((msg) => ({
+              ...msg,
+              sentAt: msg.sentAt, // We'll format this when displaying
+            })),
+          }));
+          setGroupChats(formattedChats);
         } else {
           console.error("Données invalides reçues:", chats);
           setError("Format de données incorrect");
@@ -179,6 +207,7 @@ export default function MessageriePage() {
           {
             ...data,
             senderID: senderID, // Ensure consistent naming
+            sentAt: new Date(data.sentAt || new Date()),
           },
         ]);
 
@@ -195,7 +224,7 @@ export default function MessageriePage() {
               sentAt: new Date(),
               content: data.message,
               author_id: senderID,
-              isSystemMessage: false,
+              isSystemMessage: !!data.isSystemMessage,
             };
 
             // Put the new message at the beginning of the messages array
@@ -271,24 +300,6 @@ export default function MessageriePage() {
             isSystemMessage: msg.isSystemMessage || false,
           }))
         );
-        const hasValidationMessage = result.messages.some((msg) => {
-          try {
-            if (!msg.message.trim().startsWith("{")) {
-              return false;
-            }
-            const parsedMsg = JSON.parse(msg.message);
-            return (
-              parsedMsg.lieu !== undefined && parsedMsg.heure !== undefined
-            );
-          } catch (e) {
-            console.error("Failed to parse message:", e);
-            return false;
-          }
-        });
-
-        setIsValidation(hasValidationMessage);
-      } else {
-        console.error("Failed to load messages:", result.message);
       }
     } catch (error) {
       console.error("Error loading messages:", error);
@@ -308,12 +319,15 @@ export default function MessageriePage() {
         ? currentChat.receveur_id
         : currentChat.donneur_id;
 
+    const currentTime = new Date();
+
     const socketData = {
       room: room,
       message: message,
       sender: username,
       senderID: idUser,
       receiverId: receiverId,
+      sentAt: currentTime.toISOString(),
     };
 
     console.log("Envoi du message via socket:", socketData);
@@ -324,7 +338,7 @@ export default function MessageriePage() {
       {
         sender: username,
         message,
-        sentAt: new Date(),
+        sentAt: currentTime,
         senderID: idUser,
       },
     ]);
@@ -332,15 +346,13 @@ export default function MessageriePage() {
     setGroupChats((prevChats) => {
       return prevChats.map((chat) => {
         if (chat.chat_id === room) {
-          // Create a new message object that matches the structure in groupChats
           const newMessage = {
-            sentAt: new Date(),
+            sentAt: currentTime,
             content: message,
             author_id: idUser,
             isSystemMessage: false,
           };
 
-          // Put the new message at the beginning of the messages array
           return {
             ...chat,
             messages: [newMessage, ...chat.messages],
@@ -355,6 +367,7 @@ export default function MessageriePage() {
       author_id: idUser,
       receiver_id: receiverId,
       chat_id: parseInt(room.toString()),
+      sentAt: currentTime.toISOString(),
     };
 
     try {
@@ -382,12 +395,16 @@ export default function MessageriePage() {
         ? currentChat.receveur_id
         : currentChat.donneur_id;
 
+    const currentTime = new Date();
+
     const data = {
       room: room,
       message: validationStr,
       sender: username,
       senderID: idUser,
       receiverId: receiverId,
+      sentAt: currentTime.toISOString(),
+      isSystemMessage: false,
     };
 
     setMessages((prev) => [
@@ -395,8 +412,9 @@ export default function MessageriePage() {
       {
         sender: username,
         message: validationStr,
-        sentAt: new Date(),
+        sentAt: currentTime,
         senderID: idUser,
+        isSystemMessage: false,
       },
     ]);
 
@@ -404,7 +422,7 @@ export default function MessageriePage() {
       return prevChats.map((chat) => {
         if (chat.chat_id === room) {
           const newMessage = {
-            sentAt: new Date(),
+            sentAt: currentTime,
             content: validationStr,
             author_id: idUser,
             isSystemMessage: false,
@@ -427,11 +445,11 @@ export default function MessageriePage() {
       author_id: idUser,
       receiver_id: receiverId,
       chat_id: parseInt(room.toString()),
+      sentAt: currentTime.toISOString(),
     };
 
     try {
       StoreMessage(messageData);
-      setIsValidation(true);
     } catch (error) {
       console.error("Erreur lors du stockage du message de validation:", error);
     }
@@ -548,11 +566,21 @@ export default function MessageriePage() {
               <div className="w-full max-w-3xl mx-auto">
                 <div className="overflow-y-auto p-4 mb-4 bg-gray-200 border-2 rounded-lg h-[475px]">
                   {messages.map((msg, index) => {
-                    console.log("Message:", msg);
+                    const currentChat = groupChats.find(
+                      (chat) => chat.chat_id === room
+                    );
+                    const donneurId = currentChat
+                      ? currentChat.donneur_id
+                      : null;
+                    const receveurId = currentChat
+                      ? currentChat.receveur_id
+                      : null;
                     return (
                       <ChatMessage
                         key={index}
                         sender={msg.sender}
+                        donneur_id={donneurId ?? 0}
+                        receveur_id={receveurId ?? 0}
                         message={msg.message}
                         sentAt={
                           msg.sentAt instanceof Date
@@ -564,6 +592,9 @@ export default function MessageriePage() {
                         isOwnMessage={msg.sender === username}
                         donId={donId}
                         isSystemMessage={msg.isSystemMessage}
+                        room={room}
+                        isAccepted={status.isAccepted}
+                        isRefused={status.isRefused}
                       />
                     );
                   })}
@@ -580,7 +611,8 @@ export default function MessageriePage() {
                 <ChatForm
                   onSendMessage={handleSendMessage}
                   onValidateDonation={() => setShowValidationForm(true)}
-                  isFormSubmitted={isValidation}
+                  donId={donId}
+                  chatId={room}
                 />
               </div>
             )}

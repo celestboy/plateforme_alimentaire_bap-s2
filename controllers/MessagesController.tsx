@@ -9,6 +9,7 @@ class MessagesController {
         author_id: data.author_id,
         receiver_id: data.receiver_id,
         chat_id: data.chat_id,
+        isSystemMessage: data.isSystemMessage,
         read: false,
       },
     });
