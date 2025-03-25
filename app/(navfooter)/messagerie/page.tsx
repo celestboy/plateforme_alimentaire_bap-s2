@@ -11,6 +11,7 @@ import GetChatMessages from "@/actions/get-chat-messages";
 import ValidationForm from "./_components/NewValidationForm";
 import { useNotifications } from "@/app/_context/NotificationContext";
 import getDonStatus from "@/actions/get-don-status";
+import getSingleChat from "@/actions/get-single-chat";
 
 interface JwtPayload {
   userId: number;
@@ -81,6 +82,18 @@ export default function MessageriePage() {
       inline: "start",
     });
   };
+
+  useEffect(() => {
+    if (!idUser) return;
+
+    // Join user-specific notification room
+    socket.emit("join_user_room", idUser);
+
+    // Clean up on component unmount
+    return () => {
+      socket.off("new_chat");
+    };
+  }, [idUser]);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -181,6 +194,7 @@ export default function MessageriePage() {
     socket.off("message");
     socket.off("user_joined");
     socket.off("local-system-message");
+    socket.off("new_chat");
 
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
@@ -265,12 +279,59 @@ export default function MessageriePage() {
       ]);
     });
 
+    socket.on("new_chat", async (chatData) => {
+      console.log("New chat notification received:", chatData);
+
+      // Only proceed if this chat is relevant to the current user
+      if (chatData.donneur_id !== idUser && chatData.receveur_id !== idUser) {
+        console.log("Chat not relevant to current user");
+        return;
+      }
+
+      // Check if chat already exists to prevent duplicates
+      if (groupChats.some((chat) => chat.chat_id === chatData.chat_id)) {
+        console.log("Chat already exists in state");
+        return;
+      }
+
+      // Fetch the complete chat details
+      try {
+        const result = await getSingleChat(chatData.chat_id);
+
+        if (result.success && result.data) {
+          // Format dates in messages
+          const formattedChat = {
+            ...result.data,
+            messages: Array.isArray(result.data.messages)
+              ? result.data.messages.map((msg) => ({
+                  ...msg,
+                  sentAt: new Date(msg.sentAt || new Date()),
+                }))
+              : [],
+          };
+
+          // Add the new chat to the groupChats state
+          setGroupChats((prevChats) => [...prevChats, formattedChat]);
+        }
+      } catch (error) {
+        console.error("Error fetching chat details:", error);
+      }
+    });
+
     return () => {
       socket.off("message");
       socket.off("user_joined");
-      socket.off("local-system-message"); // Clean up
+      socket.off("local-system-message");
+      socket.off("new_chat");
     };
-  }, [room, username, idUser, incrementChatNotification, markChatAsRead]);
+  }, [
+    room,
+    username,
+    idUser,
+    incrementChatNotification,
+    markChatAsRead,
+    groupChats,
+  ]);
 
   useEffect(() => {
     if (showValidationForm) {

@@ -28,6 +28,8 @@ export type FormResponse = {
   status?: DonStatus;
   chatId?: number;
   donId?: number;
+  donneurId?: number;
+  receveurId?: number;
   message?: string;
   token?: string;
 };

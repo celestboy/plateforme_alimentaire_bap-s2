@@ -52,6 +52,28 @@ app.prepare().then(() => {
       socket.emit("local-system-message", data);
     });
 
+    socket.on("new_chat_created", (data) => {
+      console.log("New chat created:", data);
+
+      // Broadcast to both users involved in the chat
+      if (data.donneur_id && data.receveur_id) {
+        // Using a special room name format for user-specific notifications
+        socket.to(`user_${data.donneur_id}`).emit("new_chat", data);
+        socket.to(`user_${data.receveur_id}`).emit("new_chat", data);
+      }
+    });
+
+    // Add this event handler for users joining their personal notification room
+    socket.on("join_user_room", (userId) => {
+      if (userId) {
+        const userRoom = `user_${userId}`;
+        socket.join(userRoom);
+        console.log(
+          `User ${userId} joined personal notification room ${userRoom}`
+        );
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
     });
