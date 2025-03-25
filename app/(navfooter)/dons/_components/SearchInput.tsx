@@ -8,9 +8,15 @@ interface SearchInputProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFilterClick: () => void;
+  onSubmit: (event: React.FormEvent) => void;
 }
 
-const SearchInput = ({ value, onChange, onFilterClick }: SearchInputProps) => {
+const SearchInput = ({
+  value,
+  onChange,
+  onFilterClick,
+  onSubmit,
+}: SearchInputProps) => {
   const router = useRouter();
 
   const onSearch = (event: React.FormEvent) => {
@@ -32,7 +38,7 @@ const SearchInput = ({ value, onChange, onFilterClick }: SearchInputProps) => {
 
   return (
     <div className="relative z-20">
-      <form onSubmit={onSearch}>
+      <form onSubmit={onSubmit}>
         <span>
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
         </span>

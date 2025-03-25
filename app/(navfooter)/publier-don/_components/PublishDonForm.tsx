@@ -177,13 +177,12 @@ export default function PublishDonForm() {
                 <NotepadText className="mr-4" />
                 Description du produit <span>*</span>
               </span>
-              <input
-                type="text"
+              <textarea
                 {...register("description")}
-                className="w-full h-[200px] my-4 py-4 px-6 rounded-lg border border-gray-600 font-Montserrat text-sm"
+                className="w-full h-[200px] my-4 py-4 px-6 rounded-lg border border-gray-600 font-Montserrat text-sm text-start align-top pt-2 resize-none"
                 placeholder="Description du produit"
                 required
-              />
+              ></textarea>
             </div>
             <div className="flex">
               <div>

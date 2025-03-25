@@ -2,6 +2,7 @@
 
 import prisma from "@/prisma/prisma";
 import { Prisma } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 interface Don {
   don_id: number;
@@ -9,6 +10,7 @@ interface Don {
   description: string;
   category: string;
   quantity: number;
+  rdv_pts: JsonValue;
   limit_date: Date;
   img_url: string;
 }
@@ -16,11 +18,14 @@ interface Don {
 interface GetDonsParams {
   query?: string;
   category?: string;
+  rdv_pts?: string;
 }
 
-export async function getDons({ query, category }: GetDonsParams = {}): Promise<
-  Don[]
-> {
+export async function getDons({
+  query,
+  category,
+  rdv_pts,
+}: GetDonsParams = {}): Promise<Don[]> {
   try {
     const searchTerms = query?.trim().split(" ") || [];
 
@@ -49,6 +54,25 @@ export async function getDons({ query, category }: GetDonsParams = {}): Promise<
         delete whereConditions.OR;
       } else {
         whereConditions.category = category;
+      }
+    }
+
+    if (rdv_pts) {
+      if (whereConditions.OR) {
+        // Need to wrap existing OR conditions to combine with AND
+        whereConditions.AND = [
+          { OR: whereConditions.OR as Prisma.DonsWhereInput[] },
+          {
+            rdv_pts: {
+              array_contains: rdv_pts,
+            },
+          },
+        ];
+        delete whereConditions.OR;
+      } else {
+        whereConditions.rdv_pts = {
+          array_contains: rdv_pts,
+        };
       }
     }
 

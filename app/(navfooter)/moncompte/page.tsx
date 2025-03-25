@@ -123,10 +123,31 @@ export default function MonCompte() {
 
   return (
     <>
-      <div className="text-center bg-gray-100 h-screen flex flex-col justify-start items-center ml-24">
-        <h2 className="font-bold text-4xl font-Montserrat uppercase mb-4 mt-10">
+      <div className="text-center h-screen flex flex-col justify-start items-center">
+        <h2 className="font-bold text-5xl text-[#B0C482] font-futuraPTBook mb-4 mt-10">
           Mon compte
         </h2>
+
+        <section className="relative w-screen font-futuraPTBold flex justify-center m-6 p-12">
+          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+              00
+            </h3>
+            <p className="absolute bottom-4 right-6">Kg sauvés</p>
+          </article>
+          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+              00
+            </h3>
+            <p className="absolute bottom-4 right-6">Kg CO2 équivalent</p>
+          </article>
+          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+              00
+            </h3>
+            <p className="absolute bottom-4 right-6">Nombre de dons</p>
+          </article>
+        </section>
 
         {/* User Info Display */}
         <div className="w-full gap-4 px-4 my-10">
