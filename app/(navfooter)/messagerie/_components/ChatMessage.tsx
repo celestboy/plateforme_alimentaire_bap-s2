@@ -230,11 +230,11 @@ const ChatMessage = ({
               <button
                 onClick={handleAccept}
                 className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage || (isAccepted && isRefused)
+                  isOwnMessage || isAccepted || isRefused
                     ? "bg-green-300 cursor-not-allowed"
                     : "bg-green-500 text-white hover:bg-green-600"
                 }`}
-                disabled={isOwnMessage || (isAccepted && isRefused)}
+                disabled={isOwnMessage || isAccepted || isRefused}
               >
                 Accepter
               </button>
