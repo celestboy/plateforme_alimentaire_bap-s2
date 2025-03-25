@@ -1,6 +1,12 @@
+import getDonStatus from "@/actions/get-don-status";
+import StoreMessage from "@/actions/store-message";
+import updateAcceptedStatus from "@/actions/update-is-don-accepted";
+import updateRejectedStatus from "@/actions/update-is-don-rejected";
 import validateForm from "@/actions/validate-form";
+import { socket } from "@/lib/socketClient";
 import { ValidateSchemaType } from "@/types/forms";
-import React from "react";
+import { DonStatus } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 
 interface ChatMessageProps {
   sender: string;
@@ -9,6 +15,11 @@ interface ChatMessageProps {
   isOwnMessage: boolean;
   donId?: number | null;
   isSystemMessage?: boolean;
+  room: number;
+  donneur_id: number;
+  receveur_id: number;
+  isAccepted?: boolean;
+  isRefused?: boolean;
 }
 
 const ChatMessage = ({
@@ -18,77 +29,160 @@ const ChatMessage = ({
   isOwnMessage,
   donId,
   isSystemMessage = false,
+  room,
+  donneur_id,
+  receveur_id,
 }: ChatMessageProps) => {
   let parsedMessage;
   try {
-    parsedMessage = JSON.parse(message);
+    parsedMessage = typeof message === "string" ? JSON.parse(message) : message;
   } catch {
     parsedMessage = message;
   }
 
-  console.log("isSystemMessage:", isSystemMessage);
+  const [donStatus, setDonStatus] = useState<DonStatus | null>(null);
 
-  const formatDate = () => {
+  const formatDate = (dateString: string) => {
     try {
-      // First try to parse the date from ISO string
-      const dateObj = new Date(sentAt);
-
-      // Check if the date is valid
+      const dateObj = new Date(dateString);
       if (isNaN(dateObj.getTime())) {
-        console.error("Invalid date:", sentAt);
-        return "Date inconnue";
+        console.error("Invalid date:", dateString);
+        return { date: "Date inconnue", time: "" };
       }
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const year = dateObj.getFullYear();
+      const hours = String(dateObj.getHours()).padStart(2, "0");
+      const minutes = String(dateObj.getMinutes()).padStart(2, "0");
 
       return {
-        date: dateObj.toLocaleDateString("fr-FR", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
-        time: dateObj.toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }),
+        date: `${day}/${month}/${year}`,
+        time: `${hours}:${minutes}`,
       };
     } catch (error) {
-      console.error("Error formatting date:", error, sentAt);
+      console.error("Error formatting date:", error, dateString);
       return { date: "Date inconnue", time: "" };
     }
   };
 
-  const formattedDate = formatDate();
+  const formattedDate = formatDate(sentAt);
+
+  const createSystemMessage = async (content: string) => {
+    const messageData = {
+      message: content,
+      room: room,
+      sender: "server",
+      senderID: donneur_id,
+      sentAt: new Date().toISOString(),
+      isOwnMessage: true,
+      isSystemMessage: true,
+    };
+
+    const messageDataDb = {
+      content: content,
+      chat_id: room,
+      sentAt: new Date().toISOString(),
+      isOwnMessage: true,
+      isSystemMessage: true,
+      author_id: donneur_id,
+      receiver_id: receveur_id,
+      status: true,
+    };
+
+    try {
+      socket.emit("message", messageData);
+      return await StoreMessage(messageDataDb);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (!donId || !room) {
+      return;
+    }
+
+    async function checkStatus() {
+      try {
+        const status = await getDonStatus(donId as number, room);
+        setDonStatus(status);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération du statut du don:",
+          error
+        );
+      }
+    }
+
+    checkStatus();
+  }, [donId, room]);
 
   const handleAccept = async () => {
+    if (!parsedMessage?.lieu || !parsedMessage?.heure) {
+      console.error("Données incomplètes ou don déjà accepté");
+      return;
+    }
+
     try {
       const data: ValidateSchemaType = {
-        id_don: donId !== null && donId !== undefined ? donId : 0,
+        id_don: donId ?? 0,
         lieu: parsedMessage.lieu,
         heure: parsedMessage.heure,
       };
 
       const response = await validateForm(data);
-      console.log("Response:", response);
+
       if (response?.success) {
-        alert("Offre acceptée avec succès!");
-      } else {
-        alert(
-          "Erreur lors de l'acceptation: " +
-            (response?.message || "Erreur inconnue")
+        await createSystemMessage(
+          `Vous avez accepté le don le ${data.heure} à ${data.lieu}`
         );
+        if (donId) {
+          await updateAcceptedStatus(donId, room);
+        }
+      } else {
+        await createSystemMessage(`Erreur lors de l'acceptation du don`);
       }
     } catch (error) {
       console.error("Erreur lors de l'acceptation:", error);
-      alert("Une erreur s'est produite lors de l'acceptation de l'offre.");
+      await createSystemMessage(`Erreur lors de l'acceptation du don`);
     }
-    console.log("adios");
   };
 
-  const handleReject = () => {
-    alert("Tu as refusé l'offre.");
+  const handleReject = async () => {
+    if (!parsedMessage?.lieu || !parsedMessage?.heure) {
+      console.error("Données incomplètes ou don déjà traité");
+      return;
+    }
+
+    try {
+      const data: ValidateSchemaType = {
+        id_don: donId ?? 0,
+        lieu: parsedMessage.lieu,
+        heure: parsedMessage.heure,
+      };
+
+      await createSystemMessage(
+        `Vous avez refusé l'offre du ${data.heure} à ${data.lieu}`
+      );
+
+      if (donId) {
+        await updateRejectedStatus(donId, room);
+      }
+    } catch (error) {
+      console.error("Erreur lors du refus:", error);
+      await createSystemMessage(`Erreur lors du refus du don`);
+    }
   };
 
-  // Update the return statement in ChatMessage
+  const isDonationMessage =
+    parsedMessage &&
+    typeof parsedMessage === "object" &&
+    parsedMessage.lieu &&
+    parsedMessage.heure;
+
+  const isAccepted = donStatus === DonStatus.ACCEPTED;
+  const isRefused = donStatus === DonStatus.REFUSED;
 
   return (
     <div
@@ -113,22 +207,18 @@ const ChatMessage = ({
           <div className="flex items-center justify-center gap-2 mb-1">
             <p className="font-futuraPTMedium text-sm text-gray-300">Système</p>
             <p className="font-futuraPTBook text-xs text-gray-300">
-              {typeof formattedDate === "string"
-                ? formattedDate
-                : `${formattedDate.date} ${formattedDate.time}`}
+              {formattedDate.date} {formattedDate.time}
             </p>
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <p className="font-futuraPTMedium text-lg">{sender}</p>
             <p className="font-futuraPTBook text-xs">
-              {typeof formattedDate === "string"
-                ? formattedDate
-                : `${formattedDate.date} ${formattedDate.time}`}
+              {formattedDate.date} {formattedDate.time}
             </p>
           </div>
         )}
-        {parsedMessage && parsedMessage.lieu && parsedMessage.heure ? (
+        {isDonationMessage ? (
           <div className="bg-green-100 text-green-700 p-3 rounded-lg my-2">
             <p>
               <strong>📍 Lieu :</strong> {parsedMessage.lieu}
@@ -140,22 +230,22 @@ const ChatMessage = ({
               <button
                 onClick={handleAccept}
                 className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage
+                  isOwnMessage || (isAccepted && isRefused)
                     ? "bg-green-300 cursor-not-allowed"
                     : "bg-green-500 text-white hover:bg-green-600"
                 }`}
-                disabled={isOwnMessage}
+                disabled={isOwnMessage || (isAccepted && isRefused)}
               >
                 Accepter
               </button>
               <button
                 onClick={handleReject}
                 className={`px-4 py-1 rounded-lg ${
-                  isOwnMessage
+                  isOwnMessage || isRefused || isAccepted
                     ? "bg-red-300 cursor-not-allowed"
                     : "bg-red-500 text-white hover:bg-red-600"
                 }`}
-                disabled={isOwnMessage}
+                disabled={isOwnMessage || isAccepted || isRefused}
               >
                 Refuser
               </button>
@@ -167,7 +257,7 @@ const ChatMessage = ({
               isSystemMessage ? "text-base italic" : "text-lg font-futuraPTBook"
             }`}
           >
-            {message}
+            {typeof message === "string" ? message : JSON.stringify(message)}
           </p>
         )}
       </div>

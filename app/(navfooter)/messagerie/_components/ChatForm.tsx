@@ -1,17 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import getDonStatus from "@/actions/get-don-status";
+import { DonStatus } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 
 const ChatForm = ({
   onSendMessage,
   onValidateDonation,
-  isFormSubmitted,
+  donId,
+  chatId,
 }: {
   onSendMessage: (message: string) => void;
   onValidateDonation: () => void;
-  isFormSubmitted?: boolean;
+  donId: number | null;
+  chatId: number | null;
 }) => {
   const [message, setMessage] = useState("");
+  const [donStatus, setDonStatus] = useState<DonStatus | null>(null);
+
+  useEffect(() => {
+    if (!donId || !chatId) {
+      return;
+    }
+
+    async function checkStatus() {
+      try {
+        const status = await getDonStatus(donId as number, chatId as number);
+        setDonStatus(status);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération du statut du don:",
+          error
+        );
+      }
+    }
+
+    checkStatus();
+  }, [donId, chatId]);
+
+  const isPending = donStatus === DonStatus.PENDING;
+  const isAccepted = donStatus === DonStatus.ACCEPTED;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,19 +61,24 @@ const ChatForm = ({
         />
         <button
           type="submit"
-          className="px-4 py-2 text-white rounded-lg bg-base-green"
+          className="px-4 py-2 text-white rounded-lg bg-base-green hover:bg-base-green"
         >
-          Envoyer
+          Send
         </button>
         <button
-          type="button"
-          className={`px-4 py-2 text-white rounded-lg ${
-            isFormSubmitted ? "bg-gray-400 cursor-not-allowed" : "bg-base-green"
-          }`}
           onClick={onValidateDonation}
-          disabled={isFormSubmitted}
+          className={`px-4 py-2 rounded-lg ${
+            isAccepted || isPending
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-base-green text-white hover:bg-base-green"
+          }`}
+          disabled={isAccepted || isPending}
         >
-          {isFormSubmitted ? "Formulaire en cours" : "Valider le don"}
+          {isPending
+            ? "Formulaire en cours"
+            : isAccepted
+            ? "Don validé"
+            : "Valider le don"}
         </button>
       </form>
     </div>

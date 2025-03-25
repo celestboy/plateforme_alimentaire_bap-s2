@@ -104,14 +104,51 @@ class ChatController {
     }
   }
 
-  async updateFormStatus(id_don: number, id_chat: number) {
+  async getFormStatus(id_don: number, id_chat: number) {
+    const chat = await prisma.chats.findUnique({
+      where: {
+        don_id: id_don,
+        chat_id: id_chat,
+      },
+      select: {
+        donStatus: true,
+      },
+    });
+    return chat?.donStatus || null;
+  }
+
+  async acceptedFormStatus(id_don: number, id_chat: number) {
     await prisma.chats.update({
       where: {
         don_id: id_don,
         chat_id: id_chat,
       },
       data: {
-        isForm: true,
+        donStatus: "ACCEPTED",
+      },
+    });
+  }
+
+  async pendingFormStatus(id_don: number, id_chat: number) {
+    await prisma.chats.update({
+      where: {
+        don_id: id_don,
+        chat_id: id_chat,
+      },
+      data: {
+        donStatus: "PENDING",
+      },
+    });
+  }
+
+  async rejectedFormStatus(id_don: number, id_chat: number) {
+    await prisma.chats.update({
+      where: {
+        don_id: id_don,
+        chat_id: id_chat,
+      },
+      data: {
+        donStatus: "REFUSED",
       },
     });
   }

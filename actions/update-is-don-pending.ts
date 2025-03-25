@@ -3,12 +3,12 @@
 import ChatControllerInstance from "@/controllers/MessagerieController";
 import { FormResponse } from "@/types/forms";
 
-const updateFormStatus = async (
+const updatePendingStatus = async (
   id_don: number,
   id_chat: number
 ): Promise<FormResponse> => {
   try {
-    const updateStatus = await ChatControllerInstance.updateFormStatus(
+    const updateStatus = await ChatControllerInstance.pendingFormStatus(
       id_don,
       id_chat
     );
@@ -23,4 +23,4 @@ const updateFormStatus = async (
   }
 };
 
-export default updateFormStatus;
+export default updatePendingStatus;
