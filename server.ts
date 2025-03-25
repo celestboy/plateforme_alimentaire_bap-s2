@@ -37,6 +37,43 @@ app.prepare().then(() => {
       }
     });
 
+    socket.on("status_update", (data) => {
+      console.log("Status update received:", data);
+      if (data?.room && data?.status) {
+        // Broadcast status update to everyone in the room
+        io.to(data.room).emit("status_update", data);
+      }
+    });
+
+    socket.on("local-system-message", (data) => {
+      console.log("Local system message received:", data);
+      // This is a special case where we want to emit only to the sender
+      // (not using socket.to() which would emit to everyone else)
+      socket.emit("local-system-message", data);
+    });
+
+    socket.on("new_chat_created", (data) => {
+      console.log("New chat created:", data);
+
+      // Broadcast to both users involved in the chat
+      if (data.donneur_id && data.receveur_id) {
+        // Using a special room name format for user-specific notifications
+        socket.to(`user_${data.donneur_id}`).emit("new_chat", data);
+        socket.to(`user_${data.receveur_id}`).emit("new_chat", data);
+      }
+    });
+
+    // Add this event handler for users joining their personal notification room
+    socket.on("join_user_room", (userId) => {
+      if (userId) {
+        const userRoom = `user_${userId}`;
+        socket.join(userRoom);
+        console.log(
+          `User ${userId} joined personal notification room ${userRoom}`
+        );
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
     });

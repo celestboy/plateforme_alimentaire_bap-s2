@@ -7,6 +7,7 @@ import displayUniqueDon from "@/actions/get-single-don";
 import DonClient from "./_components/DonClient";
 import CreateChat from "@/actions/create-chat";
 import { JsonValue } from "@prisma/client/runtime/library";
+import { socket } from "@/lib/socketClient";
 import Link from "next/link";
 
 interface JwtPayload {
@@ -73,7 +74,16 @@ export default function SingleDonPage() {
         don_id: don.don_id,
       };
 
-      await CreateChat(data);
+      const result = await CreateChat(data);
+
+      if (result.success && result.donneurId && result.receveurId) {
+        socket.emit("new_chat_created", {
+          donneur_id: data.donneur_id,
+          receveur_id: data.receveur_id,
+          chat_id: result.chatId,
+          don_id: data.don_id,
+        });
+      }
 
       router.push("/messagerie");
     } catch (error) {

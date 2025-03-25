@@ -7,6 +7,7 @@ import {
   ValidateSchema,
   MessageSchema,
 } from "@/app/schema";
+import { DonStatus } from "@prisma/client";
 
 import { z, ZodIssue } from "zod";
 
@@ -24,6 +25,11 @@ export type MessageSchemaType = z.infer<typeof MessageSchema>;
 export type FormResponse = {
   success: boolean;
   errors?: ZodIssue[];
+  status?: DonStatus;
+  chatId?: number;
+  donId?: number;
+  donneurId?: number;
+  receveurId?: number;
   message?: string;
   token?: string;
 };
