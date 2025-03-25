@@ -11,6 +11,7 @@ import GetChatMessages from "@/actions/get-chat-messages";
 import ValidationForm from "./_components/NewValidationForm";
 import { useNotifications } from "@/app/_context/NotificationContext";
 import getDonStatus from "@/actions/get-don-status";
+import getSingleChat from "@/actions/get-single-chat";
 
 interface JwtPayload {
   userId: number;
@@ -72,6 +73,9 @@ export default function MessageriePage() {
   const { chatNotifications, markChatAsRead, incrementChatNotification } =
     useNotifications();
 
+  // Add this state to track chats that need fetching
+  const [pendingNewChats, setPendingNewChats] = useState<number[]>([]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -81,6 +85,18 @@ export default function MessageriePage() {
       inline: "start",
     });
   };
+
+  useEffect(() => {
+    if (!idUser) return;
+
+    // Join user-specific notification room
+    socket.emit("join_user_room", idUser);
+
+    // Clean up on component unmount
+    return () => {
+      socket.off("new_chat");
+    };
+  }, [idUser]);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -173,6 +189,66 @@ export default function MessageriePage() {
     fetchChats();
   }, [idUser]);
 
+  // New effect to handle pending chat fetches
+  useEffect(() => {
+    // Skip if no pending chats or user not authenticated
+    if (pendingNewChats.length === 0 || !idUser) {
+      return;
+    }
+
+    console.log("Processing pending chats:", pendingNewChats);
+
+    // Create a copy of pending chats
+    const chatsToFetch = [...pendingNewChats];
+
+    // Clear the pending list immediately
+    setPendingNewChats([]);
+
+    // Process each chat ID
+    const fetchChats = async () => {
+      for (const chatId of chatsToFetch) {
+        // Double-check chat doesn't already exist in state
+        if (groupChats.some((chat) => chat.chat_id === chatId)) {
+          console.log(
+            `Chat ${chatId} already exists in state - skipping fetch`
+          );
+          continue;
+        }
+
+        try {
+          console.log(`Fetching details for chat ${chatId}`);
+          const result = await getSingleChat(chatId);
+
+          if (result.success && result.data) {
+            // Format dates in messages
+            const formattedChat = {
+              ...result.data,
+              messages: Array.isArray(result.data.messages)
+                ? result.data.messages.map((msg) => ({
+                    ...msg,
+                    sentAt: new Date(msg.sentAt || new Date()),
+                  }))
+                : [],
+            };
+
+            // Add to state
+            setGroupChats((currentChats) => {
+              // Final check for duplicates
+              if (currentChats.some((chat) => chat.chat_id === chatId)) {
+                return currentChats;
+              }
+              return [...currentChats, formattedChat];
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching chat ${chatId}:`, error);
+        }
+      }
+    };
+
+    fetchChats();
+  }, [pendingNewChats, idUser, groupChats]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -180,7 +256,10 @@ export default function MessageriePage() {
   useEffect(() => {
     socket.off("message");
     socket.off("user_joined");
+    socket.off("local-system-message");
+    socket.off("new_chat");
 
+    // In your message event handler:
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
 
@@ -202,16 +281,31 @@ export default function MessageriePage() {
 
       if (roomId === room) {
         // Message is for the current active chat room
-        setMessages((prev) => [
-          ...prev,
-          {
-            ...data,
-            senderID: senderID, // Ensure consistent naming
-            sentAt: new Date(data.sentAt || new Date()),
-          },
-        ]);
+        setMessages((prev) => {
+          // Check if this message already exists to prevent duplicates
+          if (
+            prev.some(
+              (msg) =>
+                msg.sentAt.getTime() ===
+                  new Date(data.sentAt || new Date()).getTime() &&
+                msg.message === data.message &&
+                msg.sender === data.sender
+            )
+          ) {
+            return prev;
+          }
 
-        if (idUser && senderID !== idUser) {
+          return [
+            ...prev,
+            {
+              ...data,
+              senderID: senderID,
+              sentAt: new Date(data.sentAt || new Date()),
+            },
+          ];
+        });
+
+        if (senderID !== idUser) {
           markChatAsRead(roomId);
         }
       }
@@ -221,11 +315,24 @@ export default function MessageriePage() {
         return prevChats.map((chat) => {
           if (chat.chat_id === roomId) {
             const newMessage = {
-              sentAt: new Date(),
+              sentAt: new Date(data.sentAt || new Date()),
               content: data.message,
               author_id: senderID,
               isSystemMessage: !!data.isSystemMessage,
             };
+
+            // Check if this message already exists in the chat messages
+            const messageExists = chat.messages.some(
+              (msg) =>
+                new Date(msg.sentAt).getTime() ===
+                  newMessage.sentAt.getTime() &&
+                msg.content === newMessage.content &&
+                msg.author_id === newMessage.author_id
+            );
+
+            if (messageExists) {
+              return chat; // Don't add duplicate messages
+            }
 
             // Put the new message at the beginning of the messages array
             return {
@@ -243,6 +350,15 @@ export default function MessageriePage() {
       }
     });
 
+    socket.on("status_update", (data) => {
+      console.log("Status update received:", data);
+
+      // Mark chat as read if we're in the active chat
+      if (data.room === room && data.donId === donId) {
+        markChatAsRead(data.room);
+      }
+    });
+
     socket.on("user_joined", (message) => {
       console.log("Notification de connexion reçue:", message);
       setMessages((prev) => [
@@ -251,11 +367,108 @@ export default function MessageriePage() {
       ]);
     });
 
+    socket.on("local-system-message", (data) => {
+      console.log("Local system message:", data);
+
+      // Ensure room is a number
+      const roomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+
+      // If system message is for current active chat and we're viewing this chat, mark as read
+      if (roomId === room) {
+        console.log("System message received in active room - marking as read");
+        markChatAsRead(roomId);
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "Système",
+          message: data.message,
+          sentAt: new Date(data.sentAt || new Date()),
+          isSystemMessage: true,
+        },
+      ]);
+
+      // Also update the groupChats state to include this system message
+      setGroupChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat.chat_id === roomId) {
+            const newMessage = {
+              sentAt: new Date(data.sentAt || new Date()),
+              content: data.message,
+              author_id: 0, // System message from system
+              isSystemMessage: true,
+            };
+
+            // Check if this message already exists in the chat messages
+            const messageExists = chat.messages.some(
+              (msg) =>
+                new Date(msg.sentAt).getTime() ===
+                  newMessage.sentAt.getTime() &&
+                msg.content === newMessage.content &&
+                msg.isSystemMessage === true
+            );
+
+            if (messageExists) {
+              return chat; // Don't add duplicate messages
+            }
+
+            // Put the new message at the beginning of the messages array
+            return {
+              ...chat,
+              messages: [newMessage, ...chat.messages],
+            };
+          }
+          return chat;
+        });
+      });
+    });
+
+    // Updated new_chat handler that doesn't cause React errors
+    socket.on("new_chat", (chatData) => {
+      console.log("New chat notification received:", chatData);
+
+      // Only proceed if this chat is relevant to the current user
+      if (chatData.donneur_id !== idUser && chatData.receveur_id !== idUser) {
+        console.log("Chat not relevant to current user");
+        return;
+      }
+
+      // Check if the chat already exists in state
+      const chatExists = groupChats.some(
+        (chat) => chat.chat_id === chatData.chat_id
+      );
+
+      if (chatExists) {
+        console.log("Chat already exists in state - not adding it again");
+        return;
+      }
+
+      // Add to pending chats for processing in useEffect
+      setPendingNewChats((prev) => {
+        // Avoid duplicates
+        if (prev.includes(chatData.chat_id)) {
+          return prev;
+        }
+        return [...prev, chatData.chat_id];
+      });
+    });
+
     return () => {
       socket.off("message");
       socket.off("user_joined");
+      socket.off("local-system-message");
+      socket.off("new_chat");
     };
-  }, [room, username, idUser, incrementChatNotification, markChatAsRead]);
+  }, [
+    room,
+    username,
+    idUser,
+    incrementChatNotification,
+    markChatAsRead,
+    groupChats,
+  ]);
 
   useEffect(() => {
     if (showValidationForm) {

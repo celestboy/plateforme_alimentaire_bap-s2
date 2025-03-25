@@ -1,6 +1,7 @@
 "use client";
 
 import getDonStatus from "@/actions/get-don-status";
+import { socket } from "@/lib/socketClient";
 import { DonStatus } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 
@@ -36,6 +37,27 @@ const ChatForm = ({
     }
 
     checkStatus();
+  }, [donId, chatId]);
+
+  // Listen for status updates via socket
+  useEffect(() => {
+    if (!donId || !chatId) return;
+
+    const handleStatusUpdate = (data: {
+      donId: number;
+      room: number;
+      status: DonStatus;
+    }) => {
+      if (data.donId === donId && data.room === chatId) {
+        setDonStatus(data.status);
+      }
+    };
+
+    socket.on("status_update", handleStatusUpdate);
+
+    return () => {
+      socket.off("status_update", handleStatusUpdate);
+    };
   }, [donId, chatId]);
 
   const isPending = donStatus === DonStatus.PENDING;

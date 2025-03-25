@@ -20,6 +20,7 @@ interface ChatMessageProps {
   receveur_id: number;
   isAccepted?: boolean;
   isRefused?: boolean;
+  onStatusChange?: (status: DonStatus) => void;
 }
 
 const ChatMessage = ({
@@ -32,6 +33,7 @@ const ChatMessage = ({
   room,
   donneur_id,
   receveur_id,
+  onStatusChange,
 }: ChatMessageProps) => {
   let parsedMessage;
   try {
@@ -107,6 +109,9 @@ const ChatMessage = ({
       try {
         const status = await getDonStatus(donId as number, room);
         setDonStatus(status);
+        if (status && onStatusChange) {
+          onStatusChange(status);
+        }
       } catch (error) {
         console.error(
           "Erreur lors de la récupération du statut du don:",
@@ -116,7 +121,31 @@ const ChatMessage = ({
     }
 
     checkStatus();
-  }, [donId, room]);
+  }, [donId, room, onStatusChange]);
+
+  // Listen for status updates via socket
+  useEffect(() => {
+    if (!donId || !room) return;
+
+    const handleStatusUpdate = (data: {
+      donId: number;
+      room: number;
+      status: DonStatus;
+    }) => {
+      if (data.donId === donId && data.room === room) {
+        setDonStatus(data.status);
+        if (onStatusChange) {
+          onStatusChange(data.status);
+        }
+      }
+    };
+
+    socket.on("status_update", handleStatusUpdate);
+
+    return () => {
+      socket.off("status_update", handleStatusUpdate);
+    };
+  }, [donId, room, onStatusChange]);
 
   const handleAccept = async () => {
     if (!parsedMessage?.lieu || !parsedMessage?.heure) {
@@ -133,19 +162,58 @@ const ChatMessage = ({
 
       const response = await validateForm(data);
 
+      const systemMessage = `Le don a été accepté pour le ${data.heure} à ${data.lieu}`;
+
       if (response?.success) {
-        await createSystemMessage(
-          `Vous avez accepté le don le ${data.heure} à ${data.lieu}`
-        );
+        // Create system message first so it appears in UI
+        await createSystemMessage(systemMessage);
+
+        // Add the system message to the UI immediately
+        socket.emit("local-system-message", {
+          message: systemMessage,
+          room,
+          sentAt: new Date().toISOString(),
+          isSystemMessage: true,
+        });
+
         if (donId) {
-          await updateAcceptedStatus(donId, room);
+          const updateResult = await updateAcceptedStatus(donId, room);
+          if (updateResult.success) {
+            // Emit status update via socket
+            socket.emit("status_update", {
+              room: room,
+              donId: donId,
+              status: DonStatus.ACCEPTED,
+              updatedAt: new Date().toISOString(),
+            });
+            setDonStatus(DonStatus.ACCEPTED);
+            if (onStatusChange) onStatusChange(DonStatus.ACCEPTED);
+          }
         }
       } else {
-        await createSystemMessage(`Erreur lors de l'acceptation du don`);
+        const errorMessage = `Erreur lors de l'acceptation du don`;
+        await createSystemMessage(errorMessage);
+
+        // Add the error message to UI immediately
+        socket.emit("local-system-message", {
+          message: errorMessage,
+          room,
+          sentAt: new Date().toISOString(),
+          isSystemMessage: true,
+        });
       }
     } catch (error) {
       console.error("Erreur lors de l'acceptation:", error);
-      await createSystemMessage(`Erreur lors de l'acceptation du don`);
+      const errorMessage = `Erreur lors de l'acceptation du don`;
+      await createSystemMessage(errorMessage);
+
+      // Add the error message to UI immediately
+      socket.emit("local-system-message", {
+        message: errorMessage,
+        room,
+        sentAt: new Date().toISOString(),
+        isSystemMessage: true,
+      });
     }
   };
 
@@ -162,16 +230,45 @@ const ChatMessage = ({
         heure: parsedMessage.heure,
       };
 
-      await createSystemMessage(
-        `Vous avez refusé l'offre du ${data.heure} à ${data.lieu}`
-      );
+      const systemMessage = `L'offre du ${data.heure} à ${data.lieu} a été refusée`;
+
+      // Create system message first so it appears in UI
+      await createSystemMessage(systemMessage);
+
+      // Add the system message to the UI immediately
+      socket.emit("local-system-message", {
+        message: systemMessage,
+        room,
+        sentAt: new Date().toISOString(),
+        isSystemMessage: true,
+      });
 
       if (donId) {
-        await updateRejectedStatus(donId, room);
+        const updateResult = await updateRejectedStatus(donId, room);
+        if (updateResult.success) {
+          // Emit status update via socket
+          socket.emit("status_update", {
+            room: room,
+            donId: donId,
+            status: DonStatus.REFUSED,
+            updatedAt: new Date().toISOString(),
+          });
+          setDonStatus(DonStatus.REFUSED);
+          if (onStatusChange) onStatusChange(DonStatus.REFUSED);
+        }
       }
     } catch (error) {
       console.error("Erreur lors du refus:", error);
-      await createSystemMessage(`Erreur lors du refus du don`);
+      const errorMessage = `Erreur lors du refus du don`;
+      await createSystemMessage(errorMessage);
+
+      // Add the error message to UI immediately
+      socket.emit("local-system-message", {
+        message: errorMessage,
+        room,
+        sentAt: new Date().toISOString(),
+        isSystemMessage: true,
+      });
     }
   };
 

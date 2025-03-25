@@ -38,6 +38,51 @@ class ChatController {
     return chat;
   }
 
+  async getSingleChat(id_chat: number) {
+    const chat = await prisma.chats.findUnique({
+      where: {
+        chat_id: id_chat,
+      },
+      include: {
+        donneur: {
+          select: {
+            user_id: true,
+            username: true,
+            commerce_name: true,
+            user_type: true,
+          },
+        },
+        receveur: {
+          select: {
+            user_id: true,
+            username: true,
+            commerce_name: true,
+            user_type: true,
+          },
+        },
+        don: {
+          select: {
+            title: true,
+          },
+        },
+        messages: {
+          select: {
+            sentAt: true,
+            content: true,
+            author_id: true,
+            isSystemMessage: true,
+          },
+          orderBy: {
+            sentAt: "desc",
+          },
+          take: 1,
+        },
+      },
+    });
+
+    return chat;
+  }
+
   async getUsersChats(id_user: number) {
     const chats = await prisma.chats.findMany({
       where: {

@@ -9,10 +9,11 @@ import submitLoginForm from "@/actions/login-form";
 import { toast } from "sonner";
 import { redirect } from "next/navigation";
 import { Mail, KeyRound, Eye, EyeOff, X } from "lucide-react";
+import { useAuth } from "@/app/_context/AuthContext";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
+  const { login } = useAuth();
   const { register, handleSubmit } = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
   });
@@ -21,6 +22,7 @@ function LoginForm() {
     const response = await submitLoginForm(data);
     if (response.success) {
       localStorage.setItem("token", response.token as string);
+      login(response.token as string);
       redirect("/");
     } else {
       toast.error(
