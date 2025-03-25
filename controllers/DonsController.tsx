@@ -165,6 +165,7 @@ class DonsController {
 
     const don = await prisma.dons.deleteMany({
       where: {
+        archived: false,
         limit_date: {
           lt: new Date(currentDate.setHours(23, 59, 59, 999)),
         },
