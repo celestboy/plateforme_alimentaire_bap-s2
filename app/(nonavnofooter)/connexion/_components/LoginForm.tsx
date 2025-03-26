@@ -41,25 +41,25 @@ function LoginForm() {
 
   return (
     <>
-      <div className="w-[600px] mx-auto">
+      <div className="w-screen md:w-[600px] mx-auto">
         <form
           method="POST"
           id="loginform"
-          className="w-[600px]"
+          className="md:w-[600px] p-4"
           onSubmit={handleSubmit(handleSubmitForm)}
         >
-          <div className="relative text-center w-[600px]">
+          <div className="relative text-center md:w-[600px]">
             <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
               <Mail className="mr-4" />
               Adresse Mail :
             </span>
             <input
               {...register("email")}
-              className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+              className="w-full md:w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
               placeholder="Adresse Mail"
             />
           </div>
-          <div className="relative text-center w-[600px]">
+          <div className="relative text-center md:w-[600px]">
             <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
               <KeyRound className="mr-4" />
               Mot de passe :
@@ -67,7 +67,7 @@ function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               {...register("password")}
-              className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+              className="w-full md:w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
               placeholder="Mot de passe"
             />
             <span
