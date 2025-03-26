@@ -1,7 +1,8 @@
 "use server";
 
 import { ValidateSchema } from "@/app/schema";
-import MessagesController from "@/controllers/MessagesController";
+import DonsControllerInstance from "@/controllers/DonsController";
+
 import { FormResponse, ValidateSchemaType } from "@/types/forms";
 
 const validateForm = async (
@@ -14,7 +15,8 @@ const validateForm = async (
       return { success: false, errors: parsedData.error.errors };
     }
 
-    const validatedRdv = await MessagesController.validatedRDV(data);
+    const validatedRdv = await DonsControllerInstance.validateRDV(data);
+    console.log(validatedRdv);
     if (!validatedRdv) {
       return {
         success: false,

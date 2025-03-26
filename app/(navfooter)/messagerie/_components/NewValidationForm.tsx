@@ -5,15 +5,19 @@ import { ValidateSchemaType } from "@/types/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import updatePendingStatus from "@/actions/update-is-don-pending";
+import { socket } from "@/lib/socketClient";
+import { DonStatus } from "@prisma/client";
 
 export default function ValidationForm({
   donId,
+  chatId,
   onSendForm,
   onClose,
 }: {
   donId: number | null;
+  chatId: number;
   onSendForm: (validationMessage: { lieu: string; heure: string }) => void;
-
   onClose: () => void;
 }) {
   const { register, handleSubmit, setValue, watch, formState } =
@@ -29,7 +33,7 @@ export default function ValidationForm({
     if (donId !== null) {
       setValue("id_don", donId);
     }
-  }, [donId, setValue]);
+  }, [donId, chatId, setValue]);
 
   const handleSubmitForm = async (data: ValidateSchemaType) => {
     if (!donId) {
@@ -38,6 +42,19 @@ export default function ValidationForm({
         className: "bg-red-500 border border-red-200 text-white text-base",
       });
       return;
+    }
+    console.log("data", data);
+    const updateResult = await updatePendingStatus(donId, chatId);
+    console.log("updateResult", updateResult);
+    if (updateResult.success) {
+      // Emit status update via socket
+      socket.emit("status_update", {
+        room: chatId,
+        donId: donId,
+        status: DonStatus.PENDING,
+        updatedAt: new Date().toISOString(),
+      });
+      console.log("status updated");
     }
 
     onSendForm({ lieu: data.lieu, heure: data.heure });

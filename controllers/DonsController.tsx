@@ -1,4 +1,4 @@
-import { DonSchemaType } from "@/types/forms";
+import { DonSchemaType, ValidateSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
 import fs from "fs";
 import path from "path";
@@ -136,14 +136,38 @@ class DonsController {
     return dons;
   }
 
-  async pastLimitDate(id_don: number) {
+  async validateRDV(info: ValidateSchemaType) {
+    const id_don = info.id_don;
+
+    const parsedHeureValid = new Date(info.heure);
+    if (isNaN(parsedHeureValid.getTime())) {
+      throw new Error(
+        "Date invalide, assurez-vous qu'elle est au format ISO-8601."
+      );
+    }
+
+    const changeStatus = await prisma.dons.update({
+      where: {
+        don_id: id_don,
+      },
+      data: {
+        archived: true,
+        lieu: info.lieu,
+        Heure: parsedHeureValid,
+      },
+    });
+
+    return changeStatus;
+  }
+
+  async deletePastLimitDate() {
     const currentDate = new Date();
 
     const don = await prisma.dons.deleteMany({
       where: {
-        don_id: id_don,
+        archived: false,
         limit_date: {
-          lt: currentDate,
+          lt: new Date(currentDate.setHours(23, 59, 59, 999)),
         },
       },
     });

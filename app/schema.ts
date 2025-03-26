@@ -73,7 +73,7 @@ export const DonSchema = z.object({
       "produits-surgeles",
       "produits-boulangerie",
       "boissons",
-      "autres",
+      "autres-produits",
     ],
     {
       message:
@@ -91,10 +91,29 @@ export const DonSchema = z.object({
     .refine(
       (val) => {
         const date = new Date(val);
-        return !isNaN(date.getTime()) && date > new Date();
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+
+        return !isNaN(date.getTime()) && date >= today;
       },
       {
-        message: "L'heure doit être valide et dans le futur.",
+        message: "L'heure doit être valide et ne pas être dans le passé.",
+      }
+    )
+    .refine(
+      (val) => {
+        const date = new Date(val);
+        const now = new Date();
+
+        now.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+
+        return !isNaN(date.getTime()) && date >= now;
+      },
+      {
+        message: "L'heure doit être valide et ne pas être dans le passé.",
       }
     ),
   rdv_pts: z.array(z.string().nonempty()),
@@ -130,4 +149,5 @@ export const MessageSchema = z.object({
   author_id: z.number(),
   receiver_id: z.number(),
   chat_id: z.number(),
+  isSystemMessage: z.boolean().default(false).optional(),
 });
