@@ -12,13 +12,14 @@ const Navbar = () => {
   const { isAuthenticated, checkAuth, logout } = useAuth();
   const { totalUnread, refreshNotifications } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
-  const menuItems = [
-    { href: "/", label: "Accueil" },
-    { href: "/contact", label: "Contact" },
-    { href: "/dons", label: "Annonces" },
-    { href: isAuthenticated ? "/messagerie" : "/connexion", label: "Messagerie" },
-    { href: isAuthenticated ? "/publier-don" : "/connexion", label: "Publier un don" },
-  ];
+
+  // Initial notification check when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshNotifications();
+    }
+  }, [isAuthenticated, refreshNotifications]);
+
   // Additional auth check on component mount and visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -48,6 +49,21 @@ const Navbar = () => {
     return () => clearInterval(notificationInterval);
   }, [isAuthenticated, refreshNotifications]);
 
+  const menuItems = [
+    { href: "/", label: "Accueil" },
+    { href: "/contact", label: "Contact" },
+    { href: "/dons", label: "Annonces" },
+    {
+      href: isAuthenticated ? "/messagerie" : "/connexion",
+      label: "Messagerie",
+      showNotification: isAuthenticated && totalUnread > 0,
+    },
+    {
+      href: isAuthenticated ? "/publier-don" : "/connexion",
+      label: "Publier un don",
+    },
+  ];
+
   return (
     <header className="fixed top-0 left-0 w-full h-20 bg-white text-black flex justify-between items-center px-6 md:px-12 py-5 z-50 shadow-md">
       <Link href="/">
@@ -73,9 +89,14 @@ const Navbar = () => {
             <li key={index}>
               <Link
                 href={item.href}
-                className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
+                className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white relative"
               >
                 {item.label}
+                {item.showNotification && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {totalUnread > 9 ? "9+" : totalUnread}
+                  </span>
+                )}
               </Link>
             </li>
           ))}
@@ -94,10 +115,15 @@ const Navbar = () => {
             <Link
               key={index}
               href={item.href}
-              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
+              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white relative"
               onClick={() => setIsOpen(false)}
             >
               {item.label}
+              {item.showNotification && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalUnread > 9 ? "9+" : totalUnread}
+                </span>
+              )}
             </Link>
           ))}
         </motion.nav>
@@ -137,7 +163,5 @@ const Navbar = () => {
     </header>
   );
 };
-
-
 
 export default Navbar;
