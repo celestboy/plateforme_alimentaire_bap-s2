@@ -20,7 +20,9 @@ export default async function getUserCO2Stats(
     });
 
     const receivedDonations = await prisma.dons.findMany({
-      where: {},
+      where: {
+        receveur_id: userId,
+      },
     });
 
     // Combine all donations (made and received)
