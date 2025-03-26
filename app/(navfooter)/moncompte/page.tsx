@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import displayUserInfo from "@/actions/get-user-info";
+import getUserCO2Stats from "@/actions/get-user-co2-stats";
 import { Mail, Calendar1, LogOut, Trash } from "lucide-react";
 import deleteAccount from "@/actions/delete-account";
 
@@ -17,6 +18,12 @@ interface UserInfo {
   createdAt: Date;
 }
 
+interface CO2Stats {
+  totalWeightKg: number;
+  totalCO2Saved: number;
+  totalDonations: number;
+}
+
 interface JwtPayload {
   userId: number;
   email: string;
@@ -25,6 +32,11 @@ interface JwtPayload {
 
 export default function MonCompte() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [co2Stats, setCO2Stats] = useState<CO2Stats>({
+    totalWeightKg: 0,
+    totalCO2Saved: 0,
+    totalDonations: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -59,8 +71,15 @@ export default function MonCompte() {
         const userId = decodedToken.userId;
 
         setIsLoading(true);
-        const fetchedInfos = await displayUserInfo(userId);
+
+        // Fetch user info and CO2 stats simultaneously
+        const [fetchedInfos, fetchedStats] = await Promise.all([
+          displayUserInfo(userId),
+          getUserCO2Stats(userId),
+        ]);
+
         setUserInfo(fetchedInfos);
+        setCO2Stats(fetchedStats);
         setIsLoading(false);
       } catch (err) {
         const errorMessage =
@@ -75,7 +94,7 @@ export default function MonCompte() {
     };
 
     fetchInfo();
-  }, []); // Pas de dépendance car on veut charger une seule fois
+  }, []);
 
   const deleteAccountFunction = async () => {
     try {
@@ -131,19 +150,19 @@ export default function MonCompte() {
         <section className="relative w-screen font-futuraPTBold flex justify-center m-6 p-12">
           <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
             <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
-              00
+              {isLoading ? "..." : co2Stats.totalWeightKg}
             </h3>
             <p className="absolute bottom-4 right-6">Kg sauvés</p>
           </article>
           <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
             <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
-              00
+              {isLoading ? "..." : co2Stats.totalCO2Saved}
             </h3>
             <p className="absolute bottom-4 right-6">Kg CO2 équivalent</p>
           </article>
           <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
             <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
-              00
+              {isLoading ? "..." : co2Stats.totalDonations}
             </h3>
             <p className="absolute bottom-4 right-6">Nombre de dons</p>
           </article>
