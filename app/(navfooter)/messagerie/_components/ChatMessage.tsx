@@ -23,6 +23,12 @@ interface ChatMessageProps {
   onStatusChange?: (status: DonStatus) => void;
 }
 
+interface LocationDataItem {
+  type: string;
+  value: string;
+  name: string;
+}
+
 const ChatMessage = ({
   sender,
   message,
@@ -160,9 +166,46 @@ const ChatMessage = ({
         heure: parsedMessage.heure,
       };
 
+      const formatDateTime = (dateTimeString: string) => {
+        try {
+          const dateObj = new Date(dateTimeString);
+          if (isNaN(dateObj.getTime())) {
+            console.error("Invalid date:", dateTimeString);
+            return "Date/Heure inconnue";
+          }
+          const day = String(dateObj.getDate()).padStart(2, "0");
+          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+          const year = dateObj.getFullYear();
+          const hours = String(dateObj.getHours()).padStart(2, "0");
+          const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+          return `${day}/${month}/${year} à ${hours}:${minutes}`;
+        } catch (error) {
+          console.error("Error formatting date:", error, dateTimeString);
+          return "Date/Heure inconnue";
+        }
+      };
+
+      async function getLocationName(
+        value: string,
+        locationData: LocationDataItem[]
+      ): Promise<string> {
+        const location = locationData.find(
+          (item) => item.type === "location" && item.value === value
+        );
+
+        return location ? location.name : value;
+      }
+
+      const locationResponse = await fetch("/data/filters.json");
+      const locationData: LocationDataItem[] = await locationResponse.json();
+
       const response = await validateForm(data);
 
-      const systemMessage = `Le don a été accepté pour le ${data.heure} à ${data.lieu}`;
+      const formattedLocation = await getLocationName(data.lieu, locationData);
+      const formattedHeure = formatDateTime(data.heure);
+
+      const systemMessage = `Le don a été accepté pour le ${formattedHeure} à : ${formattedLocation}`;
 
       if (response?.success) {
         // Create system message first so it appears in UI
@@ -230,7 +273,44 @@ const ChatMessage = ({
         heure: parsedMessage.heure,
       };
 
-      const systemMessage = `L'offre du ${data.heure} à ${data.lieu} a été refusée`;
+      const formatDateTime = (dateTimeString: string) => {
+        try {
+          const dateObj = new Date(dateTimeString);
+          if (isNaN(dateObj.getTime())) {
+            console.error("Invalid date:", dateTimeString);
+            return "Date/Heure inconnue";
+          }
+          const day = String(dateObj.getDate()).padStart(2, "0");
+          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+          const year = dateObj.getFullYear();
+          const hours = String(dateObj.getHours()).padStart(2, "0");
+          const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+          return `${day}/${month}/${year} à ${hours}:${minutes}`;
+        } catch (error) {
+          console.error("Error formatting date:", error, dateTimeString);
+          return "Date/Heure inconnue";
+        }
+      };
+
+      async function getLocationName(
+        value: string,
+        locationData: LocationDataItem[]
+      ): Promise<string> {
+        const location = locationData.find(
+          (item) => item.type === "location" && item.value === value
+        );
+
+        return location ? location.name : value;
+      }
+
+      const locationResponse = await fetch("/data/filters.json");
+      const locationData: LocationDataItem[] = await locationResponse.json();
+
+      const formattedLocation = await getLocationName(data.lieu, locationData);
+      const formattedDateTime = formatDateTime(data.heure);
+
+      const systemMessage = `L'offre du ${formattedDateTime} à : ${formattedLocation} a été refusée`;
 
       // Create system message first so it appears in UI
       await createSystemMessage(systemMessage);
@@ -271,6 +351,25 @@ const ChatMessage = ({
       });
     }
   };
+
+  const [locationData, setLocationData] = useState<LocationDataItem[]>([]);
+
+  useEffect(() => {
+    const fetchLocationData = async () => {
+      try {
+        const response = await fetch("/data/filters.json");
+        const data: LocationDataItem[] = await response.json();
+        setLocationData(data);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des données de localisation:",
+          error
+        );
+      }
+    };
+
+    fetchLocationData();
+  }, []);
 
   const isDonationMessage =
     parsedMessage &&
@@ -317,12 +416,60 @@ const ChatMessage = ({
         )}
         {isDonationMessage ? (
           <div className="bg-green-100 text-green-700 p-3 rounded-lg my-2">
-            <p>
-              <strong>📍 Lieu :</strong> {parsedMessage.lieu}
-            </p>
-            <p>
-              <strong>⏰ Heure :</strong> {parsedMessage.heure}
-            </p>
+            {(() => {
+              const formatDateTime = (dateTimeString: string) => {
+                try {
+                  const dateObj = new Date(dateTimeString);
+                  if (isNaN(dateObj.getTime())) {
+                    console.error("Invalid date:", dateTimeString);
+                    return "Date/Heure inconnue";
+                  }
+                  const day = String(dateObj.getDate()).padStart(2, "0");
+                  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                  const year = dateObj.getFullYear();
+                  const hours = String(dateObj.getHours()).padStart(2, "0");
+                  const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+                  return `${day}/${month}/${year} à ${hours}:${minutes}`;
+                } catch (error) {
+                  console.error(
+                    "Error formatting date:",
+                    error,
+                    dateTimeString
+                  );
+                  return "Date/Heure inconnue";
+                }
+              };
+
+              const getLocationName = (
+                value: string,
+                locationData: LocationDataItem[]
+              ): string => {
+                const location: LocationDataItem | undefined =
+                  locationData.find(
+                    (item: LocationDataItem) =>
+                      item.type === "location" && item.value === value
+                  );
+                return location ? location.name : value;
+              };
+
+              const formattedLocation = getLocationName(
+                parsedMessage.lieu,
+                locationData
+              );
+              const formattedDateTime = formatDateTime(parsedMessage.heure);
+
+              return (
+                <>
+                  <p>
+                    <strong>📍 Lieu :</strong> {formattedLocation}
+                  </p>
+                  <p>
+                    <strong>⏰ Heure :</strong> {formattedDateTime}
+                  </p>
+                </>
+              );
+            })()}
             <div className="flex gap-2 mt-2">
               <button
                 onClick={handleAccept}

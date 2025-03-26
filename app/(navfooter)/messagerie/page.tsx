@@ -259,11 +259,9 @@ export default function MessageriePage() {
     socket.off("local-system-message");
     socket.off("new_chat");
 
-    // In your message event handler:
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
 
-      // Ensure room is a number and rename senderId to be consistent
       const roomId =
         typeof data.room === "string" ? parseInt(data.room) : data.room;
       const senderID =
@@ -271,7 +269,6 @@ export default function MessageriePage() {
         data.senderId ||
         (data.sender === username ? idUser : null);
 
-      // Debug log to verify data
       console.log({
         roomId,
         senderID,
@@ -280,9 +277,7 @@ export default function MessageriePage() {
       });
 
       if (roomId === room) {
-        // Message is for the current active chat room
         setMessages((prev) => {
-          // Check if this message already exists to prevent duplicates
           if (
             prev.some(
               (msg) =>
@@ -310,7 +305,6 @@ export default function MessageriePage() {
         }
       }
 
-      // Update groupChats regardless of whether the chat is active or not
       setGroupChats((prevChats) => {
         return prevChats.map((chat) => {
           if (chat.chat_id === roomId) {
@@ -321,7 +315,6 @@ export default function MessageriePage() {
               isSystemMessage: !!data.isSystemMessage,
             };
 
-            // Check if this message already exists in the chat messages
             const messageExists = chat.messages.some(
               (msg) =>
                 new Date(msg.sentAt).getTime() ===
@@ -331,10 +324,9 @@ export default function MessageriePage() {
             );
 
             if (messageExists) {
-              return chat; // Don't add duplicate messages
+              return chat;
             }
 
-            // Put the new message at the beginning of the messages array
             return {
               ...chat,
               messages: [newMessage, ...chat.messages],
