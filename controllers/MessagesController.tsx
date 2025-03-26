@@ -16,6 +16,13 @@ class MessagesController {
     return message;
   }
 
+  async deleteMessage(id_message: number) {
+    const message = await prisma.messages.delete({
+      where: { message_id: id_message },
+    });
+    return message;
+  }
+
   async deleteRDV(id_don: number) {
     const supp = await prisma.dons.delete({
       where: {
