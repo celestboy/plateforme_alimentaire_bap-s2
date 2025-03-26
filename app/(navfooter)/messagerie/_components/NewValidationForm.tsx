@@ -1,13 +1,20 @@
-import React, { useEffect } from "react";
-import { X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Clock, Pin, X } from "lucide-react";
 import { ValidateSchema } from "@/app/schema";
 import { ValidateSchemaType } from "@/types/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import updatePendingStatus from "@/actions/update-is-don-pending";
-import { socket } from "@/lib/socketClient";
 import { DonStatus } from "@prisma/client";
+import { socket } from "@/lib/socketClient";
+
+interface Filters {
+  id: number;
+  type: string;
+  name: string;
+  value: string;
+}
 
 export default function ValidationForm({
   donId,
@@ -26,6 +33,8 @@ export default function ValidationForm({
       mode: "onChange",
     });
 
+  const [lieux, setLieux] = useState<Filters[]>([]);
+
   const lieu = watch("lieu");
   const heure = watch("heure");
 
@@ -34,6 +43,26 @@ export default function ValidationForm({
       setValue("id_don", donId);
     }
   }, [donId, chatId, setValue]);
+
+  useEffect(() => {
+    fetch("/data/filters.json")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setLieux(data);
+        } else {
+          throw new Error("Invalid data format");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const handleSubmitForm = async (data: ValidateSchemaType) => {
     if (!donId) {
@@ -58,6 +87,8 @@ export default function ValidationForm({
     }
 
     onSendForm({ lieu: data.lieu, heure: data.heure });
+
+    onClose();
   };
 
   useEffect(() => {
@@ -95,30 +126,74 @@ export default function ValidationForm({
           <h3 className="text-center uppercase font-futuraPTBold text-2xl">
             Formulaire de validation du don
           </h3>
-          <div className="my-4 w-[85%] mx-auto flex flex-col gap-4">
+          <div className="my-4 w-[85%] mx-auto flex flex-col gap-10">
+            <input type="hidden" {...register("id_don")} />
             <div className="flex flex-col justify-center gap-2">
-              <input type="hidden" {...register("id_don")} />
-              <label className="font-futuraPTBook text-lg">Lieu*</label>
+              <span className="font-semibold text-gray-600 flex items-center font-futuraPTMedium">
+                <Pin className="mr-4" size={22} />
+                Lieu*
+              </span>
               <select
                 {...register("lieu", { required: true })}
-                defaultValue={undefined}
+                defaultValue=""
+                className="appearance-none 
+                    w-full 
+                    pl-6 
+                    py-2 
+                    border 
+                    border-gray-300 
+                    rounded-full 
+                    bg-white 
+                    text-gray-900 
+                    focus:outline-none 
+                    focus:ring-2 
+                    focus:ring-base-green 
+                    focus:border-base-green
+                    pr-10
+                    bg-transparent
+                    bg-no-repeat
+                    bg-right
+                    bg-[length:1.5rem_1.5rem]
+                  "
               >
                 <option value="">Sélectionnez un lieu</option>
-                <option value="Option A">Option A</option>
-                <option value="Option B">Option B</option>
-                <option value="Option C">Option C</option>
-                <option value="Option D">Option D</option>
+                {lieux
+                  .filter((lieu) => lieu.type === "location")
+                  .map((lieu) => (
+                    <option
+                      key={lieu.id}
+                      value={lieu.value}
+                      className="bg-white"
+                    >
+                      {lieu.name}
+                    </option>
+                  ))}
               </select>
             </div>
             <div className="flex flex-col justify-center gap-2">
-              <label className="font-futuraPTBook text-lg">Heure*</label>
+              <span className="font-semibold font-futuraPTBook text-gray-600 flex items-center">
+                <Clock className="mr-4" size={22} />
+                Heure*
+              </span>
               <input
                 type="datetime-local"
+                className="w-full 
+                    px-6 
+                    py-2 
+                    border 
+                    border-gray-300 
+                    rounded-full"
                 {...register("heure", { required: true })}
               />
             </div>
-
-            <button type="submit">Je valide l&apos;heure et le lieu</button>
+          </div>
+          <div className="flex justify-center items-center">
+            <button
+              type="submit"
+              className="bg-base-green px-6 py-3 rounded-full transition-colors hover:bg-dark-blue hover:text-white"
+            >
+              Je valide l&apos;heure et le lieu
+            </button>
           </div>
         </form>
       </div>
