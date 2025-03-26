@@ -157,8 +157,8 @@ export default function HomePage() {
   return (
     <div className="text-center bg-gray-100 h-full w-screen box-border">
       <div className="text-center overflow-x-hidden">
-        <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-6 font-futuraPTMedium">
-          <Link href="/" className="absolute top-6 left-6 text-white">
+        <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-8 font-futuraPTMedium">
+          <Link href="/" className="absolute top-0 md:top-2 left-6 text-white">
             Retour
           </Link>
 
@@ -177,7 +177,7 @@ export default function HomePage() {
                 className="absolute z-10 mt-4 w-[748px] p-4 bg-white ring-1 ring-black ring-opacity-5 top-3 right-1/2 transform translate-x-1/2"
               >
                 <div className="py-1">
-                  <div className="grid grid-cols-2 gap-4 p-4">
+                  <div className="grid md:grid-cols-2 gap-4 p-4">
                     {/* Localisation */}
                     <div>
                       <h3 className="text-lg font-semibold border-b pb-2 mb-2">
@@ -191,7 +191,7 @@ export default function HomePage() {
                             onClick={() =>
                               applyFilter("location", filter.value)
                             }
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full md:text-left"
                           >
                             {filter.name}
                           </button>
@@ -209,7 +209,7 @@ export default function HomePage() {
                           <button
                             key={filter.id}
                             onClick={() => applyFilter("produit", filter.value)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full md:text-left"
                           >
                             {filter.name}
                           </button>
@@ -262,7 +262,7 @@ export default function HomePage() {
 
           <div
             id="articlecontainerteaser"
-            className="grid grid-cols-2 justify-items-center my-2 mx-5"
+            className="grid grid-cols-1 md:grid-cols-2 justify-items-center my-2 mx-0 md:mx-5"
           >
             {isLoading ? (
               <div className="relative w-full h-64 flex items-center justify-center">
@@ -275,7 +275,7 @@ export default function HomePage() {
             ) : (
               dons.map((don) => (
                 <Link href={`/dons/${don.don_id}`} key={don.don_id}>
-                  <div className="my-4 mx-6 bg-white rounded text-center w-[90%]">
+                  <div className="my-4 mx-auto md:mx-6 bg-white rounded text-center w-[90%]">
                     <Image
                       className="inline-block w-[90%] h-64 mx-auto my-2 rounded-sm object-cover aspect-video"
                       width={512}

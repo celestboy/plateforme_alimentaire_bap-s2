@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useNotifications } from "../_context/NotificationContext";
+import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { useAuth } from "../_context/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, checkAuth, logout } = useAuth();
   const { totalUnread, refreshNotifications } = useNotifications();
+  const [isOpen, setIsOpen] = useState(false);
 
+  // Initial notification check when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       refreshNotifications();
@@ -45,10 +49,25 @@ const Navbar = () => {
     return () => clearInterval(notificationInterval);
   }, [isAuthenticated, refreshNotifications]);
 
+  const menuItems = [
+    { href: "/", label: "Accueil" },
+    { href: "/contact", label: "Contact" },
+    { href: "/dons", label: "Annonces" },
+    {
+      href: isAuthenticated ? "/messagerie" : "/connexion",
+      label: "Messagerie",
+      showNotification: isAuthenticated && totalUnread > 0,
+    },
+    {
+      href: isAuthenticated ? "/publier-don" : "/connexion",
+      label: "Publier un don",
+    },
+  ];
+
   return (
-    <header className="fixed top-0 left-0 w-full h-20 bg-white text-black flex justify-between items-center px-12 py-5 z-50">
-      <Link href={"/"}>
-        <div className="w-52">
+    <header className="fixed top-0 left-0 w-full h-20 bg-white text-black flex justify-between items-center px-6 md:px-12 py-5 z-50 shadow-md">
+      <Link href="/">
+        <div className="w-40 md:w-52">
           <Image
             width={512}
             height={512}
@@ -58,84 +77,89 @@ const Navbar = () => {
         </div>
       </Link>
 
-      <nav>
+      {/* Menu burger (visible en mobile) */}
+      <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Navigation Desktop */}
+      <nav className="hidden md:flex">
         <ul className="flex space-x-8">
-          <li>
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link
+                href={item.href}
+                className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white relative"
+              >
+                {item.label}
+                {item.showNotification && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {totalUnread > 9 ? "9+" : totalUnread}
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Navigation Mobile */}
+      {isOpen && (
+        <motion.nav
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 100 }}
+          className="absolute top-20 right-0 w-64 bg-white shadow-lg py-5 flex flex-col space-y-4 items-center md:hidden"
+        >
+          {menuItems.map((item, index) => (
             <Link
-              href={"/"}
-              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
-            >
-              Accueil
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={"/contact"}
-              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={"/dons"}
-              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
-            >
-              Annonces
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={isAuthenticated ? "/messagerie" : "/connexion"}
+              key={index}
+              href={item.href}
               className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white relative"
+              onClick={() => setIsOpen(false)}
             >
-              Messagerie
-              {isAuthenticated && totalUnread > 0 && (
+              {item.label}
+              {item.showNotification && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {totalUnread > 9 ? "9+" : totalUnread}
                 </span>
               )}
             </Link>
-          </li>
-          <li>
-            <Link
-              href={isAuthenticated ? "/publier-don" : "/connexion"}
-              className="font-futuraPTBook text-black text-lg px-5 py-2 rounded-full transition duration-300 hover:bg-base-green hover:text-white"
-            >
-              Publier un don
-            </Link>
-          </li>
-        </ul>
-      </nav>
-
-      {isAuthenticated ? (
-        <div className="flex gap-3">
-          <Link href={"/moncompte"}>
-            <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
-              Mon compte
-            </button>
-          </Link>
-          <button
-            onClick={logout}
-            className="font-futuraPTBook bg-gray-200 text-gray-800 px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-gray-300"
-          >
-            Déconnexion
-          </button>
-        </div>
-      ) : (
-        <div className="flex gap-3">
-          <Link href={"/connexion"}>
-            <button className="font-futuraPTBook bg-gray-200 text-gray-800 px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-gray-300">
-              Connexion
-            </button>
-          </Link>
-          <Link href={"/register"}>
-            <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
-              Créer un compte
-            </button>
-          </Link>
-        </div>
+          ))}
+        </motion.nav>
       )}
+
+      {/* Bouton Connexion/Compte */}
+      <div className="hidden md:flex items-center gap-3">
+        {isAuthenticated ? (
+          <>
+            <Link href="/moncompte">
+              <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
+                Mon compte
+              </button>
+            </Link>
+            <button
+              onClick={logout}
+              className="font-futuraPTBook bg-gray-200 text-gray-800 px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-gray-300"
+            >
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/connexion">
+              <button className="font-futuraPTBook bg-gray-200 text-gray-800 px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-gray-300">
+                Connexion
+              </button>
+            </Link>
+            <Link href="/register">
+              <button className="font-futuraPTBook bg-base-green text-white px-5 py-2 rounded-full text-sm font-semibold transition duration-300 hover:bg-[#084784] hover:text-white">
+                Créer un compte
+              </button>
+            </Link>
+          </>
+        )}
+      </div>
     </header>
   );
 };
