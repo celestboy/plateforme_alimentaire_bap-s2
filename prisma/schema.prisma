@@ -50,6 +50,7 @@ model Dons {
   lieu String?
   Heure DateTime?
   donneur_id Int
+  receveur_id Int?
   donneur Users @relation(fields: [donneur_id], references: [user_id], onDelete: Cascade)
   chats Chats[]
 }

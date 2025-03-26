@@ -153,6 +153,8 @@ const ChatMessage = ({
     };
   }, [donId, room, onStatusChange]);
 
+  // Update only the handleAccept function in ChatMessage.tsx
+
   const handleAccept = async () => {
     if (!parsedMessage?.lieu || !parsedMessage?.heure) {
       console.error("Données incomplètes ou don déjà accepté");
@@ -220,7 +222,13 @@ const ChatMessage = ({
         });
 
         if (donId) {
-          const updateResult = await updateAcceptedStatus(donId, room);
+          // Pass the receveur_id from the component props
+          const updateResult = await updateAcceptedStatus(
+            donId,
+            room,
+            receveur_id
+          );
+
           if (updateResult.success) {
             // Emit status update via socket
             socket.emit("status_update", {
@@ -228,6 +236,7 @@ const ChatMessage = ({
               donId: donId,
               status: DonStatus.ACCEPTED,
               updatedAt: new Date().toISOString(),
+              receiverId: receveur_id,
             });
             setDonStatus(DonStatus.ACCEPTED);
             if (onStatusChange) onStatusChange(DonStatus.ACCEPTED);

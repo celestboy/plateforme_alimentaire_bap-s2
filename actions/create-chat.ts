@@ -3,6 +3,7 @@
 import { CreateChatSchema } from "@/app/schema";
 import MessagerieController from "@/controllers/MessagerieController";
 import MessagesController from "@/controllers/MessagesController";
+import prisma from "@/prisma/prisma";
 import { CreateChatSchemaType, FormResponse } from "@/types/forms";
 
 const CreateChat = async (
@@ -14,7 +15,28 @@ const CreateChat = async (
     if (!parsedData.success) {
       return { success: false, errors: parsedData.error.errors };
     }
+    const existingChat = await prisma.chats.findFirst({
+      where: {
+        don_id: data.don_id,
+        OR: [
+          {
+            donneur_id: data.donneur_id,
+            receveur_id: data.receveur_id,
+          },
+          {
+            donneur_id: data.receveur_id,
+            receveur_id: data.donneur_id,
+          },
+        ],
+      },
+    });
 
+    if (existingChat) {
+      return {
+        success: false,
+        chatId: existingChat.chat_id,
+      };
+    }
     // Create the chat
     const chat = await MessagerieController.store(data);
     if (!chat) {

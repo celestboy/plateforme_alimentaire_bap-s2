@@ -51,13 +51,13 @@ export default function RegisterForm() {
   }, [formState.errors]);
 
   return (
-    <div className="w-[600px] mx-auto">
+    <div className="w-screen md:w-[600px] mx-auto">
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         id="registerform"
-        className="w-[600px]"
+        className="md:w-[600px] m-4"
       >
-        <div className="relative w-[600px]">
+        <div className="relative md:w-[600px]">
           <input
             type="hidden"
             {...register("user_type")}
@@ -70,13 +70,13 @@ export default function RegisterForm() {
           <input
             type="text"
             {...register("username")}
-            className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
+            className="w-full md:w-[600px] my-4 py-2 md:py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
             placeholder="Nom d'utilisateur"
           />
         </div>
 
         {/* Adresse Mail */}
-        <div className="relative w-[600px]">
+        <div className="relative md:w-[600px]">
           <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
             <Mail className="mr-4" />
             Adresse Mail :
@@ -84,13 +84,13 @@ export default function RegisterForm() {
           <input
             type="email"
             {...register("email")}
-            className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
+            className="w-full md:w-[600px] my-4 py-2 md:py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
             placeholder="Adresse Mail"
           />
         </div>
 
         {/* Mot de passe */}
-        <div className="relative w-[600px]">
+        <div className="relative md:w-[600px]">
           <span className="font-semibold font-Montserrat text-gray-600 flex items-center font-futuraPTMedium">
             <KeyRound className="mr-4" />
             Mot de passe :
@@ -98,11 +98,11 @@ export default function RegisterForm() {
           <input
             type={showPassword ? "text" : "password"}
             {...register("password")}
-            className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
+            className="w-full md:w-[600px] my-4 py-2 md:py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm font-futuraPTBook"
             placeholder="Mot de passe"
           />
           <span
-            className="text-gray-600 absolute top-14 right-5 cursor-pointer"
+            className="text-gray-600 absolute top-12 md:top-14 right-5 cursor-pointer"
             onClick={togglePasswordVisibility}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -111,7 +111,7 @@ export default function RegisterForm() {
 
         {/* Bouton de soumission */}
         <div className="flex justify-center items-center font-futuraPTMedium">
-          <button type="submit" className="bg-slate-300 hover:bg-slate-400 py-4 px-8 rounded-full duration-200">Je m&apos;inscris</button>
+          <button type="submit" className="bg-slate-300 hover:bg-slate-400 py-2 md:py-4 px-4 md:px-8 rounded-full duration-200">Je m&apos;inscris</button>
         </div>
       </form>
     </div>
