@@ -40,15 +40,16 @@ const SearchInput = ({
     <div className="relative z-20">
       <form onSubmit={onSubmit}>
         <span>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
+          <Search className="absolute hidden md:block left-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer" />
         </span>
         <input
           type="text"
           value={value}
           onChange={onChange}
-          className="w-[750px] h-12 rounded-full px-2 pl-12 pr-28 border border-gray-600 font-Montserrat"
+          className="md:w-[750px] h-12 rounded-full md:pl-14 pl-4 pr-28 border border-gray-600 font-Montserrat"
           placeholder="Adresse, quartier, ..."
         />
+
         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-gray-600 cursor-pointer border-l border-gray-600 pl-4">
           <button
             type="button"
