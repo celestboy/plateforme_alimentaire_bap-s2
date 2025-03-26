@@ -1,12 +1,39 @@
 "use client";
 
+"use client";
+
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import displayUserInfo from "@/actions/get-user-info";
 import getUserCO2Stats from "@/actions/get-user-co2-stats";
 import { Mail, Calendar1, LogOut, Trash } from "lucide-react";
 import deleteAccount from "@/actions/delete-account";
+import { Line, Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from "chart.js";
+import { format, parseISO } from "date-fns";
+import { fr } from "date-fns/locale";
 
+// Enregistrement des composants Chart.js nécessaires
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 interface UserInfo {
   user_id: number;
   user_type: string;
@@ -22,6 +49,11 @@ interface CO2Stats {
   totalWeightKg: number;
   totalCO2Saved: number;
   totalDonations: number;
+  history?: {
+    date: string;
+    weightKg: number;
+    co2Saved: number;
+  }[];
 }
 
 interface JwtPayload {
@@ -36,6 +68,7 @@ export default function MonCompte() {
     totalWeightKg: 0,
     totalCO2Saved: 0,
     totalDonations: 0,
+    history: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -166,6 +199,134 @@ export default function MonCompte() {
             </h3>
             <p className="absolute bottom-4 right-6">Nombre de dons</p>
           </article>
+        </section>
+
+        {/* Section des graphiques */}
+        <section className="w-full px-10 mb-10">
+          <h2 className="font-bold text-3xl text-[#B0C482] font-futuraPTBook mb-6">
+            Évolution de votre impact
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Graphique linéaire */}
+            <div className="bg-white p-4 rounded-xl shadow-lg">
+              <h3 className="text-xl font-bold mb-4 text-gray-700">
+                Évolution à travers le temps
+              </h3>
+              {co2Stats.history && co2Stats.history.length > 0 ? (
+                <Line
+                  data={{
+                    labels: co2Stats.history.map((item) =>
+                      format(parseISO(item.date), "dd MMM yyyy", { locale: fr })
+                    ),
+                    datasets: [
+                      {
+                        label: "Poids sauvé (kg)",
+                        data: co2Stats.history.map((item) => item.weightKg),
+                        borderColor: "#B0C482",
+                        backgroundColor: "rgba(176, 196, 130, 0.2)",
+                        tension: 0.3,
+                      },
+                      {
+                        label: "CO2 économisé (kg)",
+                        data: co2Stats.history.map((item) => item.co2Saved),
+                        borderColor: "#5C8D89",
+                        backgroundColor: "rgba(92, 141, 137, 0.2)",
+                        tension: 0.3,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                      legend: {
+                        position: "top",
+                      },
+                      title: {
+                        display: false,
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: "Kilogrammes",
+                        },
+                      },
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date",
+                        },
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <div className="flex justify-center items-center h-64 text-gray-500">
+                  Pas assez de données pour afficher un graphique
+                </div>
+              )}
+            </div>
+
+            {/* Graphique circulaire */}
+            <div className="bg-white p-4 rounded-xl shadow-lg">
+              <h3 className="text-xl font-bold mb-4 text-gray-700">
+                Répartition de votre impact
+              </h3>
+              {co2Stats.totalWeightKg > 0 || co2Stats.totalCO2Saved > 0 ? (
+                <div className="flex justify-center">
+                  <div style={{ maxWidth: "400px" }}>
+                    <Pie
+                      data={{
+                        labels: [
+                          "Poids d'aliments sauvés (kg)",
+                          "CO2 économisé (kg)",
+                        ],
+                        datasets: [
+                          {
+                            data: [
+                              co2Stats.totalWeightKg,
+                              co2Stats.totalCO2Saved,
+                            ],
+                            backgroundColor: [
+                              "rgba(176, 196, 130, 0.8)",
+                              "rgba(92, 141, 137, 0.8)",
+                            ],
+                            borderColor: ["#B0C482", "#5C8D89"],
+                            borderWidth: 1,
+                          },
+                        ],
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: "bottom",
+                          },
+                          tooltip: {
+                            callbacks: {
+                              label: function (context) {
+                                const label = context.label || "";
+                                const value = context.parsed || 0;
+                                return `${label}: ${value} kg`;
+                              },
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center items-center h-64 text-gray-500">
+                  Pas assez de données pour afficher un graphique
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
         {/* User Info Display */}
