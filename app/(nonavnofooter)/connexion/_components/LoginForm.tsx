@@ -55,7 +55,7 @@ function LoginForm() {
             </span>
             <input
               {...register("email")}
-              className="w-full md:w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+              className="w-full md:w-[600px] my-4 py-2 md:py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
               placeholder="Adresse Mail"
             />
           </div>
@@ -67,12 +67,12 @@ function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               {...register("password")}
-              className="w-full md:w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+              className="w-full md:w-[600px] my-4 py-2 md:py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
               placeholder="Mot de passe"
             />
             <span
               onClick={togglePasswordVisibility}
-              className="cursor-pointer absolute top-14 right-5"
+              className="cursor-pointer absolute top-12 md:top-14 right-5"
             >
               {showPassword ? <EyeOff /> : <Eye />}
             </span>
@@ -81,7 +81,7 @@ function LoginForm() {
           <div className="flex justify-center items-center">
             <button
               type="submit"
-              className="bg-slate-300 hover:bg-slate-400 py-4 px-8 rounded-full duration-200"
+              className="bg-slate-300 hover:bg-slate-400 py-2 md:py-4 px-4 md:px-8 rounded-full duration-200"
             >
               Se connecter
             </button>

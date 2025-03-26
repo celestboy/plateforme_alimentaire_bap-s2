@@ -29,8 +29,8 @@ export default function Login() {
         <div className="text-center">
           <LoginForm />
           <Link href={"/register"}>
-            <button type="button" className="mt-4">
-             Nouveau ici ? Créez un compte
+            <button type="button" className="m-4 text-xs md:text-lg">
+              Nouveau ici ? Créez un compte
             </button>
           </Link>
         </div>

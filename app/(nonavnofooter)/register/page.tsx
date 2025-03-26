@@ -11,7 +11,7 @@ export default function RegisterSchema() {
           <button type="button" className="mt-8 bg-[#084784] p-4 rounded-full text-white">Je me connecte</button>
         </Link>
       </div>
-      <div className="flex justify-center items-center gap-10 mt-12">
+      <div className="flex flex-col md:flex-row justify-center items-center gap-10 mt-12">
         <ParticulierBox />
         <CommercantBox />
       </div>
