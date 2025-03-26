@@ -1,13 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 // app/page.tsx
-
+import getTotalCO2Stats from "@/actions/get-total-dons-co2";
 import Image from "next/image";
 import DisplayLastThree from "../_components/DisplayLastDons";
+interface CO2Stats {
+  totalWeightKg: number;
+  totalCO2Saved: number;
+  totalDonations: number;
+}
 
 export default function HomePage() {
-	return (
+  const [co2Stats, setCO2Stats] = useState<CO2Stats>({
+    totalWeightKg: 0,
+    totalCO2Saved: 0,
+    totalDonations: 0,
+  });
+
+  React.useEffect(() => {
+    async function fetchStats() {
+      try {
+        const stats = await getTotalCO2Stats();
+        setCO2Stats(stats);
+      } catch (error) {
+        console.error("Error fetching CO2 stats:", error);
+      }
+    }
+
+    fetchStats();
+  }, []);
+
+  return (
     <div>
       <section className="hero bg-cover bg-center text-white h-[600px] w-full flex flex-col items-center justify-center">
         <div className="text-2xl font-semibold text-justify w-full px-10">
@@ -235,12 +259,16 @@ export default function HomePage() {
           <h3 className="mb-6 font-futuraPTBold text-xl md:text-3xl">
             Nombre total de dons
           </h3>
-          <p className="font-futuraPTMedium text-xl md:text-3xl">999</p>
+          <p className="font-futuraPTMedium text-xl md:text-3xl">
+            {co2Stats.totalDonations}
+          </p>
         </article>
         <article className="m-8 p-12 md:w-full text-center rounded-xl bg-slate-100">
-          <h3 className="mb-6 font-futuraPTBold text-xl md:text-3xl">CO2 évité</h3>
+          <h3 className="mb-6 font-futuraPTBold text-xl md:text-3xl">
+            CO2 évité
+          </h3>
           <p className="font-futuraPTMedium text-xl md:text-3xl">
-            <span>999 </span>Kg
+            <span>{co2Stats.totalCO2Saved} </span>Kg
           </p>
         </article>
       </section>
