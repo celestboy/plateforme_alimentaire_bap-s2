@@ -135,15 +135,15 @@ export default function PublishDonForm() {
   }, [formState.errors]);
 
   return (
-    <div className="w-4/5 mx-auto">
+    <div className="md:w-4/5 mx-auto">
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         id="registerform"
-        className="w-max mb-36"
+        className="w-full p-4 mb-36"
       >
-        <div className="flex w-screen">
-          <div className="w-2/5 mr-4">
-            <div className="flex">
+        <div className="md:flex w-full">
+          <div className="w-full md:w-2/5 mr-4">
+            <div className="md:flex">
               <div className="relative w-full mr-4">
                 <span className="font-semibold font-Montserrat text-gray-600 flex items-center">
                   <CaseSensitive className="mr-4" />
@@ -166,7 +166,7 @@ export default function PublishDonForm() {
                   type="number"
                   step="0.1"
                   {...register("quantity", { valueAsNumber: true })}
-                  className="my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
+                  className="w-full my-4 py-4 px-6 rounded-full border border-gray-600 font-Montserrat text-sm"
                   placeholder="Quantité"
                   required
                 />
@@ -184,8 +184,8 @@ export default function PublishDonForm() {
                 required
               ></textarea>
             </div>
-            <div className="flex">
-              <div>
+            <div className="md:flex">
+              <div className="text-center">
                 <span className="font-semibold font-Montserrat text-gray-600 flex items-center">
                   <Calendar1 className="mr-4" />
                   DLC<span>*</span>
@@ -205,6 +205,9 @@ export default function PublishDonForm() {
                   required
                 />
               </div>
+              <p className="visible md:invisible mb-6">
+                DLC: Date Limite de Consommation
+              </p>
               <div className="w-full">
                 <span className="font-semibold font-Montserrat text-gray-600 flex items-center">
                   <Folder className="mr-4" />
@@ -230,7 +233,9 @@ export default function PublishDonForm() {
                 </select>
               </div>
             </div>
-            <p>DLC: Date Limite de Consommation</p>
+            <p className="invisible md:visible">
+              DLC: Date Limite de Consommation
+            </p>
           </div>
           <div>
             <div>
@@ -257,7 +262,7 @@ export default function PublishDonForm() {
                   display: "grid",
                   gridTemplateColumns: "repeat(2, 1fr)",
                 }}
-                className="bg-white rounded-2xl border border-gray-600 my-4 text-sm"
+                className="bg-white rounded-2xl border p-2 border-gray-600 my-4 text-xs md:text-sm"
               >
                 {rdvpts
                   .filter((point: RdvPts) => point.type === "location") // Filtrer uniquement ceux avec type "location"
@@ -290,7 +295,7 @@ export default function PublishDonForm() {
         <div className="flex justify-center items-center">
           <button
             type="submit"
-            className="absolute right-36 mt-12 px-8 py-4 rounded-full bg-[#B0C482] hover:bg-[#a0b470] duration-200 text-white"
+            className="absolute md:right-36 mt-12 px-4 md:px-8 py-2 md:py-4 rounded-full bg-[#B0C482] hover:bg-[#a0b470] duration-200 text-white"
           >
             Je publie mon don
           </button>
