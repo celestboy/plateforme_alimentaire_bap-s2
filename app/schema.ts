@@ -151,3 +151,20 @@ export const MessageSchema = z.object({
   chat_id: z.number(),
   isSystemMessage: z.boolean().default(false).optional(),
 });
+
+export const ContactSchema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: "Veuillez remplir votre nom de famille." }),
+  firstname: z.string().nonempty({ message: "Veuillez remplir votre prénom." }),
+  sujet: z
+    .string()
+    .nonempty({ message: "Veuillez remplir le sujet du message." }),
+  email: z
+    .string()
+    .email({ message: "Le mail doit être valide." })
+    .nonempty({ message: "Veuillez remplir le mail." }),
+  content: z.string().nonempty({
+    message: "Le contenu du message est vide, veuillez rédiger un message.",
+  }),
+});

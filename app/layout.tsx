@@ -89,7 +89,20 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
-          <Toaster />
+          <Toaster
+            toastOptions={{
+              unstyled: true,
+              classNames: {
+                error:
+                  "flex items-center gap-2 rounded-md bg-red-400 text-white font-futuraPTBook py-3 px-4",
+                success:
+                  "flex items-center gap-2 rounded-md  text-green-400 text-white font-futuraPTBook py-3 px-4",
+                warning:
+                  "flex items-center gap-2 rounded-md text-yellow-400 text-white font-futuraPTBook py-3 px-4",
+                info: "flex items-center gap-2 rounded-md bg-blue-400 text-white font-futuraPTBook py-3 px-4",
+              },
+            }}
+          />
         </AuthProvider>
       </body>
     </html>
