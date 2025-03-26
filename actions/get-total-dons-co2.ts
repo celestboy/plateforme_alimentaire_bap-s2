@@ -9,18 +9,16 @@ interface CO2Stats {
   totalDonations: number;
 }
 
-export default async function getUserCO2Stats(
-  userId: number
-): Promise<CO2Stats> {
+export default async function getTotalCO2Stats(): Promise<CO2Stats> {
   try {
-    const userDonations = await DonsControllerInstance.getDonByUser(userId);
+    const allDonations = await DonsControllerInstance.index();
 
     // Calculate totals
     let totalWeightKg = 0;
     let totalCO2Saved = 0;
 
     // Process each donation to calculate CO2 savings
-    for (const donation of userDonations) {
+    for (const donation of allDonations) {
       // Calculate CO2 if not already calculated
       const co2Result = calculateCO2Saved(
         donation.title,
@@ -36,10 +34,10 @@ export default async function getUserCO2Stats(
     return {
       totalWeightKg: parseFloat(totalWeightKg.toFixed(2)),
       totalCO2Saved: parseFloat(totalCO2Saved.toFixed(2)),
-      totalDonations: userDonations.length,
+      totalDonations: allDonations.length,
     };
   } catch (error) {
-    console.error("Error calculating user CO2 stats:", error);
+    console.error("Error calculating total CO2 stats:", error);
     return {
       totalWeightKg: 0,
       totalCO2Saved: 0,

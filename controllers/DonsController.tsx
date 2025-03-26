@@ -136,6 +136,15 @@ class DonsController {
     return dons;
   }
 
+  async getDonByUser(userId: number) {
+    const dons = await prisma.dons.findMany({
+      where: {
+        OR: [{ donneur_id: userId }, { receveur_id: userId }],
+      },
+    });
+    return dons;
+  }
+
   async validateRDV(info: ValidateSchemaType) {
     const id_don = info.id_don;
 
