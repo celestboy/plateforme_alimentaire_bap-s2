@@ -7,6 +7,7 @@ import Image from "next/image";
 import SearchInput from "./_components/SearchInput";
 import { getDons } from "@/actions/fetch-don-by-keywords";
 import { JsonValue } from "@prisma/client/runtime/library";
+import { ChevronRight } from "lucide-react";
 
 interface Don {
   don_id: number;
@@ -156,7 +157,7 @@ export default function HomePage() {
 
   return (
     <div className="text-center bg-gray-100 h-full w-screen box-border">
-      <div className="text-center overflow-x-hidden">
+      <div className="text-center overflow-x-hidden h-screen">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-8 font-futuraPTMedium">
           <Link href="/" className="absolute top-0 md:top-2 left-6 text-white">
             Retour
@@ -231,7 +232,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative w-3/4 mx-auto">
+        <div className="relative mx-12 mt-4">
           <h2 className="text-[#B0C482] font-futuraPTBook text-[3.5rem] my-12">
             Annonces
           </h2>
@@ -262,7 +263,7 @@ export default function HomePage() {
 
           <div
             id="articlecontainerteaser"
-            className="grid grid-cols-1 md:grid-cols-2 justify-items-center my-2 mx-0 md:mx-5"
+            className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center my-2 mx-0 md:mx-5"
           >
             {isLoading ? (
               <div className="relative w-full h-64 flex items-center justify-center">
@@ -275,20 +276,25 @@ export default function HomePage() {
             ) : (
               dons.map((don) => (
                 <Link href={`/dons/${don.don_id}`} key={don.don_id}>
-                  <div className="my-4 mx-auto md:mx-6 bg-white rounded text-center w-[90%]">
+                  <div className=" rounded-xl">
                     <Image
-                      className="inline-block w-[90%] h-64 mx-auto my-2 rounded-sm object-cover aspect-video"
+                      className="w-full object-cover rounded-2xl aspect-video"
                       width={512}
                       height={512}
                       src={don.img_url}
                       alt={don.title}
                     />
-                    <h2 className="text-justify text-black font-semibold font-Montserrat w-[90%] text-lg py-2 pr-2 mx-auto">
-                      {don.title}
-                    </h2>
-                    <p className="w-[90%] text-black text-justify font-Montserrat mx-auto pb-4 text-sm leading-5">
-                      {don.description}
-                    </p>
+                    <div className="flex items-center justify-between mt-2 mx-2">
+                      <div className="flex items-center">
+                        <h2 className="text-lg text-left font-futuraPTMedium mr-2">
+                          {don.title}
+                        </h2>
+                        <ChevronRight size={20} />
+                      </div>
+                      <h2 className="text-base text-right font-futuraPTBook">
+                        {don.limit_date.toLocaleDateString("fr-FR")}
+                      </h2>
+                    </div>
                   </div>
                 </Link>
               ))
