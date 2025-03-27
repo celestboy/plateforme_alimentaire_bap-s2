@@ -5,7 +5,7 @@ import { UserCircle2 } from "lucide-react";
 export default function ParticulierBox() {
   return (
     <Link href={"/register/particulier"}>
-      <div className="w-[300px] h-[400px] bg-dark-blue border-4 border-white rounded-xl flex flex-col items-center p-6">
+      <div className="w-[300px] h-[400px] bg-dark-blue border-4 border-white rounded-xl flex flex-col items-center p-6 transition-colors hover:border-[#082f84] hover:scale-105">
         <div className="border-4 w-[250px] h-[250px] border-white rounded-xl flex items-center justify-center">
           <UserCircle2 width={200} height={200} className="text-white" />
         </div>

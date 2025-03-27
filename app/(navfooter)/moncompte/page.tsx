@@ -38,6 +38,8 @@ import updateParticulierInfo from "@/actions/update-particulier-info";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateParticulierSchema } from "@/app/schema";
+import displayUsersDons from "@/actions/get-user-dons";
+import Image from "next/image";
 
 // Enregistrement des composants Chart.js nécessaires
 ChartJS.register(
@@ -78,6 +80,13 @@ interface JwtPayload {
   exp: number;
 }
 
+interface Don {
+  don_id: number;
+  title: string;
+  limit_date: Date;
+  img_url: string;
+}
+
 export default function MonCompte(user: UserInfo) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [co2Stats, setCO2Stats] = useState<CO2Stats>({
@@ -92,6 +101,7 @@ export default function MonCompte(user: UserInfo) {
   const [formData, setFormData] = useState({ ...user });
   const [isUpdating, setIsUpdating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [dons, setDons] = useState<Don[]>([]);
 
   const isTokenExpired = (token: string): boolean => {
     try {
@@ -166,6 +176,25 @@ export default function MonCompte(user: UserInfo) {
       toast.error("Une erreur s'est produite lors de la mise à jour");
     }
   };
+
+  useEffect(() => {
+    const loadDons = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const decodedToken = jwtDecode<JwtPayload>(token);
+        const userId = decodedToken.userId;
+
+        const fetchedDons = await displayUsersDons(userId);
+        setDons(fetchedDons ?? []);
+      } catch (error) {
+        console.error("Erreur lors du chargement des dons", error);
+      }
+    };
+
+    loadDons();
+  }, []);
 
   const deleteAccountFunction = async () => {
     try {
@@ -498,6 +527,42 @@ export default function MonCompte(user: UserInfo) {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-bold text-3xl text-[#B0C482] font-futuraPTBook mb-6">
+            Dons et contributions
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
+            {dons.length > 0 ? (
+              dons.map((don) => (
+                <div
+                  key={don.don_id}
+                  className="bg-[#F5F5F5] rounded-xl p-4 text-center w-[400px]"
+                >
+                  <Image
+                    src={`${don.img_url}`}
+                    width={512}
+                    height={512}
+                    alt="Image du don"
+                    className="w-full object-cover rounded-2xl aspect-video"
+                  />
+                  <div className="flex justify-between mt-4 mx-4">
+                    <h4 className="font-futuraPTBook font-semibold">
+                      {don.title}
+                    </h4>
+                    <p className="text-gray-600 font-futuraPTBook">
+                      {new Date(don.limit_date).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="col-span-3 text-center text-gray-500">
+                Aucun don effectué pour le moment
+              </p>
+            )}
           </div>
         </section>
 

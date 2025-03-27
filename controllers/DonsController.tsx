@@ -196,6 +196,25 @@ class DonsController {
     });
     return don;
   }
+
+  async getUsersDon(id_user: number) {
+    const dons = await prisma.dons.findMany({
+      where: {
+        OR: [
+          { donneur_id: id_user },
+          { chats: { some: { receveur_id: id_user } } },
+        ],
+      },
+      include: {
+        chats: {
+          select: {
+            receveur_id: true,
+          },
+        },
+      },
+    });
+    return dons;
+  }
 }
 
 const DonsControllerInstance = new DonsController();
