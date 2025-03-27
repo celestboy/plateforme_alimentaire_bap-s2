@@ -284,9 +284,6 @@ export default function MessageriePage() {
     socket.off("new_chat");
     socket.off("status_update");
     socket.off("delete_validation_form"); // Add this line
-    socket.off("delete_message"); // Add this line
-
-    // Replace your socket.on("message", ...) handler with this improved version:
 
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
@@ -626,25 +623,70 @@ export default function MessageriePage() {
     });
     // Update the delete_message socket handler in page.tsx
 
-    socket.on("delete_message", (data) => {
-      console.log("Message deletion event received:", data);
+    return () => {
+      socket.off("message");
+      socket.off("user_joined");
+      socket.off("local-system-message");
+      socket.off("new_chat");
+      socket.off("status_update");
+      socket.off("delete_validation_form");
+    };
+  }, [
+    room,
+    username,
+    idUser,
+    incrementChatNotification,
+    markChatAsRead,
+    groupChats,
+    donId,
+    messages,
+  ]);
+
+  useEffect(() => {
+    // Create a dedicated handler for delete_message events
+    interface DeleteMessageData {
+      room: string | number;
+      timestamp: string;
+    }
+
+    const handleDeleteMessage = (data: DeleteMessageData) => {
+      console.log("DELETE MESSAGE INDEPENDENT HANDLER - Event received:", data);
+
+      if (!data) {
+        console.log("DELETE MESSAGE INDEPENDENT - Empty data received");
+        return;
+      }
 
       const roomId =
         typeof data.room === "string" ? parseInt(data.room) : data.room;
       const messageTimestamp = data.timestamp;
 
-      // If this is for the current room, update the messages array
+      console.log(
+        `DELETE MESSAGE INDEPENDENT - Processing for room ${roomId}, timestamp ${messageTimestamp}`
+      );
+
+      // Update messages if this is the current room
       if (roomId === room) {
         setMessages((prev) => {
+          console.log(
+            `DELETE MESSAGE INDEPENDENT - Filtering ${prev.length} messages in active room`
+          );
           return prev.filter((msg) => {
-            // Compare timestamps with some tolerance (±1 second)
             if (msg.sentAt && messageTimestamp) {
               const msgTime = new Date(msg.sentAt).getTime();
               const deleteTime = new Date(messageTimestamp).getTime();
               const timeDiff = Math.abs(msgTime - deleteTime);
 
-              // If the message is within 1 second of the target timestamp, remove it
-              return timeDiff > 500;
+              // Keep messages that are NOT within 500ms of the deletion timestamp
+              const shouldKeep = timeDiff > 500;
+
+              if (!shouldKeep) {
+                console.log(
+                  `DELETE MESSAGE INDEPENDENT - Found message to remove: "${msg.message}"`
+                );
+              }
+
+              return shouldKeep;
             }
             return true;
           });
@@ -655,19 +697,22 @@ export default function MessageriePage() {
       setGroupChats((prevChats) => {
         return prevChats.map((chat) => {
           if (chat.chat_id === roomId) {
+            console.log(
+              `DELETE MESSAGE INDEPENDENT - Updating chat ${chat.chat_id}`
+            );
             const filteredMessages = chat.messages.filter((msg) => {
-              // Compare timestamps with some tolerance
               if (msg.sentAt && messageTimestamp) {
                 const msgTime = new Date(msg.sentAt).getTime();
                 const deleteTime = new Date(messageTimestamp).getTime();
                 const timeDiff = Math.abs(msgTime - deleteTime);
-
-                // If the message is within 1 second of the target timestamp, remove it
-                return timeDiff > 1000;
+                return timeDiff > 500; // More aggressive tolerance
               }
               return true;
             });
 
+            console.log(
+              `DELETE MESSAGE INDEPENDENT - Filtered from ${chat.messages.length} to ${filteredMessages.length}`
+            );
             return {
               ...chat,
               messages: filteredMessages,
@@ -676,26 +721,18 @@ export default function MessageriePage() {
           return chat;
         });
       });
-    });
-
-    return () => {
-      socket.off("message");
-      socket.off("user_joined");
-      socket.off("local-system-message");
-      socket.off("new_chat");
-      socket.off("status_update");
-      socket.off("delete_validation_form");
-      socket.off("delete_message"); // Add this
     };
-  }, [
-    room,
-    username,
-    idUser,
-    incrementChatNotification,
-    markChatAsRead,
-    groupChats,
-    donId,
-  ]);
+
+    // Register the handler - this is critical!
+    console.log("DELETE MESSAGE INDEPENDENT - Registering handler");
+    socket.on("delete_message", handleDeleteMessage);
+
+    // Clean up function
+    return () => {
+      console.log("DELETE MESSAGE INDEPENDENT - Removing handler");
+      socket.off("delete_message", handleDeleteMessage);
+    };
+  }, [room]); // Only depend on room to avoid re-registering too often
 
   useEffect(() => {
     if (showValidationForm) {

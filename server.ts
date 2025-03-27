@@ -36,6 +36,31 @@ app.prepare().then(() => {
         console.log("Invalid message data:", data);
       }
     });
+    // Update socket.on("delete_message") handler in server.ts
+
+    socket.on("delete_message", (data) => {
+      console.log("Delete message request received:", data);
+
+      if (data?.room && data?.timestamp) {
+        const roomId =
+          typeof data.room === "string" ? data.room : data.room.toString();
+        console.log(
+          `Broadcasting message deletion for timestamp ${data.timestamp} to room ${roomId}`
+        );
+
+        // Broadcast to EVERYONE in the room, including the sender
+        io.to(roomId).emit("delete_message", data);
+
+        io.to(roomId).emit("delete_message", data);
+        // Debug: broadcast to everyone connected
+        io.emit("delete_message", { ...data, debug: true });
+        console.log(
+          `DEBUG: Broadcasting delete_message to all connected clients`
+        );
+      } else {
+        console.log("Invalid delete_message data:", data);
+      }
+    });
 
     socket.on("status_update", (data) => {
       console.log("Status update received:", data);
@@ -96,25 +121,6 @@ app.prepare().then(() => {
         );
       } else {
         console.log("Invalid delete_validation_form data:", data);
-      }
-    });
-
-    // Update socket.on("delete_message") handler in server.ts
-
-    socket.on("delete_message", (data) => {
-      console.log("Delete message request received:", data);
-
-      if (data?.room && data?.timestamp) {
-        const roomId =
-          typeof data.room === "string" ? data.room : data.room.toString();
-        console.log(
-          `Broadcasting message deletion for timestamp ${data.timestamp} to room ${roomId}`
-        );
-
-        // Broadcast to EVERYONE in the room, including the sender
-        io.to(roomId).emit("delete_message", data);
-      } else {
-        console.log("Invalid delete_message data:", data);
       }
     });
 

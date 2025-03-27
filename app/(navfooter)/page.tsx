@@ -35,7 +35,7 @@ export default function HomePage() {
     <div>
       <section className="hero bg-cover bg-center text-white h-[600px] w-full flex flex-col items-center justify-center">
         <div className="text-2xl font-semibold text-justify w-full px-10">
-          <h1 className="max-w-lg mx-auto text-2xl/[40px] md:text-4xl font-futuraPTBold text-center md:text-right md:absolute md:top-1/2 md:right-10 md:transform md:-translate-y-1/2">
+          <h1 className="max-w-lg mx-auto text-2xl/[40px] md:text-5xl font-futuraPTBold text-center md:text-right md:absolute md:top-1/3 md:right-16 md:transform">
             La nouvelle initiative contre le gaspillage alimentaire &agrave;
             Rueil-Malmaison
           </h1>
@@ -43,15 +43,15 @@ export default function HomePage() {
 
         <div className="flex flex-col md:flex-row items-center justify-center w-full px-10 mt-10">
           <div className="w-full text-xs md:text-md md:w-1/2 flex justify-center">
-            <div className="bg-white text-black rounded-lg p-5 w-80 font-futuraPTBold">
+            <div className="bg-white text-black rounded-lg p-5 w-80 font-futuraPTBold flex flex-col items-center">
               <p className="text-sm md:text-xl font-bold mb-4">
                 Vous aussi, agissez contre le gaspillage
               </p>
               <div className="flex gap-4 font-futuraPTBold">
-                <button className="bg-red-700 text-white px-4 py-2 rounded hover:bg-gray-300">
+                <button className="bg-[#B0C482] text-white px-4 py-2 rounded hover:bg-gray-300">
                   En savoir plus
                 </button>
-                <button className="bg-red-700 text-white px-4 py-2 rounded hover:bg-gray-300">
+                <button className="bg-[#B0C482] text-white px-4 py-2 rounded hover:bg-gray-300">
                   Commencer
                 </button>
               </div>
@@ -72,9 +72,6 @@ export default function HomePage() {
             <div className="h-5 w-px bg-gray-300 mx-1 md:mx-3"></div>
             <i className="fas fa-search text-black text-lg"></i>
           </div>
-          <p className="ml-4 mt-2 text-xs md:text-lg">
-            Cherchez des annonces selon votre localisation
-          </p>
         </div>
       </section>
 
