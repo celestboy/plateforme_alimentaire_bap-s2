@@ -71,7 +71,7 @@ const Navbar = () => {
           <Image
             width={512}
             height={512}
-            src="/images/logo-sharefood-full-black.png"
+            src="/images/logo-crop.webp"
             alt="Logo Gaspillage Alimentaire"
           />
         </div>
