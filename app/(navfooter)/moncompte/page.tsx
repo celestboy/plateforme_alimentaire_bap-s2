@@ -180,6 +180,49 @@ export default function MonCompte() {
           Mon compte
         </h2>
 
+        {/* User Info Display */}
+        <div className="w-full gap-4 px-4 my-10 flex justify-center text-xs md:text-xl">
+          {isLoading ? (
+            <p className="text-gray-600">Chargement des informations...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : userInfo ? (
+            <>
+              <div className="flex gap-4">
+                <div className="flex flex-col items-center justify-center gap-2 font-Montserrat p-8 bg-white rounded-xl shadow-xl">
+                  <div className="text-center my-4">
+                    <h3 className="uppercase font-Montserrat font-bold text-2xl">
+                      {userInfo.username}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail width={20} height={20} />
+                    <label className="font-medium">Email :</label>
+                    <p>{userInfo.email}</p>
+                  </div>
+                  <div className="flex-col md:flex-row flex items-center gap-2">
+                    <Calendar1 width={20} height={20} />
+                    <label className="font-medium">
+                      Inscrit sur FoodShare depuis le :
+                    </label>
+                    <p>
+                      {new Date(userInfo.createdAt).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <button type="button">Modifier ce profil</button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p className="text-gray-600">
+              Aucune information utilisateur trouvée.
+            </p>
+          )}
+        </div>
+
         <section className="relative w-screen font-futuraPTBold md:flex justify-center m-6 md:p-12">
           <article className="relative text-xl md:w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
             <h3 className="text-left absolute top-10 ml-12 md:ml-8 font-futuraPTBook text-[5rem]">
@@ -329,97 +372,54 @@ export default function MonCompte() {
           </div>
         </section>
 
-        {/* User Info Display */}
-        <div className="w-full gap-4 px-4 my-10">
-          {isLoading ? (
-            <p className="text-gray-600">Chargement des informations...</p>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : userInfo ? (
-            <>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center justify-center gap-2 font-Montserrat p-4 bg-white rounded-xl shadow-xl">
-                  <div className="text-center my-4">
-                    <h3 className="uppercase font-Montserrat font-bold text-2xl">
-                      {userInfo.username}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail width={20} height={20} />
-                    <label className="font-medium">Email :</label>
-                    <p>{userInfo.email}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar1 width={20} height={20} />
-                    <label className="font-medium">
-                      Inscrit sur FoodShare depuis le :
-                    </label>
-                    <p>
-                      {new Date(userInfo.createdAt).toLocaleDateString("fr-FR")}
-                    </p>
-                  </div>
-
-                  <div>
-                    <button type="button">Modifier ce profil</button>
+        <div className="md:flex items-center justify-center gap-4 font-Montserrat my-10">
+          <div className="bg-white text-red-600 border-2 border-red-600 px-6 py-2 rounded-full flex items-center gap-2 transition-colors hover:bg-gray-100">
+            <LogOut className="" />
+            <button type="button" onClick={logOutFunction} className="">
+              Se déconnecter
+            </button>
+          </div>
+          <div className="">
+            {isPopupOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                    Supprimer le compte ?
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Cette action est irréversible. Êtes-vous sûr de vouloir
+                    continuer ?
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => setIsPopupOpen(false)}
+                      className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg transition-colors hover:bg-gray-500 hover:text-white"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={() => {
+                        deleteAccountFunction();
+                        setIsPopupOpen(false);
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg transition-colors hover:bg-red-800"
+                    >
+                      Supprimer
+                    </button>
                   </div>
                 </div>
               </div>
+            )}
 
-              <div className="md:flex items-center justify-center gap-4 font-Montserrat my-10">
-                <div className="bg-white text-red-600 border-2 border-red-600 px-6 py-2 rounded-full flex items-center gap-2 transition-colors hover:bg-gray-100">
-                  <LogOut className="" />
-                  <button type="button" onClick={logOutFunction} className="">
-                    Se déconnecter
-                  </button>
-                </div>
-                <div className="">
-                  {isPopupOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                      <div className="bg-white p-6 rounded-xl shadow-lg w-96 text-center">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">
-                          Supprimer le compte ?
-                        </h3>
-                        <p className="text-gray-600 mb-6">
-                          Cette action est irréversible. Êtes-vous sûr de
-                          vouloir continuer ?
-                        </p>
-                        <div className="flex justify-center gap-4">
-                          <button
-                            onClick={() => setIsPopupOpen(false)}
-                            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg transition-colors hover:bg-gray-500 hover:text-white"
-                          >
-                            Annuler
-                          </button>
-                          <button
-                            onClick={() => {
-                              deleteAccountFunction();
-                              setIsPopupOpen(false);
-                            }}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg transition-colors hover:bg-red-800"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setIsPopupOpen(true)}
-                    className="w-full my-8 md:my-0 flex items-center gap-2 bg-red-600 px-6 py-2 rounded-full text-white transition-colors hover:bg-red-800"
-                  >
-                    <Trash />
-                    Supprimer ce compte
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="text-gray-600">
-              Aucune information utilisateur trouvée.
-            </p>
-          )}
+            <button
+              type="button"
+              onClick={() => setIsPopupOpen(true)}
+              className="w-full my-8 md:my-0 flex items-center gap-2 bg-red-600 px-6 py-2 rounded-full text-white transition-colors hover:bg-red-800"
+            >
+              <Trash />
+              Supprimer ce compte
+            </button>
+          </div>
         </div>
       </div>
     </>
