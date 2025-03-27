@@ -142,6 +142,45 @@ class MessagesController {
       throw error;
     }
   }
+
+  async deleteValidationMessages(chatId: number) {
+    try {
+      // Find all messages in this chat
+      const messages = await prisma.messages.findMany({
+        where: {
+          chat_id: chatId,
+        },
+      });
+
+      let deletedCount = 0;
+
+      // Process each message to find and delete validation forms
+      for (const message of messages) {
+        try {
+          // Check if the message content starts with {"lieu":
+          if (message.content.startsWith('{"lieu":')) {
+            // This is likely a validation form message - delete it
+            await prisma.messages.delete({
+              where: { message_id: message.message_id },
+            });
+            deletedCount++;
+            console.log(`Deleted validation message ID: ${message.message_id}`);
+          }
+        } catch (e) {
+          console.error("Error checking message content:", e);
+          continue;
+        }
+      }
+
+      console.log(
+        `Deleted ${deletedCount} validation messages in chat ${chatId}`
+      );
+      return deletedCount;
+    } catch (error) {
+      console.error("Error deleting validation messages:", error);
+      throw error;
+    }
+  }
 }
 
 const MessagesControllerInstance = new MessagesController();

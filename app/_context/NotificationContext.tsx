@@ -100,25 +100,31 @@ export const NotificationProvider = ({
     }
   }, [chatNotifications]);
 
-  const markChatAsRead = async (chatId: number) => {
-    if (!authUserId) return;
+  const markChatAsRead = useCallback(
+    async (chatId: number) => {
+      if (!authUserId) return;
 
-    // Update UI immediately for responsiveness
-    setChatNotifications((prev) => {
-      const updated = { ...prev };
-      delete updated[chatId];
-      return updated;
-    });
+      // Add a delay of 500ms before marking as read
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-    // Then update database in background
-    try {
-      await markMessagesAsRead(chatId, authUserId);
-    } catch (error) {
-      console.error("Error marking messages as read:", error);
-      // On error, refresh notifications to stay in sync
-      refreshNotifications();
-    }
-  };
+      // Update UI immediately for responsiveness
+      setChatNotifications((prev) => {
+        const updated = { ...prev };
+        delete updated[chatId];
+        return updated;
+      });
+
+      // Then update database in background
+      try {
+        await markMessagesAsRead(chatId, authUserId);
+      } catch (error) {
+        console.error("Error marking messages as read:", error);
+        // On error, refresh notifications to stay in sync
+        refreshNotifications();
+      }
+    },
+    [authUserId, refreshNotifications]
+  );
 
   const incrementChatNotification = useCallback((chatId: number) => {
     if (!chatId || isNaN(chatId)) {
