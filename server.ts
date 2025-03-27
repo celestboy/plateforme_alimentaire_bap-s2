@@ -44,10 +44,12 @@ app.prepare().then(() => {
         // The room should be a number or string that represents the chat ID
         const roomId =
           typeof data.room === "string" ? data.room : data.room.toString();
-        console.log(`Emitting status update to room ${roomId} only`);
+        console.log(
+          `Emitting status update ${data.status}to room ${roomId} only`
+        );
 
         // This will only send to the specific chat room
-        socket.to(roomId).emit("status_update", data);
+        io.to(data.room).emit("status_update", data);
       } else {
         console.log("Invalid status update data:", data);
       }
@@ -56,17 +58,7 @@ app.prepare().then(() => {
     socket.on("local-system-message", (data) => {
       console.log("Local system message received:", data);
 
-      if (data?.room) {
-        const roomId =
-          typeof data.room === "string" ? data.room : data.room.toString();
-        console.log(`Emitting system message to room ${roomId} only`);
-
-        // Send to the specific room, not to all rooms
-        socket.to(roomId).emit("local-system-message", data);
-      } else {
-        // Fall back to previous behavior if no room specified
-        socket.emit("local-system-message", data);
-      }
+      socket.emit("local-system-message", data);
     });
 
     socket.on("new_chat_created", (data) => {
@@ -77,6 +69,33 @@ app.prepare().then(() => {
         // Using a special room name format for user-specific notifications
         socket.to(`user_${data.donneur_id}`).emit("new_chat", data);
         socket.to(`user_${data.receveur_id}`).emit("new_chat", data);
+      }
+    });
+
+    // Update this socket.on handler in your server.ts file:
+
+    socket.on("delete_validation_form", (data) => {
+      console.log("Delete validation form request received:", data);
+
+      if (data?.room) {
+        const roomId =
+          typeof data.room === "string" ? data.room : data.room.toString();
+        console.log(
+          `Broadcasting delete_validation_form event to room ${roomId}`
+        );
+
+        // Emit to the room first
+        io.to(roomId).emit("delete_validation_form", data);
+
+        // Also emit globally as a fallback
+        io.emit("delete_validation_form", data);
+
+        // Log confirmation
+        console.log(
+          `Emitted delete_validation_form to room ${roomId} and globally`
+        );
+      } else {
+        console.log("Invalid delete_validation_form data:", data);
       }
     });
 
