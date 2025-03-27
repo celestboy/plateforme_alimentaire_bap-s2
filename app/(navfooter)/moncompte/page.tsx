@@ -180,21 +180,21 @@ export default function MonCompte() {
           Mon compte
         </h2>
 
-        <section className="relative w-screen font-futuraPTBold flex justify-center m-6 p-12">
-          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
-            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+        <section className="relative w-screen font-futuraPTBold md:flex justify-center m-6 md:p-12">
+          <article className="relative text-xl md:w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left absolute top-10 ml-12 md:ml-8 font-futuraPTBook text-[5rem]">
               {isLoading ? "..." : co2Stats.totalWeightKg}
             </h3>
             <p className="absolute bottom-4 right-6">Kg sauvés</p>
           </article>
-          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
-            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+          <article className="relative text-xl md:w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left absolute top-10 ml-12 md:ml-8 font-futuraPTBook text-[5rem]">
               {isLoading ? "..." : co2Stats.totalCO2Saved}
             </h3>
             <p className="absolute bottom-4 right-6">Kg CO2 équivalent</p>
           </article>
-          <article className="relative text-xl w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
-            <h3 className="text-left ml-8 mt-20 font-futuraPTBook text-[5rem]">
+          <article className="relative text-xl md:w-1/4 h-56 m-12 rounded-3xl bg-[#F5F5F5]">
+            <h3 className="text-left absolute top-10 ml-12 md:ml-8 font-futuraPTBook text-[5rem]">
               {isLoading ? "..." : co2Stats.totalDonations}
             </h3>
             <p className="absolute bottom-4 right-6">Nombre de dons</p>
@@ -365,7 +365,7 @@ export default function MonCompte() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center gap-4 font-Montserrat my-10">
+              <div className="md:flex items-center justify-center gap-4 font-Montserrat my-10">
                 <div className="bg-white text-red-600 border-2 border-red-600 px-6 py-2 rounded-full flex items-center gap-2 transition-colors hover:bg-gray-100">
                   <LogOut className="" />
                   <button type="button" onClick={logOutFunction} className="">
@@ -407,7 +407,7 @@ export default function MonCompte() {
                   <button
                     type="button"
                     onClick={() => setIsPopupOpen(true)}
-                    className="flex items-center gap-2 bg-red-600 px-6 py-2 rounded-full text-white transition-colors hover:bg-red-800"
+                    className="w-full my-8 md:my-0 flex items-center gap-2 bg-red-600 px-6 py-2 rounded-full text-white transition-colors hover:bg-red-800"
                   >
                     <Trash />
                     Supprimer ce compte
