@@ -36,7 +36,7 @@ export default function HomePage() {
       <section className="hero bg-cover bg-center text-white h-[600px] w-full flex flex-col items-center justify-center">
         <div className="text-2xl font-semibold text-justify w-full px-10">
           <h1 className="max-w-lg mx-auto text-2xl/[40px] md:text-4xl font-futuraPTBold text-center md:text-right md:absolute md:top-1/2 md:right-10 md:transform md:-translate-y-1/2">
-            La nouvelle initiative contre le gaspillage alimentaire à
+            La nouvelle initiative contre le gaspillage alimentaire &agrave;
             Rueil-Malmaison
           </h1>
         </div>
@@ -137,45 +137,48 @@ export default function HomePage() {
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
                 Repertoriez rapidement les articles alimentaires en surplus de
-                votre garde-manger ou de votre refrigerateur, pour que les
-                autres membres de votre communaute puissent voir ce qui est
-                disponible.
+                votre garde-manger ou de votre r&eacute;frigerateur, pour que
+                les autres membres de votre communaut&eacute; puissent voir ce
+                qui est disponible.
               </p>
             </article>
           </div>
           <div className="aspect-square">
             <article className="flex flex-col justify-center items-center h-full p-4 md:p-6 lg:p-8 text-center border-[#B0C482] border-2 rounded-[30px] md:rounded-[50px] box-border">
               <p className="text-[#B0C482] text-lg sm:text-xl lg:text-xl 2xl:text-2xl mb-2 font-futuraPTBold">
-                Disponibilite basee sur la localisation
+                Disponibilit&eacute; bas&eacute;e sur la localisation
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
-                Trouvez des articles alimentaires pres de chez vous grace a la
-                recherche et aux filtres bases sur la localisation, ce qui rend
-                l&apos;acces aux ressources alimentaires locales plus pratique.
+                Trouvez des articles alimentaires pr&egrave;s de chez vous
+                gr&acirc;ce &agrave; la recherche et aux filtres bas&eacute;s
+                sur la localisation, ce qui rend l&apos;acc&egrave;s aux
+                ressources alimentaires locales plus pratique.
               </p>
             </article>
           </div>
           <div className="aspect-square">
             <article className="flex flex-col justify-center items-center h-full p-4 md:p-6 lg:p-8 text-center border-[#B0C482] border-2 rounded-[30px] md:rounded-[50px] box-border">
               <p className="text-[#B0C482] text-lg sm:text-xl lg:text-xl 2xl:text-2xl mb-2 font-futuraPTBold">
-                Profils de donateurs verifies
+                Profils de donateurs v&eacute;rifi&eacute;s
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
-                Consultez des profils verifies des personnes offrant des
-                aliments, vous assurant ainsi de savoir a qui vous vous adressez
-                pour des echanges surs et fiables.
+                Consultez des profils v&eacute;rifi&eacute;s des personnes
+                offrant des aliments, vous assurant ainsi de savoir &agrave; qui
+                vous vous adressez pour des &eacute;changes s&ucirc;rs et
+                fiables.
               </p>
             </article>
           </div>
           <div className="aspect-square">
             <article className="flex flex-col justify-center items-center h-full p-4 md:p-6 lg:p-8 text-center border-[#B0C482] border-2 rounded-[30px] md:rounded-[50px] box-border">
               <p className="text-[#B0C482] text-lg sm:text-xl lg:text-xl 2xl:text-2xl mb-2 font-futuraPTBold">
-                Mises a jour a temps reel
+                Mises &agrave; jour &agrave; temps r&eacute;el
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
                 Recevez des notifications sur les nouveaux articles alimentaires
-                disponibles et ceux qui approchent de leur date de peremption,
-                pour agir rapidement et eviter le gaspillage.
+                disponibles et ceux qui approchent de leur date de
+                p&eacute;remption, pour agir rapidement et &eacute;viter le
+                gaspillage.
               </p>
             </article>
           </div>
@@ -186,8 +189,8 @@ export default function HomePage() {
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
                 Engagez-vous avec d&apos;autres membres, partagez des conseils
-                et rejoignez des initiatives communautiares pour reduire le
-                gaspillage alimentaire dans votre quartier.
+                et rejoignez des initiatives communautiares pour r&eacute;duire
+                le gaspillage alimentaire dans votre quartier.
               </p>
             </article>
           </div>
@@ -197,9 +200,10 @@ export default function HomePage() {
                 Tableau de bord
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
-                Suivez la quantite de gaspillage alimentaire evitee et voyez
-                votre contribution personnelle a la reduction du gaspillage dans
-                la communaute.
+                Suivez la quantit&eacute; de gaspillage alimentaire
+                &eacute;vit&eacute;e et voyez votre contribution personnelle
+                &agrave; la r&eacute;duction du gaspillage dans la
+                communaut&eacute;.
               </p>
             </article>
           </div>
@@ -208,7 +212,7 @@ export default function HomePage() {
 
       <section>
         <h3 className="text-2xl md:text-4xl text-center m-8 font-futuraPTBold">
-          Localisation en temps réel,{" "}
+          Localisation en temps r&eacute;el,{" "}
           <span className="text-[#084784]">avec de vraies personnes</span>
         </h3>
 
@@ -224,12 +228,13 @@ export default function HomePage() {
           <div className="flex flex-col justify-evenly text-lg font-futuraPTBold">
             <article className="m-6">
               <p className="text-[#084784]">
-                Repertorier facilement les aliments excedentaires
+                Repertorier facilement les aliments exc&eacute;dentaires
               </p>
               <p>
-                Ajoutez rapidement des articles alimentaires excedentaires de
-                votre cuisine, les rendant disponibles pour que les autres les
-                trouvent et contribuent a reduire le gaspillage.
+                Ajoutez rapidement des articles alimentaires
+                exc&eacute;dentaires de votre cuisine, les rendant disponibles
+                pour que les autres les trouvent et contribuent &agrave;
+                r&eacute;duire le gaspillage.
               </p>
             </article>
             <article className="m-6">
@@ -237,16 +242,18 @@ export default function HomePage() {
                 Partager des aliments en quelques minutes
               </p>
               <p>
-                Repertoriez et partagez des aliments excedentaires avec la
-                communaute en quelques clics, contribuant instantanement a la
-                reduction du gaspillage.
+                Repertoriez et partagez des aliments exc&eacute;dentaires avec
+                la communaut&eacute; en quelques clics, contribuant
+                instantan&eacute;ment &agrave; la r&eacute;duction du
+                gaspillage.
               </p>
             </article>
             <article className="m-6">
               <p className="text-[#084784]">Suivre votre impact</p>
               <p>
-                Voyez combien de gaspillage alimentaire vous avez contribue a
-                prevenir, creant un impact positif dans votre communaute et pour
+                Voyez combien de gaspillage alimentaire vous avez
+                contribu&eacute; &agrave; pr&eacute;venir, cr&eacute;ant un
+                impact positif dans votre communaut&eacute; et pour
                 l&apos;environnement.
               </p>
             </article>
@@ -265,7 +272,7 @@ export default function HomePage() {
         </article>
         <article className="m-8 p-12 md:w-full text-center rounded-xl bg-slate-100">
           <h3 className="mb-6 font-futuraPTBold text-xl md:text-3xl">
-            CO2 évité
+            CO2 &eacute;vit&eacute;
           </h3>
           <p className="font-futuraPTMedium text-xl md:text-3xl">
             <span>{co2Stats.totalCO2Saved} </span>Kg

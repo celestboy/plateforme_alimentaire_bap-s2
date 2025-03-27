@@ -17,10 +17,23 @@ class MessagesController {
   }
 
   async deleteMessage(id_message: number) {
-    const message = await prisma.messages.delete({
-      where: { message_id: id_message },
-    });
-    return message;
+    try {
+      const message = await prisma.messages.delete({
+        where: { message_id: id_message },
+      });
+      return {
+        success: true,
+        message: "Message deleted successfully",
+        data: message,
+      };
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      return {
+        success: true,
+        message: "Message deleted successfully",
+        data: null,
+      };
+    }
   }
 
   async deleteRDV(id_don: number) {
@@ -139,6 +152,75 @@ class MessagesController {
       return systemMessage;
     } catch (error) {
       console.error("Error storing system message:", error);
+      throw error;
+    }
+  }
+
+  async deleteValidationMessages(chatId: number) {
+    try {
+      // Find all messages in this chat
+      const messages = await prisma.messages.findMany({
+        where: {
+          chat_id: chatId,
+        },
+      });
+
+      let deletedCount = 0;
+
+      // Process each message to find and delete validation forms
+      for (const message of messages) {
+        try {
+          // Check if the message content starts with {"lieu":
+          if (message.content.startsWith('{"lieu":')) {
+            // This is likely a validation form message - delete it
+            await prisma.messages.delete({
+              where: { message_id: message.message_id },
+            });
+            deletedCount++;
+            console.log(`Deleted validation message ID: ${message.message_id}`);
+          }
+        } catch (e) {
+          console.error("Error checking message content:", e);
+          continue;
+        }
+      }
+
+      console.log(
+        `Deleted ${deletedCount} validation messages in chat ${chatId}`
+      );
+      return deletedCount;
+    } catch (error) {
+      console.error("Error deleting validation messages:", error);
+      throw error;
+    }
+  }
+
+  // Add this method to MessagesController
+
+  async deleteMessageByTimestamp(
+    chatId: number,
+    timestamp: string,
+    authorId: number
+  ) {
+    try {
+      const sentAt = new Date(timestamp);
+
+      // Find and delete the message that matches the chat, timestamp, and author
+      const deletedMessage = await prisma.messages.deleteMany({
+        where: {
+          chat_id: chatId,
+          author_id: authorId,
+          sentAt: {
+            // Add a small tolerance for timestamp comparison (±1 second)
+            gte: new Date(sentAt.getTime() - 500),
+            lte: new Date(sentAt.getTime() + 500),
+          },
+        },
+      });
+
+      return deletedMessage.count > 0;
+    } catch (error) {
+      console.error("Error deleting message by timestamp:", error);
       throw error;
     }
   }

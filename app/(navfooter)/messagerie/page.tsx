@@ -44,6 +44,7 @@ interface Chat {
     content: string;
     author_id: number;
     isSystemMessage: boolean;
+    message_id: number;
   }[];
   unreadCount?: number;
 }
@@ -68,6 +69,8 @@ export default function MessageriePage() {
       message: string;
       sentAt: Date;
       isSystemMessage?: boolean;
+      senderID: number;
+      messageId?: number;
     }[]
   >([]);
   const [showValidationForm, setShowValidationForm] = useState(false);
@@ -81,11 +84,29 @@ export default function MessageriePage() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
       block: "nearest",
       inline: "start",
     });
   };
+
+  // Add this utility file if it doesn't exist already
+
+  /**
+   * Generates a unique temporary ID for client-side use before server assignment
+   * Format: temp_[timestamp]_[random]
+   */
+  const generateTempId = (): number => {
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 10000);
+    return timestamp + random;
+  };
+
+  /**
+   * Checks if an ID is a temporary client-generated ID
+   *   const isTempId = (id: string | number): boolean => {
+    return typeof id === "string" && id.startsWith("temp_");
+  };
+   */
 
   useEffect(() => {
     if (!idUser) return;
@@ -171,6 +192,7 @@ export default function MessageriePage() {
             messages: chat.messages.map((msg) => ({
               ...msg,
               sentAt: msg.sentAt, // We'll format this when displaying
+              message_id: msg.message_id, // Ensure message_id is always present
             })),
           }));
           setGroupChats(formattedChats);
@@ -228,6 +250,7 @@ export default function MessageriePage() {
                 ? result.data.messages.map((msg) => ({
                     ...msg,
                     sentAt: new Date(msg.sentAt || new Date()),
+                    message_id: msg.message_id,
                   }))
                 : [],
             };
@@ -260,10 +283,15 @@ export default function MessageriePage() {
     socket.off("local-system-message");
     socket.off("new_chat");
     socket.off("status_update");
+    socket.off("delete_validation_form"); // Add this line
+    socket.off("delete_message"); // Add this line
+
+    // Replace your socket.on("message", ...) handler with this improved version:
 
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
 
+      // Ensure we have consistent room ID and sender ID formats
       const roomId =
         typeof data.room === "string" ? parseInt(data.room) : data.room;
       const senderID =
@@ -271,47 +299,82 @@ export default function MessageriePage() {
         data.senderId ||
         (data.sender === username ? idUser : null);
 
-      console.log({
+      console.log(
+        "Current room:",
+        room,
+        "Message room:",
         roomId,
+        "Are they equal?",
+        roomId === room
+      );
+      console.log(
+        "Current user:",
+        idUser,
+        "Sender:",
         senderID,
-        currentRoom: room,
-        currentUser: idUser,
-      });
+        "Is own message?",
+        senderID === idUser
+      );
 
+      // IMPORTANT: Check if this message is for the room we're currently viewing
+      // Only mark as read and don't increment notifications if we're in this room
       if (roomId === room) {
+        console.log("Message is for the current room - no notification needed");
+
+        // If we're actively viewing this chat, mark it as read immediately
+        // But only if it's not our own message (since our messages are always "read" by us)
+        if (senderID !== idUser) {
+          console.log(
+            "Message from someone else in current room - marking as read"
+          );
+          markChatAsRead(roomId);
+        }
+
+        // Update messages in current view
         setMessages((prev) => {
+          // Check if this message already exists in our list
+          const messageTime = new Date(data.sentAt || new Date()).getTime();
           if (
             prev.some(
               (msg) =>
-                msg.sentAt.getTime() ===
-                  new Date(data.sentAt || new Date()).getTime() &&
+                msg.sentAt?.getTime() === messageTime &&
                 msg.message === data.message &&
                 msg.sender === data.sender
             )
           ) {
-            return prev;
+            return prev; // Skip duplicate messages
           }
 
+          // Add new message to our list
           return [
             ...prev,
             {
-              ...data,
-              senderID: senderID,
+              sender: data.sender,
+              message: data.message,
               sentAt: new Date(data.sentAt || new Date()),
+              senderID: senderID,
+              isSystemMessage: !!data.isSystemMessage,
+              messageId: data.messageId,
             },
           ];
         });
-
+      } else {
+        // Message is for another room - increment notification ONLY if it's not from us
         if (senderID !== idUser) {
-          markChatAsRead(roomId);
-          console.log("Marking chat as read:", roomId);
+          console.log("Message for another room - incrementing notification");
+          console.log(
+            "Incrementing notification for room:",
+            roomId,
+            "sender:",
+            senderID,
+            "current user:",
+            idUser
+          );
+          incrementChatNotification(roomId);
         }
-      } else if (senderID !== idUser) {
-        // If message is for another room and not from the current user, increment notification
-        console.log("Incrementing chat notification for room", roomId);
-        incrementChatNotification(roomId);
       }
 
+      // Always update the groupChats state regardless of which room is active
       setGroupChats((prevChats) => {
         return prevChats.map((chat) => {
           if (chat.chat_id === roomId) {
@@ -320,8 +383,10 @@ export default function MessageriePage() {
               content: data.message,
               author_id: senderID,
               isSystemMessage: !!data.isSystemMessage,
+              message_id: data.messageId,
             };
 
+            // Check if this message already exists in chat messages
             const messageExists = chat.messages.some(
               (msg) =>
                 new Date(msg.sentAt).getTime() ===
@@ -331,7 +396,7 @@ export default function MessageriePage() {
             );
 
             if (messageExists) {
-              return chat;
+              return chat; // Don't add duplicate messages
             }
 
             return {
@@ -370,7 +435,13 @@ export default function MessageriePage() {
         // Also mark as read if we're viewing this chat
         markChatAsRead(updateRoomId);
       } else {
-        // If it's for another room, increment notification count
+        console.log(
+          "Status update for another room - incrementing notification",
+          updateRoomId,
+          room,
+          donId,
+          data.status
+        );
         incrementChatNotification(updateRoomId);
       }
     });
@@ -379,49 +450,75 @@ export default function MessageriePage() {
       console.log("Notification de connexion reçue:", message);
       setMessages((prev) => [
         ...prev,
-        { sender: "system", message, sentAt: new Date() },
+        { sender: "system", message, sentAt: new Date(), senderID: 0 },
       ]);
     });
 
-    socket.on("local-system-message", (data) => {
-      console.log("Local system message:", data);
+    // Replace your socket.on("local-system-message", ...) handler:
 
-      // Ensure room is a number
+    socket.on("local-system-message", (data) => {
+      console.log("Local system message received:", data);
+
+      // Ensure we have consistent room ID format
       const roomId =
         typeof data.room === "string" ? parseInt(data.room) : data.room;
 
-      // If system message is for current active chat and we're viewing this chat, mark as read
+      console.log(`System message for room ${roomId}, current room: ${room}`);
+
+      // If system message is for current active chat
       if (roomId === room) {
-        console.log("System message received in active room - marking as read");
+        console.log("System message for current room - no notification needed");
+
+        // Add message to the current view
+        setMessages((prev) => {
+          // Check for duplicates
+          const msgTime = new Date(data.sentAt || new Date()).getTime();
+          if (
+            prev.some(
+              (msg) =>
+                msg.sentAt?.getTime() === msgTime &&
+                msg.message === data.message &&
+                msg.isSystemMessage === true
+            )
+          ) {
+            return prev; // Don't add duplicate messages
+          }
+
+          return [
+            ...prev,
+            {
+              sender: "Système",
+              message: data.message,
+              sentAt: new Date(data.sentAt || new Date()),
+              isSystemMessage: true,
+              senderID: 0, // System messages don't have a real sender ID
+            },
+          ];
+        });
+
+        // If we're viewing this chat, mark it as read immediately
         markChatAsRead(roomId);
       } else {
-        // If it's for another room, increment notification count
+        // System message is for another room - increment notification
+        console.log(
+          `System message for another room: ${roomId} - incrementing notification`
+        );
         incrementChatNotification(roomId);
       }
-      if (roomId === room) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "Système",
-            message: data.message,
-            sentAt: new Date(data.sentAt || new Date()),
-            isSystemMessage: true,
-          },
-        ]);
-      }
 
-      // Also update the groupChats state to include this system message
+      // Always update the groupChats state
       setGroupChats((prevChats) => {
         return prevChats.map((chat) => {
           if (chat.chat_id === roomId) {
             const newMessage = {
               sentAt: new Date(data.sentAt || new Date()),
               content: data.message,
-              author_id: 0, // System message from system
+              author_id: 0, // System message doesn't have an author
               isSystemMessage: true,
+              message_id: data.messageId,
             };
 
-            // Check if this message already exists in the chat messages
+            // Check for duplicates
             const messageExists = chat.messages.some(
               (msg) =>
                 new Date(msg.sentAt).getTime() ===
@@ -431,10 +528,9 @@ export default function MessageriePage() {
             );
 
             if (messageExists) {
-              return chat; // Don't add duplicate messages
+              return chat; // Skip duplicate messages
             }
 
-            // Put the new message at the beginning of the messages array
             return {
               ...chat,
               messages: [newMessage, ...chat.messages],
@@ -476,12 +572,120 @@ export default function MessageriePage() {
       incrementChatNotification(chatData.chat_id);
     });
 
+    socket.on("delete_validation_form", (data) => {
+      console.log("Received delete_validation_form event:", data);
+
+      const roomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+
+      // Check if we need to update the current view
+      if (roomId === room) {
+        console.log("Removing validation form messages from current view");
+
+        // Filter out validation form messages from the messages array
+        setMessages((prev) => {
+          return prev.filter((msg) => {
+            if (
+              typeof msg.message === "string" &&
+              msg.message.startsWith('{"lieu":')
+            ) {
+              console.log("Found a validation form message to remove");
+              return false; // Remove this message
+            }
+            return true; // Keep all other messages
+          });
+        });
+      } else {
+        console.log("Not removing validation form messages from chat", roomId);
+      }
+
+      // Always update the groupChats state
+      setGroupChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat.chat_id === roomId) {
+            console.log(
+              `Filtering validation messages from chat ${chat.chat_id}`
+            );
+
+            const filteredMessages = chat.messages.filter((msg) => {
+              // If it's a validation form message, remove it
+              return !(
+                typeof msg.content === "string" &&
+                msg.content.startsWith('{"lieu":')
+              );
+            });
+
+            return {
+              ...chat,
+              messages: filteredMessages,
+            };
+          }
+          return chat;
+        });
+      });
+    });
+    // Update the delete_message socket handler in page.tsx
+
+    socket.on("delete_message", (data) => {
+      console.log("Message deletion event received:", data);
+
+      const roomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+      const messageTimestamp = data.timestamp;
+
+      // If this is for the current room, update the messages array
+      if (roomId === room) {
+        setMessages((prev) => {
+          return prev.filter((msg) => {
+            // Compare timestamps with some tolerance (±1 second)
+            if (msg.sentAt && messageTimestamp) {
+              const msgTime = new Date(msg.sentAt).getTime();
+              const deleteTime = new Date(messageTimestamp).getTime();
+              const timeDiff = Math.abs(msgTime - deleteTime);
+
+              // If the message is within 1 second of the target timestamp, remove it
+              return timeDiff > 500;
+            }
+            return true;
+          });
+        });
+      }
+
+      // Always update the groupChats state
+      setGroupChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat.chat_id === roomId) {
+            const filteredMessages = chat.messages.filter((msg) => {
+              // Compare timestamps with some tolerance
+              if (msg.sentAt && messageTimestamp) {
+                const msgTime = new Date(msg.sentAt).getTime();
+                const deleteTime = new Date(messageTimestamp).getTime();
+                const timeDiff = Math.abs(msgTime - deleteTime);
+
+                // If the message is within 1 second of the target timestamp, remove it
+                return timeDiff > 1000;
+              }
+              return true;
+            });
+
+            return {
+              ...chat,
+              messages: filteredMessages,
+            };
+          }
+          return chat;
+        });
+      });
+    });
+
     return () => {
       socket.off("message");
       socket.off("user_joined");
       socket.off("local-system-message");
       socket.off("new_chat");
       socket.off("status_update");
+      socket.off("delete_validation_form");
+      socket.off("delete_message"); // Add this
     };
   }, [
     room,
@@ -519,10 +723,12 @@ export default function MessageriePage() {
             chat.receveur.commerce_name ||
             "Utilisateur inconnu"
     );
+    // Mark chat as read BEFORE emitting the join-room event
     if (idUser) {
-      markChatAsRead(chat.chat_id);
-      console.log("Marking chat as read:", chat.chat_id);
+      console.log("Marking chat as read on join:", chat.chat_id);
+      await markChatAsRead(chat.chat_id);
     }
+
     socket.emit("join-room", { room: chat.chat_id, username, userId: idUser });
 
     try {
@@ -533,8 +739,9 @@ export default function MessageriePage() {
             sender: msg.sender,
             message: msg.message,
             sentAt: new Date(msg.sentAt),
-            senderID: msg.sender,
+            senderID: msg.author_id,
             isSystemMessage: msg.isSystemMessage || false,
+            messageId: msg.message_id,
           }))
         );
       }
@@ -579,6 +786,7 @@ export default function MessageriePage() {
         senderID: idUser,
       },
     ]);
+    const tempMessageId = generateTempId();
 
     setGroupChats((prevChats) => {
       return prevChats.map((chat) => {
@@ -588,6 +796,7 @@ export default function MessageriePage() {
             content: message,
             author_id: idUser,
             isSystemMessage: false,
+            message_id: tempMessageId, // Placeholder for now
           };
 
           return {
@@ -617,6 +826,12 @@ export default function MessageriePage() {
     }
   };
 
+  // Update handleMessageDelete in page.tsx:
+
+  const handleMessageDelete = (timestamp: string) => {
+    console.log("Message deleted with timestamp:", timestamp);
+    // The socket handler will take care of removing the message
+  };
   const handleSendValidation = (validationMessage: {
     lieu: string;
     heure: string;
@@ -655,6 +870,8 @@ export default function MessageriePage() {
       },
     ]);
 
+    const tempMessageId = generateTempId();
+
     setGroupChats((prevChats) => {
       return prevChats.map((chat) => {
         if (chat.chat_id === room) {
@@ -663,6 +880,7 @@ export default function MessageriePage() {
             content: validationStr,
             author_id: idUser,
             isSystemMessage: false,
+            message_id: tempMessageId,
           };
 
           return {
@@ -819,6 +1037,9 @@ export default function MessageriePage() {
                         donneur_id={donneurId ?? 0}
                         receveur_id={receveurId ?? 0}
                         message={msg.message}
+                        messageId={msg.messageId} // Add the message ID
+                        senderID={msg.senderID || 0} // Add the sender ID
+                        currentUserId={idUser || 0} // Pass the current user's ID
                         sentAt={
                           msg.sentAt instanceof Date
                             ? msg.sentAt.toISOString()
@@ -826,12 +1047,15 @@ export default function MessageriePage() {
                             ? msg.sentAt
                             : new Date().toISOString()
                         }
-                        isOwnMessage={msg.sender === username}
+                        isOwnMessage={
+                          msg.sender === username || msg.senderID === idUser
+                        }
                         donId={donId}
                         isSystemMessage={msg.isSystemMessage}
                         room={room}
                         isAccepted={status.isAccepted}
                         isRefused={status.isRefused}
+                        onMessageDelete={handleMessageDelete} // Add the message deletion handler
                       />
                     );
                   })}

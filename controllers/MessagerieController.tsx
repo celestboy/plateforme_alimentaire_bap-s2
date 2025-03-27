@@ -71,6 +71,7 @@ class ChatController {
             content: true,
             author_id: true,
             isSystemMessage: true,
+            message_id: true,
           },
           orderBy: {
             sentAt: "desc",
@@ -116,6 +117,7 @@ class ChatController {
             content: true,
             author_id: true,
             isSystemMessage: true,
+            message_id: true,
           },
           orderBy: {
             sentAt: "desc",
