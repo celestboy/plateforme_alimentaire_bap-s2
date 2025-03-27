@@ -40,16 +40,33 @@ app.prepare().then(() => {
     socket.on("status_update", (data) => {
       console.log("Status update received:", data);
       if (data?.room && data?.status) {
-        // Broadcast status update to everyone in the room
-        io.to(data.room).emit("status_update", data);
+        // Only emit to the specific room, not to all rooms the user is in
+        // The room should be a number or string that represents the chat ID
+        const roomId =
+          typeof data.room === "string" ? data.room : data.room.toString();
+        console.log(`Emitting status update to room ${roomId} only`);
+
+        // This will only send to the specific chat room
+        socket.to(roomId).emit("status_update", data);
+      } else {
+        console.log("Invalid status update data:", data);
       }
     });
 
     socket.on("local-system-message", (data) => {
       console.log("Local system message received:", data);
-      // This is a special case where we want to emit only to the sender
-      // (not using socket.to() which would emit to everyone else)
-      socket.emit("local-system-message", data);
+
+      if (data?.room) {
+        const roomId =
+          typeof data.room === "string" ? data.room : data.room.toString();
+        console.log(`Emitting system message to room ${roomId} only`);
+
+        // Send to the specific room, not to all rooms
+        socket.to(roomId).emit("local-system-message", data);
+      } else {
+        // Fall back to previous behavior if no room specified
+        socket.emit("local-system-message", data);
+      }
     });
 
     socket.on("new_chat_created", (data) => {

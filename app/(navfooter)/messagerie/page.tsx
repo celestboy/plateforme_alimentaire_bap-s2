@@ -12,6 +12,7 @@ import ValidationForm from "./_components/NewValidationForm";
 import { useNotifications } from "@/app/_context/NotificationContext";
 import getDonStatus from "@/actions/get-don-status";
 import getSingleChat from "@/actions/get-single-chat";
+import { DonStatus } from "@prisma/client";
 
 interface JwtPayload {
   userId: number;
@@ -258,6 +259,7 @@ export default function MessageriePage() {
     socket.off("user_joined");
     socket.off("local-system-message");
     socket.off("new_chat");
+    socket.off("status_update");
 
     socket.on("message", (data) => {
       console.log("Message reçu via socket:", data);
@@ -345,14 +347,31 @@ export default function MessageriePage() {
     socket.on("status_update", (data) => {
       console.log("Status update received:", data);
 
-      // Mark chat as read if we're in the active chat
-      // Mark chat as read ONLY if we're in the active chat AND it's about the current don
-      if (data.room === room && data.donId === donId) {
-        markChatAsRead(data.room);
-        console.log("Marking chat as read:", room, donId);
+      // Get the room and donId as numbers for reliable comparison
+      const updateRoomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+      const updateDonId =
+        typeof data.donId === "string" ? parseInt(data.donId) : data.donId;
+
+      console.log(
+        `Status update for room ${updateRoomId}, donId ${updateDonId}, status: ${data.status}`
+      );
+
+      // Update the local state immediately if it's the current chat
+      if (updateRoomId === room && updateDonId === donId) {
+        console.log("Updating current chat status to:", data.status);
+        // Update the status state based on the status value
+        setStatus({
+          isAccepted: data.status === DonStatus.ACCEPTED,
+          isPending: data.status === DonStatus.PENDING,
+          isRefused: data.status === DonStatus.REFUSED,
+        });
+
+        // Also mark as read if we're viewing this chat
+        markChatAsRead(updateRoomId);
       } else {
-        // Otherwise increment the notification count
-        incrementChatNotification(data.room);
+        // If it's for another room, increment notification count
+        incrementChatNotification(updateRoomId);
       }
     });
 
@@ -462,6 +481,7 @@ export default function MessageriePage() {
       socket.off("user_joined");
       socket.off("local-system-message");
       socket.off("new_chat");
+      socket.off("status_update");
     };
   }, [
     room,
@@ -829,7 +849,16 @@ export default function MessageriePage() {
                   onSendMessage={handleSendMessage}
                   onValidateDonation={() => setShowValidationForm(true)}
                   donId={donId}
-                  chatId={room}
+                  chatId={room || null}
+                  currentStatus={
+                    status.isAccepted
+                      ? DonStatus.ACCEPTED
+                      : status.isPending
+                      ? DonStatus.PENDING
+                      : status.isRefused
+                      ? DonStatus.REFUSED
+                      : null
+                  }
                 />
               </div>
             )}
