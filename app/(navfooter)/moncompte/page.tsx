@@ -175,7 +175,7 @@ export default function MonCompte() {
 
   return (
     <>
-      <div className="text-center h-screen flex flex-col justify-start items-center">
+      <div className="text-center min-h-screen flex flex-col justify-start items-center">
         <h2 className="font-bold text-5xl text-[#B0C482] font-futuraPTBook mb-4 mt-10">
           Mon compte
         </h2>

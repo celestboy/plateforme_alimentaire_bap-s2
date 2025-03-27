@@ -156,7 +156,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="text-center bg-gray-100 h-full w-screen box-border">
+    <div className="text-center bg-gray-100 min-h-screen w-screen box-border">
       <div className="text-center overflow-x-hidden h-screen">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-8 font-futuraPTMedium">
           <Link href="/" className="absolute top-0 md:top-2 left-6 text-white">
