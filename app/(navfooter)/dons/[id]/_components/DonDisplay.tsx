@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CreateChat from "@/actions/create-chat";
 import { socket } from "@/lib/socketClient";
 import { toast } from "sonner"; // You may need to install this package
-import { Star } from "lucide-react";
+import { Star, StarHalf } from "lucide-react";
 
 interface DonProps {
   don: {
@@ -90,38 +90,49 @@ export default function DonDisplay({ don }: DonProps) {
           width={600}
           height={1024}
           alt="Image de bannière de l'article"
-          className="aspect-video w-1/3 h-max object-cover object-top m-24 rounded-xl"
+          className="aspect-video w-2/5 h-max object-cover object-top m-24 rounded-xl"
         />
         <div className="p-8 w-1/3 border-[3px] border-[#BEBEBE] rounded-xl absolute right-36">
           <h2 className="ml-4 font-Montserrat font-extrabold text-3xl">
             {don.title}
           </h2>
           <p className="my-4">
-            Date de publication : {don.publishedAt.toLocaleDateString()}
+            Date de publication :{" "}
+            <span className="text-[#7F7F7F]">
+              {don.publishedAt.toLocaleDateString()}
+            </span>
           </p>
           <p className="my-4">
-            Date d&apos;expiration : {don.limit_date.toLocaleDateString()}
+            Date d&apos;expiration :{" "}
+            <span className="text-[#7F7F7F]">
+              {don.limit_date.toLocaleDateString()}
+            </span>
           </p>
-          <p className="my-4">Quantité : {don.quantity}</p>
+          <p className="my-4">
+            Quantité : <span className="text-[#7F7F7F]">{don.quantity}</span>
+          </p>
           <p className="my-4">
             Lieux :{" "}
-            {don.rdv_pts
-              ? Array.isArray(don.rdv_pts)
-                ? don.rdv_pts
-                    .map((pt) =>
-                      typeof pt === "object" && pt !== null
-                        ? Object.values(pt).join(" ")
-                        : String(pt)
-                    )
-                    .join(", ")
-                : typeof don.rdv_pts === "object"
-                ? Object.values(don.rdv_pts).join(", ")
-                : String(don.rdv_pts)
-              : "Non spécifié"}
+            <span className="text-[#7F7F7F]">
+              {don.rdv_pts
+                ? Array.isArray(don.rdv_pts)
+                  ? don.rdv_pts
+                      .map((pt) =>
+                        typeof pt === "object" && pt !== null
+                          ? Object.values(pt).join(" ")
+                          : String(pt)
+                      )
+                      .join(", ")
+                  : typeof don.rdv_pts === "object"
+                  ? Object.values(don.rdv_pts).join(", ")
+                  : String(don.rdv_pts)
+                : "Non spécifié"}
+            </span>
           </p>
 
           <p className="my-4 h-36">
-            Description : <br></br> {don.description}
+            Description : <br></br>{" "}
+            <span className="text-[#7F7F7F]">{don.description}</span>
           </p>
 
           <div className="mt-8 flex items-center">
@@ -139,8 +150,12 @@ export default function DonDisplay({ don }: DonProps) {
                 <Star color="#f8bd00" fill="#f8bd00" size={20} />
                 <Star color="#f8bd00" fill="#f8bd00" size={20} />
                 <Star color="#f8bd00" fill="#f8bd00" size={20} />
+                <StarHalf color="#f8bd00" fill="#f8bd00" size={20} />
               </div>
-              <p>Vu la dernière fois : il y a 2 heures</p>
+              <p>
+                Vu la dernière fois :{" "}
+                <span className="text-[#7F7F7F]">il y a 2 heures</span>
+              </p>
             </div>
           </div>
 
