@@ -19,10 +19,18 @@ interface Don {
   donneur_id: number;
 }
 
+interface Filter {
+  id: number;
+  type: string;
+  name: string;
+  value: string;
+}
+
 export default function DonClient() {
   const params = useParams();
   const [don, setDon] = useState<Don | null>(null);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   useEffect(() => {
     if (!params?.id) return;
@@ -42,8 +50,42 @@ export default function DonClient() {
     fetchDon();
   }, [params?.id]);
 
-  if (loading) return <p>Chargement...</p>;
-  if (!don) return <p>Aucun don trouvé.</p>;
+  useEffect(() => {
+    async function fetchFilters() {
+      try {
+        const response = await fetch("/data/filters.json");
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+        const data: Filter[] = await response.json();
+        setFilters(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des filtres :", error);
+      }
+    }
 
-  return <DonDisplay don={don} />;
+    fetchFilters();
+  }, []);
+
+  // Convert rdv_pts values to human-readable names using filters
+  const processedDon =
+    don && filters.length > 0
+      ? {
+          ...don,
+          rdv_pts: Array.isArray(don.rdv_pts)
+            ? don.rdv_pts.map((point: JsonValue) => {
+                const pointStr = String(point);
+                const matchingFilter = filters.find(
+                  (filter) => filter.value === pointStr
+                );
+                return matchingFilter ? matchingFilter.name : pointStr;
+              })
+            : don.rdv_pts,
+        }
+      : don;
+
+  if (loading) return <p>Chargement...</p>;
+  if (!processedDon) return <p>Aucun don trouvé.</p>;
+
+  return <DonDisplay don={processedDon} />;
 }

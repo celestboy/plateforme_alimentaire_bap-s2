@@ -156,8 +156,8 @@ export default function HomePage() {
   };
 
   return (
-    <div className="text-center bg-gray-100 h-full w-screen box-border">
-      <div className="text-center overflow-x-hidden h-screen">
+    <div className="text-center bg-gray-100 min-h-screen w-screen box-border pb-10">
+      <div className="text-center overflow-x-hidden min-h-screen">
         <div className="relative items-center justify-center mx-auto bg-[#B0C482] p-8 font-futuraPTMedium">
           <Link href="/" className="absolute top-0 md:top-2 left-6 text-white">
             Retour
@@ -263,22 +263,26 @@ export default function HomePage() {
 
           <div
             id="articlecontainerteaser"
-            className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center my-2 mx-0 md:mx-5"
+            className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center my-2 mx-0 md:mx-5 auto-rows-fr"
           >
             {isLoading ? (
               <div className="relative w-full h-64 flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-t-[#B0C482] border-gray-300 rounded-full animate-spin"></div>
               </div>
             ) : dons.length === 0 ? (
-              <p className="text-2xl font-semibold text-gray-600 col-span-2 my-12">
+              <p className="text-2xl font-semibold text-gray-600 col-span-3 my-12">
                 Aucun don trouvé.
               </p>
             ) : (
               dons.map((don) => (
-                <Link href={`/dons/${don.don_id}`} key={don.don_id}>
-                  <div className=" rounded-xl">
+                <Link
+                  href={`/dons/${don.don_id}`}
+                  key={don.don_id}
+                  className="block w-full"
+                >
+                  <div className="rounded-xl w-full max-w-[400px] min-h-[250px] flex flex-col">
                     <Image
-                      className="w-full object-cover rounded-2xl aspect-video"
+                      className="w-full h-auto object-cover rounded-2xl aspect-video"
                       width={512}
                       height={512}
                       src={don.img_url}

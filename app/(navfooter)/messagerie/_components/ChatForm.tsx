@@ -10,15 +10,27 @@ const ChatForm = ({
   onValidateDonation,
   donId,
   chatId,
+  currentStatus, // Add this prop to receive status from parent
 }: {
   onSendMessage: (message: string) => void;
   onValidateDonation: () => void;
   donId: number | null;
   chatId: number | null;
+  currentStatus?: DonStatus | null;
 }) => {
   const [message, setMessage] = useState("");
-  const [donStatus, setDonStatus] = useState<DonStatus | null>(null);
+  const [donStatus, setDonStatus] = useState<DonStatus | null>(
+    currentStatus || null
+  );
 
+  // Update when prop changes
+  useEffect(() => {
+    if (currentStatus) {
+      setDonStatus(currentStatus);
+    }
+  }, [currentStatus]);
+
+  // Initial status fetch
   useEffect(() => {
     if (!donId || !chatId) {
       return;
@@ -49,6 +61,7 @@ const ChatForm = ({
       status: DonStatus;
     }) => {
       if (data.donId === donId && data.room === chatId) {
+        console.log("ChatForm updating status to:", data.status);
         setDonStatus(data.status);
       }
     };
@@ -88,7 +101,10 @@ const ChatForm = ({
           Send
         </button>
         <button
-          onClick={onValidateDonation}
+          onClick={(e) => {
+            e.preventDefault();
+            onValidateDonation();
+          }}
           className={`px-4 py-2 rounded-lg ${
             isAccepted || isPending
               ? "bg-gray-400 cursor-not-allowed"
