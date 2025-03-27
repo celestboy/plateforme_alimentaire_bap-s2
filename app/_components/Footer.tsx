@@ -5,7 +5,7 @@ import Image from "next/image";
 const Footer = () => {
   return (
     <footer className="bottom-0 w-full bg-[#b0c482] p-8">
-      <div className="flex text-white font-futuraPTMedium text-xl p-12 justify-between">
+      <div className="md:flex text-white font-futuraPTMedium text-sm md:text-xl md:p-12 justify-between">
         <section>
           <Image
             src="/images/logo-rueil.png"
@@ -13,10 +13,10 @@ const Footer = () => {
             height={200}
             alt="logo"
           ></Image>
-          <p className="my-8">
+          <p className="my-2 md:my-8">
             13 Bd du Maréchal Foch, 92500 <br></br> Rueil-Malmaison
           </p>
-          <p>+33 1 47 32 65 65</p>
+          <p className="mb-8 md:mb-0">+33 1 47 32 65 65</p>
         </section>
         <section className="flex items-end mb-24">
           <p>
