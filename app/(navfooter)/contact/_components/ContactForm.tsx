@@ -69,9 +69,9 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(handleSubmitForm)}>
-      <div className="w-[800px] flex flex-col justify-center gap-6">
-        <div className="flex justify-center items-center gap-10 w-full">
-          <div className="flex flex-col gap-2 w-1/2">
+      <div className="md:w-[800px] flex flex-col justify-center gap-6">
+        <div className="md:flex justify-center items-center gap-10 w-full">
+          <div className="md:flex flex-col gap-2 w-1/2">
             <span className="ml-4 flex items-center gap-2 font-futuraPTBook font-semibold text-gray-600">
               <User />
               Nom*
@@ -80,10 +80,10 @@ export default function ContactForm() {
               type="text"
               placeholder="Nom"
               {...register("name")}
-              className="border border-gray-600 py-3 px-6 rounded-full"
+              className="border border-gray-600 py-3 px-6 rounded-full mb-4 md:mb-0"
             />
           </div>
-          <div className="flex flex-col gap-2 w-1/2">
+          <div className="md:flex flex-col gap-2 w-1/2">
             <span className="ml-4 flex items-center gap-2 font-futuraPTBook font-semibold text-gray-600">
               <User />
               Prénom*
@@ -96,8 +96,8 @@ export default function ContactForm() {
             />
           </div>
         </div>
-        <div className="flex justify-center items-center gap-10 w-full">
-          <div className="flex flex-col gap-2 w-1/2">
+        <div className="md:flex justify-center items-center gap-10 w-full">
+          <div className="md:flex flex-col gap-2 w-1/2">
             <span className="ml-4 flex items-center gap-2 font-futuraPTBook font-semibold text-gray-600">
               <Mail />
               Email*
@@ -106,10 +106,10 @@ export default function ContactForm() {
               type="text"
               placeholder="Adresse Mail"
               {...register("email")}
-              className="border border-gray-600 py-3 px-6 rounded-full"
+              className="border border-gray-600 py-3 px-6 rounded-full mb-4 md:mb-0"
             />
           </div>
-          <div className="flex flex-col gap-2 w-1/2">
+          <div className="flex flex-col md:gap-2 md:w-1/2">
             <span className="ml-4 flex items-center gap-2 font-futuraPTBook font-semibold text-gray-600">
               <Tag />
               Sujet*
