@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import CreateChat from "@/actions/create-chat";
 import { socket } from "@/lib/socketClient";
 import { toast } from "sonner"; // You may need to install this package
+import { Star } from "lucide-react";
 
 interface DonProps {
   don: {
@@ -91,11 +92,13 @@ export default function DonDisplay({ don }: DonProps) {
           alt="Image de bannière de l'article"
           className="aspect-video w-1/3 h-max object-cover object-top m-24 rounded-xl"
         />
-        <div className="p-16 h-4/5 w-1/3 border-[3px] border-[#717171] rounded-xl absolute right-36">
-          <h2 className="font-Montserrat font-extrabold text-3xl">
+        <div className="p-8 w-1/3 border-[3px] border-[#BEBEBE] rounded-xl absolute right-36">
+          <h2 className="ml-4 font-Montserrat font-extrabold text-3xl">
             {don.title}
           </h2>
-
+          <p className="my-4">
+            Date de publication : {don.publishedAt.toLocaleDateString()}
+          </p>
           <p className="my-4">
             Date d&apos;expiration : {don.limit_date.toLocaleDateString()}
           </p>
@@ -117,9 +120,29 @@ export default function DonDisplay({ don }: DonProps) {
               : "Non spécifié"}
           </p>
 
-          <p className="my-4">
+          <p className="my-4 h-36">
             Description : <br></br> {don.description}
           </p>
+
+          <div className="mt-8 flex items-center">
+            <Image
+              src={`${don.img_url}`}
+              width={70}
+              height={70}
+              alt="photo de profil du donneur"
+              className="rounded-full"
+            ></Image>
+            <div className="ml-4">
+              <p>Rueillois925</p>
+              <div className="flex items-center">
+                <Star color="#f8bd00" fill="#f8bd00" size={20} />
+                <Star color="#f8bd00" fill="#f8bd00" size={20} />
+                <Star color="#f8bd00" fill="#f8bd00" size={20} />
+                <Star color="#f8bd00" fill="#f8bd00" size={20} />
+              </div>
+              <p>Vu la dernière fois : il y a 2 heures</p>
+            </div>
+          </div>
 
           <button
             onClick={handleContactDonneur}
@@ -130,7 +153,7 @@ export default function DonDisplay({ don }: DonProps) {
                   ? "bg-gray-400 cursor-not-allowed"
                   : userId === don.donneur_id
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
+                  : "bg-[#B0C482] hover:bg-[#a2b574]"
               }`}
           >
             {isLoading
