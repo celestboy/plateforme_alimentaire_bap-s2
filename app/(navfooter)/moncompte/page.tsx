@@ -181,38 +181,41 @@ export default function MonCompte() {
         </h2>
 
         {/* User Info Display */}
-        <div className="w-full gap-4 px-4 my-10 flex justify-center text-xs md:text-xl">
+        <div className="w-full gap-4 px-4 mt-10 flex justify-center text-xs md:text-xl">
           {isLoading ? (
             <p className="text-gray-600">Chargement des informations...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : userInfo ? (
             <>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center justify-center gap-2 font-Montserrat p-8 bg-white rounded-xl shadow-xl">
-                  <div className="text-center my-4">
-                    <h3 className="uppercase font-Montserrat font-bold text-2xl">
-                      {userInfo.username}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail width={20} height={20} />
-                    <label className="font-medium">Email :</label>
-                    <p>{userInfo.email}</p>
-                  </div>
-                  <div className="flex-col md:flex-row flex items-center gap-2">
-                    <Calendar1 width={20} height={20} />
-                    <label className="font-medium">
-                      Inscrit sur FoodShare depuis le :
-                    </label>
-                    <p>
-                      {new Date(userInfo.createdAt).toLocaleDateString("fr-FR")}
-                    </p>
-                  </div>
+              <div className="flex flex-col items-center gap-4">
+                <div className="text-center my-4">
+                  <h3 className="uppercase font-futuraPTBold font-bold text-4xl">
+                    {userInfo.username}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2 font-futuraPTMedium text-2xl">
+                  <Mail width={20} height={20} />
+                  <label className="">Email :</label>
+                  <p className="text-gray-600">{userInfo.email}</p>
+                </div>
+                <div className="flex-col md:flex-row flex items-center gap-2 font-futuraPTMedium text-2xl">
+                  <Calendar1 width={20} height={20} />
+                  <label className="font-medium">
+                    Inscrit sur FoodShare depuis le :
+                  </label>
+                  <p className="text-gray-600">
+                    {new Date(userInfo.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
+                </div>
 
-                  <div>
-                    <button type="button">Modifier ce profil</button>
-                  </div>
+                <div>
+                  <button
+                    type="button"
+                    className="mt-6 px-6 py-3 rounded-md text-white bg-base-green font-medium transition-colors flex items-center gap-2 hover:bg-[#a2b574]"
+                  >
+                    Modifier ce profil
+                  </button>
                 </div>
               </div>
             </>
