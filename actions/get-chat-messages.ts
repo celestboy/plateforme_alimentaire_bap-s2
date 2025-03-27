@@ -25,6 +25,8 @@ const GetChatMessages = async (chatId: number) => {
         message: msg.content,
         sentAt: msg.sentAt,
         isSystemMessage: msg.isSystemMessage,
+        message_id: msg.message_id,
+        author_id: msg.author_id,
       })),
     };
   } catch (error) {

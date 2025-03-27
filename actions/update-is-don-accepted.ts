@@ -36,7 +36,7 @@ const updateAcceptedStatus = async (
       status: DonStatus.ACCEPTED,
       chatId: id_chat,
       donId: id_don,
-      receiverId: receveur_id,
+      receveurId: receveur_id,
     };
   } catch (err) {
     console.error("Error updating donation status:", err);

@@ -2,15 +2,15 @@
 
 import MessagesControllerInstance from "@/controllers/MessagesController";
 
+// Define MessageResponse type locally if it's not available in forms
 interface MessageResponse {
   success: boolean;
   message: string;
-  timestamp?: string;
+  messageId?: number;
 }
 
 const deleteMessage = async (
-  chatId: number,
-  timestamp: string,
+  messageId: number,
   authorId: number,
   currentUserId: number
 ): Promise<MessageResponse> => {
@@ -23,24 +23,13 @@ const deleteMessage = async (
       };
     }
 
-    // Delete the message using timestamp-based identification
-    const result = await MessagesControllerInstance.deleteMessageByTimestamp(
-      chatId,
-      timestamp,
-      authorId
-    );
-
-    if (!result) {
-      return {
-        success: false,
-        message: "Message non trouvé ou déjà supprimé.",
-      };
-    }
+    // Delete the message from the database
+    await MessagesControllerInstance.deleteMessage(messageId);
 
     return {
       success: true,
       message: "Message supprimé avec succès.",
-      timestamp: timestamp,
+      messageId,
     };
   } catch (err) {
     console.error("Error deleting message:", err);
