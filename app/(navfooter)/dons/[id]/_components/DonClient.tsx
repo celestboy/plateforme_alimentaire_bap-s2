@@ -17,6 +17,9 @@ interface Don {
   publishedAt: Date;
   img_url: string;
   donneur_id: number;
+  donneur: {
+    pseudo: string;
+  };
 }
 
 interface Filter {
@@ -43,7 +46,16 @@ export default function DonClient() {
         return;
       }
       const fetchedDon = await displayUniqueDon(id);
-      setDon(fetchedDon);
+      setDon(
+        fetchedDon
+          ? {
+              ...fetchedDon,
+              donneur: {
+                pseudo: fetchedDon.donneur.username || "Unknown",
+              },
+            }
+          : null
+      );
       setLoading(false);
     };
 

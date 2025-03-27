@@ -1,4 +1,7 @@
-import { RegisterCommercantSchemaType } from "@/types/forms";
+import {
+  RegisterCommercantSchemaType,
+  UpdateParticulierSchemaType,
+} from "@/types/forms";
 import { RegisterParticulierSchemaType } from "@/types/forms";
 import prisma from "../prisma/prisma";
 import { hashPassword } from "@/utils/bcrypt";
@@ -60,17 +63,26 @@ class UserController {
     return result;
   }
 
-  async update(
-    id_user: number,
-    username: string,
-    commerce_name: string,
-    adresse_commerce: string,
-    email: string,
-    password: string
-  ) {
+  async updateParticulier(data: UpdateParticulierSchemaType, id_user: number) {
+    const pseudo = data.username;
+    const email = data.email;
+    const hashedPassword = await hashPassword(data.password);
+
     const user = await prisma.users.update({
       where: { user_id: id_user },
-      data: { username, commerce_name, adresse_commerce, email, password },
+      data: {
+        username: pseudo,
+        email: email,
+        password: hashedPassword,
+      },
+    });
+    return user;
+  }
+
+  async updateCommercant(data: RegisterCommercantSchemaType, id_user: number) {
+    const user = await prisma.users.update({
+      where: { user_id: id_user },
+      data: { ...data },
     });
     return user;
   }
