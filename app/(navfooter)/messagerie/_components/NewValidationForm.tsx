@@ -73,21 +73,21 @@ export default function ValidationForm({
       return;
     }
     console.log("data", data);
+
+    // Emit the status update via socket FIRST for immediate UI feedback
+    socket.emit("status_update", {
+      room: chatId,
+      donId: donId,
+      status: DonStatus.PENDING,
+      updatedAt: new Date().toISOString(),
+    });
+    console.log("status update emitted for immediate feedback");
+
+    // Then update the database
     const updateResult = await updatePendingStatus(donId, chatId);
     console.log("updateResult", updateResult);
-    if (updateResult.success) {
-      // Emit status update via socket
-      socket.emit("status_update", {
-        room: chatId,
-        donId: donId,
-        status: DonStatus.PENDING,
-        updatedAt: new Date().toISOString(),
-      });
-      console.log("status updated");
-    }
 
     onSendForm({ lieu: data.lieu, heure: data.heure });
-
     onClose();
   };
 
