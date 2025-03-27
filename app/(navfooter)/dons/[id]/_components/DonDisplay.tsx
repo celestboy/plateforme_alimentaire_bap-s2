@@ -90,7 +90,7 @@ export default function DonDisplay({ don }: DonProps) {
           width={600}
           height={1024}
           alt="Image de bannière de l'article"
-          className="aspect-video w-2/5 h-max object-cover object-top m-24 rounded-xl"
+          className="aspect-video w-2/5 h-max object-cover object-center m-24 rounded-xl"
         />
         <div className="p-8 w-1/3 border-[3px] border-[#BEBEBE] rounded-xl absolute right-36">
           <h2 className="ml-4 font-Montserrat font-extrabold text-3xl">
@@ -141,8 +141,9 @@ export default function DonDisplay({ don }: DonProps) {
               width={70}
               height={70}
               alt="photo de profil du donneur"
-              className="rounded-full"
+              className="rounded-full h-[70px] w-[70px] object-cover"
             ></Image>
+
             <div className="ml-4">
               <p>Rueillois925</p>
               <div className="flex items-center">

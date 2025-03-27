@@ -302,7 +302,12 @@ export default function MessageriePage() {
 
         if (senderID !== idUser) {
           markChatAsRead(roomId);
+          console.log("Marking chat as read:", roomId);
         }
+      } else if (senderID !== idUser) {
+        // If message is for another room and not from the current user, increment notification
+        console.log("Incrementing chat notification for room", roomId);
+        incrementChatNotification(roomId);
       }
 
       setGroupChats((prevChats) => {
@@ -335,19 +340,19 @@ export default function MessageriePage() {
           return chat;
         });
       });
-
-      if (roomId !== room && senderID !== idUser) {
-        console.log("Incrementing chat notification for room", roomId);
-        incrementChatNotification(roomId);
-      }
     });
 
     socket.on("status_update", (data) => {
       console.log("Status update received:", data);
 
       // Mark chat as read if we're in the active chat
+      // Mark chat as read ONLY if we're in the active chat AND it's about the current don
       if (data.room === room && data.donId === donId) {
         markChatAsRead(data.room);
+        console.log("Marking chat as read:", room, donId);
+      } else {
+        // Otherwise increment the notification count
+        incrementChatNotification(data.room);
       }
     });
 
@@ -370,17 +375,21 @@ export default function MessageriePage() {
       if (roomId === room) {
         console.log("System message received in active room - marking as read");
         markChatAsRead(roomId);
+      } else {
+        // If it's for another room, increment notification count
+        incrementChatNotification(roomId);
       }
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "Système",
-          message: data.message,
-          sentAt: new Date(data.sentAt || new Date()),
-          isSystemMessage: true,
-        },
-      ]);
+      if (roomId === room) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "Système",
+            message: data.message,
+            sentAt: new Date(data.sentAt || new Date()),
+            isSystemMessage: true,
+          },
+        ]);
+      }
 
       // Also update the groupChats state to include this system message
       setGroupChats((prevChats) => {
@@ -445,6 +454,7 @@ export default function MessageriePage() {
         }
         return [...prev, chatData.chat_id];
       });
+      incrementChatNotification(chatData.chat_id);
     });
 
     return () => {
@@ -491,6 +501,7 @@ export default function MessageriePage() {
     );
     if (idUser) {
       markChatAsRead(chat.chat_id);
+      console.log("Marking chat as read:", chat.chat_id);
     }
     socket.emit("join-room", { room: chat.chat_id, username, userId: idUser });
 
