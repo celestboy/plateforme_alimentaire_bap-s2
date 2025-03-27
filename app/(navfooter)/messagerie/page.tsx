@@ -460,6 +460,7 @@ export default function MessageriePage() {
     incrementChatNotification,
     markChatAsRead,
     groupChats,
+    donId,
   ]);
 
   useEffect(() => {
