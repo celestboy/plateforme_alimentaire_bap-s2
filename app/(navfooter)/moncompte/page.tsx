@@ -6,7 +6,17 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import displayUserInfo from "@/actions/get-user-info";
 import getUserCO2Stats from "@/actions/get-user-co2-stats";
-import { Mail, Calendar1, LogOut, Trash } from "lucide-react";
+import {
+  Mail,
+  Calendar1,
+  LogOut,
+  Trash,
+  PenBox,
+  Save,
+  X,
+  EyeOff,
+  Eye,
+} from "lucide-react";
 import deleteAccount from "@/actions/delete-account";
 import { Line, Pie } from "react-chartjs-2";
 import {
@@ -22,6 +32,12 @@ import {
 } from "chart.js";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { toast } from "sonner";
+import { UpdateParticulierSchemaType } from "@/types/forms";
+import updateParticulierInfo from "@/actions/update-particulier-info";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UpdateParticulierSchema } from "@/app/schema";
 
 // Enregistrement des composants Chart.js nécessaires
 ChartJS.register(
@@ -62,7 +78,7 @@ interface JwtPayload {
   exp: number;
 }
 
-export default function MonCompte() {
+export default function MonCompte(user: UserInfo) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [co2Stats, setCO2Stats] = useState<CO2Stats>({
     totalWeightKg: 0,
@@ -73,6 +89,9 @@ export default function MonCompte() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [formData, setFormData] = useState({ ...user });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const isTokenExpired = (token: string): boolean => {
     try {
@@ -129,6 +148,25 @@ export default function MonCompte() {
     fetchInfo();
   }, []);
 
+  const handleUpdate = async (
+    data: UpdateParticulierSchemaType,
+    user_id: number
+  ) => {
+    if (!data.username || !data.email || !data.password) {
+      return toast.error("Tous les champs doivent être remplis.");
+    }
+
+    try {
+      setIsUpdating(false);
+      const updateForm = await updateParticulierInfo(data, user_id);
+      toast.success("Utilisateur modifié avec succès");
+      return updateForm;
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+      toast.error("Une erreur s'est produite lors de la mise à jour");
+    }
+  };
+
   const deleteAccountFunction = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -173,32 +211,106 @@ export default function MonCompte() {
     }
   };
 
+  const { handleSubmit, formState, register } =
+    useForm<UpdateParticulierSchemaType>({
+      resolver: zodResolver(UpdateParticulierSchema),
+      defaultValues: {
+        username: formData.username ?? "",
+        email: formData.email,
+        password: formData.password,
+      },
+    });
+
+  useEffect(() => {
+    setFormData({ ...user });
+  }, [user]);
+
+  useEffect(() => {
+    Object.values(formState.errors).forEach((error) => {
+      if (error && "message" in error) {
+        toast.error(error.message as string, {
+          icon: <X className="text-white" />,
+          className:
+            "bg-red-500 !important border border-red-200 text-white text-base",
+        });
+      }
+    });
+  }, [formState.errors]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <>
-      <div className="text-center min-h-screen flex flex-col justify-start items-center">
+      <div className="text-center min-h-screen flex flex-col justify-start items-center ">
         <h2 className="font-bold text-5xl text-[#B0C482] font-futuraPTBook mb-4 mt-10">
           Mon compte
         </h2>
 
         {/* User Info Display */}
-        <div className="w-full gap-4 px-4 mt-10 flex justify-center text-xs md:text-xl">
+        <div className=" w-[600px] gap-4 px-4 mt-10 flex justify-center text-xs md:text-xl">
           {isLoading ? (
             <p className="text-gray-600">Chargement des informations...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : userInfo ? (
             <>
-              <div className="flex flex-col items-center gap-4">
-                <div className="text-center my-4">
-                  <h3 className="uppercase font-futuraPTBold font-bold text-4xl">
-                    {userInfo.username}
-                  </h3>
-                </div>
-                <div className="flex items-center gap-2 font-futuraPTMedium text-2xl">
-                  <Mail width={20} height={20} />
-                  <label className="">Email :</label>
-                  <p className="text-gray-600">{userInfo.email}</p>
-                </div>
+              <div className="flex flex-col items-center gap-4 w-full">
+                {isUpdating ? (
+                  <div className="flex flex-col font-futuraPTBook font-extrabold text-xl uppercase">
+                    <span className="ml-4">Pseudo :</span>
+                    <input
+                      type="text"
+                      {...register("username")}
+                      className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 text-sm"
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div className="text-center my-4">
+                    <h3 className="font-futuraPTBold font-extrabold text-3xl uppercase">
+                      {userInfo.username}
+                    </h3>
+                  </div>
+                )}
+
+                {isUpdating ? (
+                  <div className="flex flex-col font-futuraPTBook font-extrabold text-xl uppercase">
+                    <span className="ml-4">Email :</span>
+                    <input
+                      type="email"
+                      {...register("email")}
+                      className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 text-sm"
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 font-futuraPTMedium text-2xl">
+                    <Mail width={20} height={20} />
+                    <label className="">Email :</label>
+                    <p className="text-gray-600">{userInfo.email}</p>
+                  </div>
+                )}
+
+                {isUpdating ? (
+                  <div className="flex flex-col font-futuraPTBook font-extrabold text-xl uppercase relative">
+                    <span className="ml-4">Mot de passe :</span>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      {...register("password")}
+                      className="w-[600px] my-4 py-4 px-6 rounded-full border border-gray-600 text-sm"
+                      required
+                    />
+                    <span
+                      onClick={togglePasswordVisibility}
+                      className="cursor-pointer absolute top-1/2 right-5"
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </span>
+                  </div>
+                ) : null}
+
                 <div className="flex-col md:flex-row flex items-center gap-2 font-futuraPTMedium text-2xl">
                   <Calendar1 width={20} height={20} />
                   <label className="font-medium">
@@ -210,12 +322,26 @@ export default function MonCompte() {
                 </div>
 
                 <div>
-                  <button
-                    type="button"
-                    className="mt-6 px-6 py-3 rounded-md text-white bg-base-green font-medium transition-colors flex items-center gap-2 hover:bg-[#a2b574]"
-                  >
-                    Modifier ce profil
-                  </button>
+                  {!isUpdating ? (
+                    <button
+                      onClick={() => setIsUpdating(true)}
+                      className="mt-6 px-6 py-3 rounded-md text-white bg-base-green font-medium transition-colors flex items-center gap-2 hover:bg-[#a2b574]"
+                    >
+                      <PenBox />
+                      Modifier le profil
+                    </button>
+                  ) : (
+                    <form
+                      onSubmit={handleSubmit((data) =>
+                        handleUpdate(data, userInfo.user_id)
+                      )}
+                    >
+                      <button className="mt-6 px-6 py-3 rounded-md text-white bg-base-green font-medium transition-colors flex items-center gap-2 hover:bg-[#a2b574]">
+                        <Save />
+                        Enregistrer les modifications
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             </>

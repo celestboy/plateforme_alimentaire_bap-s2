@@ -184,3 +184,47 @@ export const UpdateDonSchema = z.object({
     .transform((val) => new Date(val).toISOString()),
   rdv_pts: z.array(z.string().nonempty({ message: "obligatoire mg" })),
 });
+
+export const UpdateParticulierSchema = z.object({
+  username: z
+    .string()
+    .nonempty({ message: "Le pseudo doit contenir au moins 1 caractère." }),
+  email: z.string().email({ message: "Le mail doit être valide." }).nonempty(),
+  password: z
+    .string()
+    .min(6, {
+      message: "Le mot de passe doit contenir au minimum 6 caractères.",
+    })
+    .max(25, {
+      message: "Le mot de passe doit contenir au maximum 25 caractères.",
+    })
+    .nonempty(),
+});
+export const UpdateCommercantSchema = z.object({
+  commerce_name: z
+    .string()
+    .min(5, {
+      message: "Le nom du commerce doit contenir au moins 5 caractères.",
+    })
+    .max(100, { message: "Le pseudo doit contenir au maximum 100 caractères." })
+    .nonempty(),
+  adresse_commerce: z
+    .string()
+    .min(5, {
+      message: "L'adresse du commerce doit contenir au moins 5 caractères.",
+    })
+    .max(100, {
+      message: "L'adresse du commerce doit contenir au maximum 100 caractères.",
+    })
+    .nonempty(),
+  email: z.string().email({ message: "Le mail doit être valide." }).nonempty(),
+  password: z
+    .string()
+    .min(6, {
+      message: "Le mot de passe doit contenir au minimum 6 caractères.",
+    })
+    .max(25, {
+      message: "Le mot de passe doit contenir au maximum 25 caractères.",
+    })
+    .nonempty(),
+});

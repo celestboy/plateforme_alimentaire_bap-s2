@@ -8,6 +8,8 @@ import {
   MessageSchema,
   ContactSchema,
   UpdateDonSchema,
+  UpdateParticulierSchema,
+  UpdateCommercantSchema,
 } from "@/app/schema";
 import { DonStatus } from "@prisma/client";
 
@@ -26,6 +28,10 @@ export type CreateChatSchemaType = z.infer<typeof CreateChatSchema>;
 export type MessageSchemaType = z.infer<typeof MessageSchema>;
 export type ContactSchemaType = z.infer<typeof ContactSchema>;
 export type UpdateDonSchemaType = z.infer<typeof UpdateDonSchema>;
+export type UpdateParticulierSchemaType = z.infer<
+  typeof UpdateParticulierSchema
+>;
+export type UpdateCommercantSchemaType = z.infer<typeof UpdateCommercantSchema>;
 export type FormResponse = {
   success: boolean;
   errors?: ZodIssue[];
