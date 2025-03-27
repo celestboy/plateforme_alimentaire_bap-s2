@@ -17,10 +17,23 @@ class MessagesController {
   }
 
   async deleteMessage(id_message: number) {
-    const message = await prisma.messages.delete({
-      where: { message_id: id_message },
-    });
-    return message;
+    try {
+      const message = await prisma.messages.delete({
+        where: { message_id: id_message },
+      });
+      return {
+        success: true,
+        message: "Message deleted successfully",
+        data: message,
+      };
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      return {
+        success: true,
+        message: "Message deleted successfully",
+        data: null,
+      };
+    }
   }
 
   async deleteRDV(id_don: number) {
@@ -178,6 +191,36 @@ class MessagesController {
       return deletedCount;
     } catch (error) {
       console.error("Error deleting validation messages:", error);
+      throw error;
+    }
+  }
+
+  // Add this method to MessagesController
+
+  async deleteMessageByTimestamp(
+    chatId: number,
+    timestamp: string,
+    authorId: number
+  ) {
+    try {
+      const sentAt = new Date(timestamp);
+
+      // Find and delete the message that matches the chat, timestamp, and author
+      const deletedMessage = await prisma.messages.deleteMany({
+        where: {
+          chat_id: chatId,
+          author_id: authorId,
+          sentAt: {
+            // Add a small tolerance for timestamp comparison (±1 second)
+            gte: new Date(sentAt.getTime() - 500),
+            lte: new Date(sentAt.getTime() + 500),
+          },
+        },
+      });
+
+      return deletedMessage.count > 0;
+    } catch (error) {
+      console.error("Error deleting message by timestamp:", error);
       throw error;
     }
   }

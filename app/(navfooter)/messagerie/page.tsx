@@ -44,6 +44,7 @@ interface Chat {
     content: string;
     author_id: number;
     isSystemMessage: boolean;
+    message_id: number;
   }[];
   unreadCount?: number;
 }
@@ -68,6 +69,8 @@ export default function MessageriePage() {
       message: string;
       sentAt: Date;
       isSystemMessage?: boolean;
+      senderID: number;
+      messageId?: number;
     }[]
   >([]);
   const [showValidationForm, setShowValidationForm] = useState(false);
@@ -81,11 +84,29 @@ export default function MessageriePage() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
       block: "nearest",
       inline: "start",
     });
   };
+
+  // Add this utility file if it doesn't exist already
+
+  /**
+   * Generates a unique temporary ID for client-side use before server assignment
+   * Format: temp_[timestamp]_[random]
+   */
+  const generateTempId = (): number => {
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 10000);
+    return timestamp + random;
+  };
+
+  /**
+   * Checks if an ID is a temporary client-generated ID
+   *   const isTempId = (id: string | number): boolean => {
+    return typeof id === "string" && id.startsWith("temp_");
+  };
+   */
 
   useEffect(() => {
     if (!idUser) return;
@@ -171,6 +192,7 @@ export default function MessageriePage() {
             messages: chat.messages.map((msg) => ({
               ...msg,
               sentAt: msg.sentAt, // We'll format this when displaying
+              message_id: msg.message_id, // Ensure message_id is always present
             })),
           }));
           setGroupChats(formattedChats);
@@ -228,6 +250,7 @@ export default function MessageriePage() {
                 ? result.data.messages.map((msg) => ({
                     ...msg,
                     sentAt: new Date(msg.sentAt || new Date()),
+                    message_id: msg.message_id,
                   }))
                 : [],
             };
@@ -260,6 +283,8 @@ export default function MessageriePage() {
     socket.off("local-system-message");
     socket.off("new_chat");
     socket.off("status_update");
+    socket.off("delete_validation_form"); // Add this line
+    socket.off("delete_message"); // Add this line
 
     // Replace your socket.on("message", ...) handler with this improved version:
 
@@ -329,6 +354,7 @@ export default function MessageriePage() {
               sentAt: new Date(data.sentAt || new Date()),
               senderID: senderID,
               isSystemMessage: !!data.isSystemMessage,
+              messageId: data.messageId,
             },
           ];
         });
@@ -357,6 +383,7 @@ export default function MessageriePage() {
               content: data.message,
               author_id: senderID,
               isSystemMessage: !!data.isSystemMessage,
+              message_id: data.messageId,
             };
 
             // Check if this message already exists in chat messages
@@ -423,7 +450,7 @@ export default function MessageriePage() {
       console.log("Notification de connexion reçue:", message);
       setMessages((prev) => [
         ...prev,
-        { sender: "system", message, sentAt: new Date() },
+        { sender: "system", message, sentAt: new Date(), senderID: 0 },
       ]);
     });
 
@@ -488,6 +515,7 @@ export default function MessageriePage() {
               content: data.message,
               author_id: 0, // System message doesn't have an author
               isSystemMessage: true,
+              message_id: data.messageId,
             };
 
             // Check for duplicates
@@ -596,6 +624,59 @@ export default function MessageriePage() {
         });
       });
     });
+    // Update the delete_message socket handler in page.tsx
+
+    socket.on("delete_message", (data) => {
+      console.log("Message deletion event received:", data);
+
+      const roomId =
+        typeof data.room === "string" ? parseInt(data.room) : data.room;
+      const messageTimestamp = data.timestamp;
+
+      // If this is for the current room, update the messages array
+      if (roomId === room) {
+        setMessages((prev) => {
+          return prev.filter((msg) => {
+            // Compare timestamps with some tolerance (±1 second)
+            if (msg.sentAt && messageTimestamp) {
+              const msgTime = new Date(msg.sentAt).getTime();
+              const deleteTime = new Date(messageTimestamp).getTime();
+              const timeDiff = Math.abs(msgTime - deleteTime);
+
+              // If the message is within 1 second of the target timestamp, remove it
+              return timeDiff > 500;
+            }
+            return true;
+          });
+        });
+      }
+
+      // Always update the groupChats state
+      setGroupChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat.chat_id === roomId) {
+            const filteredMessages = chat.messages.filter((msg) => {
+              // Compare timestamps with some tolerance
+              if (msg.sentAt && messageTimestamp) {
+                const msgTime = new Date(msg.sentAt).getTime();
+                const deleteTime = new Date(messageTimestamp).getTime();
+                const timeDiff = Math.abs(msgTime - deleteTime);
+
+                // If the message is within 1 second of the target timestamp, remove it
+                return timeDiff > 1000;
+              }
+              return true;
+            });
+
+            return {
+              ...chat,
+              messages: filteredMessages,
+            };
+          }
+          return chat;
+        });
+      });
+    });
 
     return () => {
       socket.off("message");
@@ -603,7 +684,8 @@ export default function MessageriePage() {
       socket.off("local-system-message");
       socket.off("new_chat");
       socket.off("status_update");
-      socket.off("delete_validation_form"); // Add this line
+      socket.off("delete_validation_form");
+      socket.off("delete_message"); // Add this
     };
   }, [
     room,
@@ -657,8 +739,9 @@ export default function MessageriePage() {
             sender: msg.sender,
             message: msg.message,
             sentAt: new Date(msg.sentAt),
-            senderID: msg.sender,
+            senderID: msg.author_id,
             isSystemMessage: msg.isSystemMessage || false,
+            messageId: msg.message_id,
           }))
         );
       }
@@ -703,6 +786,7 @@ export default function MessageriePage() {
         senderID: idUser,
       },
     ]);
+    const tempMessageId = generateTempId();
 
     setGroupChats((prevChats) => {
       return prevChats.map((chat) => {
@@ -712,6 +796,7 @@ export default function MessageriePage() {
             content: message,
             author_id: idUser,
             isSystemMessage: false,
+            message_id: tempMessageId, // Placeholder for now
           };
 
           return {
@@ -741,6 +826,12 @@ export default function MessageriePage() {
     }
   };
 
+  // Update handleMessageDelete in page.tsx:
+
+  const handleMessageDelete = (timestamp: string) => {
+    console.log("Message deleted with timestamp:", timestamp);
+    // The socket handler will take care of removing the message
+  };
   const handleSendValidation = (validationMessage: {
     lieu: string;
     heure: string;
@@ -779,6 +870,8 @@ export default function MessageriePage() {
       },
     ]);
 
+    const tempMessageId = generateTempId();
+
     setGroupChats((prevChats) => {
       return prevChats.map((chat) => {
         if (chat.chat_id === room) {
@@ -787,6 +880,7 @@ export default function MessageriePage() {
             content: validationStr,
             author_id: idUser,
             isSystemMessage: false,
+            message_id: tempMessageId,
           };
 
           return {
@@ -943,6 +1037,9 @@ export default function MessageriePage() {
                         donneur_id={donneurId ?? 0}
                         receveur_id={receveurId ?? 0}
                         message={msg.message}
+                        messageId={msg.messageId} // Add the message ID
+                        senderID={msg.senderID || 0} // Add the sender ID
+                        currentUserId={idUser || 0} // Pass the current user's ID
                         sentAt={
                           msg.sentAt instanceof Date
                             ? msg.sentAt.toISOString()
@@ -950,12 +1047,15 @@ export default function MessageriePage() {
                             ? msg.sentAt
                             : new Date().toISOString()
                         }
-                        isOwnMessage={msg.sender === username}
+                        isOwnMessage={
+                          msg.sender === username || msg.senderID === idUser
+                        }
                         donId={donId}
                         isSystemMessage={msg.isSystemMessage}
                         room={room}
                         isAccepted={status.isAccepted}
                         isRefused={status.isRefused}
+                        onMessageDelete={handleMessageDelete} // Add the message deletion handler
                       />
                     );
                   })}

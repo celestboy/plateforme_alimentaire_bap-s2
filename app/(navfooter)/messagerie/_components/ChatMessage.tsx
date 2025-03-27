@@ -6,8 +6,9 @@ import validateForm from "@/actions/validate-form";
 import { socket } from "@/lib/socketClient";
 import { ValidateSchemaType } from "@/types/forms";
 import { DonStatus } from "@prisma/client";
-import React, { useEffect, useState } from "react";
-
+import React, { useEffect, useState, useRef } from "react";
+import deleteMessage from "@/actions/delete-message";
+import MessageContextMenu from "./MessageContextMenu";
 interface ChatMessageProps {
   sender: string;
   sentAt: string;
@@ -20,7 +21,11 @@ interface ChatMessageProps {
   receveur_id: number;
   isAccepted?: boolean;
   isRefused?: boolean;
+  messageId?: number;
+  senderID: number;
+  currentUserId: number;
   onStatusChange?: (status: DonStatus) => void;
+  onMessageDelete?: (timestamp: string) => void;
 }
 
 interface LocationDataItem {
@@ -39,8 +44,74 @@ const ChatMessage = ({
   room,
   donneur_id,
   receveur_id,
+  currentUserId,
+  senderID,
+  onMessageDelete,
   onStatusChange,
 }: ChatMessageProps) => {
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+  });
+
+  // Add a ref to the message div
+  const messageRef = useRef<HTMLDivElement>(null);
+
+  // Handle right-click
+  const handleContextMenu = (event: React.MouseEvent) => {
+    // Only allow context menu for own messages
+    if (!isOwnMessage) return;
+
+    event.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
+  // Handle message deletion
+  // Update handleDeleteMessage function:
+
+  const handleDeleteMessage = async () => {
+    if (!isOwnMessage) return;
+
+    try {
+      console.log("Deleting message with timestamp:", sentAt);
+
+      // First, emit socket event to immediately update all clients
+      socket.emit("delete_message", {
+        room: room,
+        timestamp: sentAt, // Use timestamp instead of messageId
+        chatId: room,
+        authorId: senderID,
+        deletedBy: currentUserId,
+        deletedAt: new Date().toISOString(),
+      });
+
+      // Then, delete from database
+      const result = await deleteMessage(room, sentAt, senderID, currentUserId);
+
+      if (result.success) {
+        console.log("Message deleted successfully");
+
+        // Notify parent component
+        if (onMessageDelete) {
+          onMessageDelete(sentAt);
+        }
+      } else {
+        console.error("Failed to delete message:", result.message);
+      }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
+  };
+
   let parsedMessage;
   try {
     parsedMessage = typeof message === "string" ? JSON.parse(message) : message;
@@ -414,6 +485,8 @@ const ChatMessage = ({
           ? "justify-end"
           : "justify-start"
       } mb-3`}
+      ref={messageRef}
+      onContextMenu={handleContextMenu} // Add this handler
     >
       <div
         className={`w-auto px-4 py-2 rounded-lg ${
@@ -530,6 +603,14 @@ const ChatMessage = ({
           </p>
         )}
       </div>
+      {contextMenu.visible && isOwnMessage && (
+        <MessageContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onDelete={handleDeleteMessage}
+          onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+        />
+      )}
     </div>
   );
 };

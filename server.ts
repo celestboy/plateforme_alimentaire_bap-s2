@@ -99,6 +99,25 @@ app.prepare().then(() => {
       }
     });
 
+    // Update socket.on("delete_message") handler in server.ts
+
+    socket.on("delete_message", (data) => {
+      console.log("Delete message request received:", data);
+
+      if (data?.room && data?.timestamp) {
+        const roomId =
+          typeof data.room === "string" ? data.room : data.room.toString();
+        console.log(
+          `Broadcasting message deletion for timestamp ${data.timestamp} to room ${roomId}`
+        );
+
+        // Broadcast to EVERYONE in the room, including the sender
+        io.to(roomId).emit("delete_message", data);
+      } else {
+        console.log("Invalid delete_message data:", data);
+      }
+    });
+
     // Add this event handler for users joining their personal notification room
     socket.on("join_user_room", (userId) => {
       if (userId) {
