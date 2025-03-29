@@ -107,6 +107,7 @@ class DonsController {
         donneur: {
           select: {
             username: true,
+            commerce_name: true,
           },
         },
       },
@@ -146,7 +147,7 @@ class DonsController {
   async getDonByUser(userId: number) {
     const dons = await prisma.dons.findMany({
       where: {
-        donneur_id: userId,
+        OR: [{ donneur_id: userId }, { receveur_id: userId }],
       },
       include: {
         donneur: {

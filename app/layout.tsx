@@ -79,6 +79,13 @@ export default function RootLayout({
     <html lang="fr">
       <head>
         {/* FontAwesome CDN */}
+        <title>FoodShare - Plateforme de Dons Alimentaires</title>
+        <meta
+          name="description"
+          content="Plateforme alimentaire pour favoriser l'accès à une alimentation saine et durable"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"

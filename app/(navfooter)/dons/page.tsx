@@ -278,9 +278,9 @@ export default function HomePage() {
                 <Link
                   href={`/dons/${don.don_id}`}
                   key={don.don_id}
-                  className="block w-full"
+                  className="block w-full transform transition-transform duration-300 hover:scale-105"
                 >
-                  <div className="rounded-xl w-full max-w-[400px] min-h-[250px] flex flex-col">
+                  <div className="rounded-xl bg-[#e8e8e8] p-2 w-full max-w-[400px] min-h-[250px] flex flex-col shadow-sm hover:shadow-lg transition-shadow duration-300">
                     <Image
                       className="w-full h-auto object-cover rounded-2xl aspect-video"
                       width={512}
@@ -288,12 +288,16 @@ export default function HomePage() {
                       src={don.img_url}
                       alt={don.title}
                     />
+
                     <div className="flex items-center justify-between mt-2 mx-2">
-                      <div className="flex items-center">
-                        <h2 className="text-lg text-left font-futuraPTMedium mr-2">
+                      <div className="flex items-center group">
+                        <h2 className="text-lg text-left font-futuraPTMedium mr-2 group-hover:text-[#B0C482] transition-colors duration-300">
                           {don.title}
                         </h2>
-                        <ChevronRight size={20} />
+                        <ChevronRight
+                          size={20}
+                          className="transform transition-transform group-hover:translate-x-1 group-hover:text-[#B0C482]"
+                        />
                       </div>
                       <h2 className="text-base text-right font-futuraPTBook">
                         {don.limit_date.toLocaleDateString("fr-FR")}

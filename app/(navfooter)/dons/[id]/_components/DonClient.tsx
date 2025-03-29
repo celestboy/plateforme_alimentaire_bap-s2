@@ -51,7 +51,10 @@ export default function DonClient() {
           ? {
               ...fetchedDon,
               donneur: {
-                pseudo: fetchedDon.donneur.username || "Unknown",
+                pseudo:
+                  fetchedDon.donneur.username ||
+                  fetchedDon.donneur.commerce_name ||
+                  "Anonyme",
               },
             }
           : null

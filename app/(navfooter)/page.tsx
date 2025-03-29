@@ -133,10 +133,10 @@ export default function HomePage() {
                 Liste facile des articles
               </p>
               <p className="text-sm sm:text-base lg:text-base 2xl:text-lg">
-                Repertoriez rapidement les articles alimentaires en surplus de
-                votre garde-manger ou de votre r&eacute;frigerateur, pour que
-                les autres membres de votre communaut&eacute; puissent voir ce
-                qui est disponible.
+                R&eacute;pertoriez rapidement les articles alimentaires en
+                surplus de votre garde-manger ou de votre r&eacute;frigerateur,
+                pour que les autres membres de votre communaut&eacute; puissent
+                voir ce qui est disponible.
               </p>
             </article>
           </div>
@@ -225,7 +225,7 @@ export default function HomePage() {
           <div className="flex flex-col justify-evenly text-lg font-futuraPTBold">
             <article className="m-6">
               <p className="text-[#084784]">
-                Repertorier facilement les aliments exc&eacute;dentaires
+                R&eacute;pertorier facilement les aliments exc&eacute;dentaires
               </p>
               <p>
                 Ajoutez rapidement des articles alimentaires
@@ -239,8 +239,8 @@ export default function HomePage() {
                 Partager des aliments en quelques minutes
               </p>
               <p>
-                Repertoriez et partagez des aliments exc&eacute;dentaires avec
-                la communaut&eacute; en quelques clics, contribuant
+                R&eacute;pertoriez et partagez des aliments exc&eacute;dentaires
+                avec la communaut&eacute; en quelques clics, contribuant
                 instantan&eacute;ment &agrave; la r&eacute;duction du
                 gaspillage.
               </p>
@@ -264,15 +264,15 @@ export default function HomePage() {
             Nombre total de dons
           </h3>
           <p className="font-futuraPTMedium text-xl md:text-3xl">
-            {co2Stats.totalDonations}
+            69{co2Stats.totalDonations}
           </p>
         </article>
         <article className="m-8 p-12 md:w-full text-center rounded-xl bg-slate-100">
           <h3 className="mb-6 font-futuraPTBold text-xl md:text-3xl">
-            CO2 &eacute;vit&eacute;
+            CO2 non gaspill&eacute;
           </h3>
           <p className="font-futuraPTMedium text-xl md:text-3xl">
-            <span>{co2Stats.totalCO2Saved} </span>Kg
+            <span>36{co2Stats.totalCO2Saved} </span>Kg
           </p>
         </article>
       </section>

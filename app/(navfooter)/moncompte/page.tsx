@@ -78,7 +78,106 @@ interface JwtPayload {
   exp: number;
 }
 
+const fakeData = {
+  totalWeightKg: 186,
+  totalCO2Saved: 321,
+  totalDonations: 24,
+  history: [
+    {
+      date: "2024-11-03",
+      weightKg: 12.5,
+      co2Saved: 21.8,
+    },
+    {
+      date: "2024-11-10",
+      weightKg: 8.2,
+      co2Saved: 14.3,
+    },
+    {
+      date: "2024-11-17",
+      weightKg: 15.7,
+      co2Saved: 27.4,
+    },
+    {
+      date: "2024-11-24",
+      weightKg: 5.3,
+      co2Saved: 9.2,
+    },
+    {
+      date: "2024-12-01",
+      weightKg: 10.1,
+      co2Saved: 17.6,
+    },
+    {
+      date: "2024-12-08",
+      weightKg: 13.8,
+      co2Saved: 24.0,
+    },
+    {
+      date: "2024-12-15",
+      weightKg: 7.9,
+      co2Saved: 13.8,
+    },
+    {
+      date: "2024-12-22",
+      weightKg: 14.2,
+      co2Saved: 24.7,
+    },
+    {
+      date: "2024-12-29",
+      weightKg: 9.5,
+      co2Saved: 16.5,
+    },
+    {
+      date: "2025-01-05",
+      weightKg: 18.3,
+      co2Saved: 31.8,
+    },
+    {
+      date: "2025-01-12",
+      weightKg: 11.2,
+      co2Saved: 19.5,
+    },
+    {
+      date: "2025-01-19",
+      weightKg: 16.4,
+      co2Saved: 28.5,
+    },
+    {
+      date: "2025-01-26",
+      weightKg: 9.8,
+      co2Saved: 17.1,
+    },
+    {
+      date: "2025-02-02",
+      weightKg: 13.5,
+      co2Saved: 23.5,
+    },
+    {
+      date: "2025-02-09",
+      weightKg: 6.8,
+      co2Saved: 11.8,
+    },
+    {
+      date: "2025-02-16",
+      weightKg: 12.8,
+      co2Saved: 22.3,
+    },
+    {
+      date: "2025-02-23",
+      weightKg: 8.4,
+      co2Saved: 14.6,
+    },
+    {
+      date: "2025-03-02",
+      weightKg: 11.6,
+      co2Saved: 20.2,
+    },
+  ],
+};
+
 export default function MonCompte(user: UserInfo) {
+  const useFakeData = true; // Set this to true to use fake data
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [co2Stats, setCO2Stats] = useState<CO2Stats>({
     totalWeightKg: 0,
@@ -107,6 +206,8 @@ export default function MonCompte(user: UserInfo) {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
+        // If useFakeData is true, set fake data and skip API calls
+
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -131,7 +232,11 @@ export default function MonCompte(user: UserInfo) {
         ]);
 
         setUserInfo(fetchedInfos);
-        setCO2Stats(fetchedStats);
+        if (useFakeData) {
+          setCO2Stats(fakeData);
+        } else {
+          setCO2Stats(fetchedStats);
+        }
         setIsLoading(false);
       } catch (err) {
         const errorMessage =
@@ -146,7 +251,7 @@ export default function MonCompte(user: UserInfo) {
     };
 
     fetchInfo();
-  }, []);
+  }, [user, useFakeData]);
 
   const handleUpdate = async (
     data: UpdateParticulierSchemaType,

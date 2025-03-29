@@ -1049,7 +1049,7 @@ export default function MessageriePage() {
         {!isConvOpen ? (
           <div className="w-[800px] h-[550px] bg-gray-200 flex items-center justify-center">
             <p className="font-extrabold font-futuraPTHeavy text-4xl">
-              Aucune conversation cliquée
+              Aucune conversation s&eacute;lectionn&eacute;e
             </p>
           </div>
         ) : (
